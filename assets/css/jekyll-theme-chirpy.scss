@@ -1,3 +1,4 @@
+```scss
 ---
 ---
 
@@ -8,21 +9,43 @@
 /* prettier-ignore */
 @use 'main {%- if jekyll.environment == 'production' -%} .bundle {%- endif -%} ';
 
-/* ========== Custom post headings ========== */
+/* ========== Academic serif title style ========== */
 
+/* Article title */
+main h1,
+.post-title,
+h1.dynamic-title {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 2.35rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+/* Article h2 headings */
 main h2 {
   margin-top: 2.4rem;
   margin-bottom: 1rem;
   padding-left: 0.75rem;
-  border-left: 4px solid #6ea8fe;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  border-left: 4px solid #8ab4f8;
+
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 1.65rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
 }
 
+/* Article h3 headings */
 main h3 {
   margin-top: 1.8rem;
   margin-bottom: 0.8rem;
-  font-weight: 700;
+
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
   color: #8ab4f8;
 }
 
@@ -39,8 +62,12 @@ main h3 {
 
 .math-box .box-title {
   margin-bottom: 0.65rem;
-  font-weight: 800;
-  font-size: 1rem;
+
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
   color: #8ab4f8;
 }
 
@@ -85,3 +112,34 @@ main h3 {
 .math-box.proof .box-title {
   color: #ffa657;
 }
+
+/* ========== Light mode adjustment ========== */
+
+html[data-mode="light"] .math-box {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+html[data-mode="light"] main h2 {
+  border-left-color: #3b82f6;
+}
+
+html[data-mode="light"] main h3 {
+  color: #2563eb;
+}
+
+html[data-mode="light"] .math-box .box-title {
+  color: #2563eb;
+}
+
+html[data-mode="light"] .math-box.theorem .box-title {
+  color: #7c3aed;
+}
+
+html[data-mode="light"] .math-box.definition .box-title {
+  color: #15803d;
+}
+
+html[data-mode="light"] .math-box.proof .box-title {
+  color: #c2410c;
+}
+```
