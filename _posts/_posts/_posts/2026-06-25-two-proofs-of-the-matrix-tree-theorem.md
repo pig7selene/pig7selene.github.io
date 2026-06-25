@@ -1,7 +1,7 @@
 ---
 title: "Two Proofs of the Matrix-Tree Theorem"
-date: 2026-06-25 16:30:00 +0800
-categories: [Mathematics]
+date: 2026-06-25 15:00:00 +0800
+categories: [Mathematics, Graph Theory]
 tags: [graph-theory]
 math: true
 ---
