@@ -1,0 +1,10 @@
+{% assign thm_type = include.type | default: "Theorem" %}
+
+<div class="theorem-box">
+  <div class="theorem-title">
+    <strong>{{ thm_type }}</strong>{% if include.title and include.title != "" %} ({{ include.title }}){% endif %}<strong>.</strong>
+  </div>
+  <div class="theorem-content">
+    {{ include.content | markdownify }}
+  </div>
+</div>
