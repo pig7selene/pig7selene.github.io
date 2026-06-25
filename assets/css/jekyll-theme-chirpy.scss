@@ -1,0 +1,87 @@
+---
+---
+
+@use 'abstracts/variables' with (
+  $theme: '{{ site.theme_mode }}'
+);
+
+/* prettier-ignore */
+@use 'main {%- if jekyll.environment == 'production' -%} .bundle {%- endif -%} ';
+
+/* ========== Custom post headings ========== */
+
+main h2 {
+  margin-top: 2.4rem;
+  margin-bottom: 1rem;
+  padding-left: 0.75rem;
+  border-left: 4px solid #6ea8fe;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+main h3 {
+  margin-top: 1.8rem;
+  margin-bottom: 0.8rem;
+  font-weight: 700;
+  color: #8ab4f8;
+}
+
+/* ========== Math note boxes ========== */
+
+.math-box {
+  margin: 1.4rem 0;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(110, 168, 254, 0.35);
+  background: rgba(110, 168, 254, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.math-box .box-title {
+  margin-bottom: 0.65rem;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #8ab4f8;
+}
+
+.math-box p:last-child {
+  margin-bottom: 0;
+}
+
+/* Lemma box */
+.math-box.lemma {
+  border-left: 5px solid #6ea8fe;
+}
+
+/* Definition box */
+.math-box.definition {
+  border-left: 5px solid #7ee787;
+  background: rgba(126, 231, 135, 0.08);
+  border-color: rgba(126, 231, 135, 0.35);
+}
+
+.math-box.definition .box-title {
+  color: #7ee787;
+}
+
+/* Theorem box */
+.math-box.theorem {
+  border-left: 5px solid #d2a8ff;
+  background: rgba(210, 168, 255, 0.08);
+  border-color: rgba(210, 168, 255, 0.35);
+}
+
+.math-box.theorem .box-title {
+  color: #d2a8ff;
+}
+
+/* Proof box */
+.math-box.proof {
+  border-left: 5px solid #ffa657;
+  background: rgba(255, 166, 87, 0.08);
+  border-color: rgba(255, 166, 87, 0.35);
+}
+
+.math-box.proof .box-title {
+  color: #ffa657;
+}
