@@ -13,9 +13,7 @@ We denote by $A[i]$ the matrix obtained from $A$ by deleting the $i$-th row and 
 
 ## Kirchhoff's Matrix-Tree Theorem
 
-<div class="math-box theorem" markdown="1">
-<div class="box-title">Kirchhoff's Matrix-Tree Theorem</div>
-
+{% capture theorem_content %}
 The number of spanning trees of a graph $G$ is given by
 
 $$
@@ -23,8 +21,8 @@ $$
 $$
 
 where $i$ can be any vertex.
-
-</div>
+{% endcapture %}
+{% include thms/theorem.html title="Kirchhoff's Matrix-Tree Theorem" content=theorem_content %}
 
 Here $L_G$ denotes the Laplacian matrix of $G$.
 
@@ -193,9 +191,7 @@ We further let $B_S[i]$ denote the matrix obtained from $B[i]$ by keeping only t
 
 We also need the following lemma.
 
-<div class="math-box lemma" markdown="1">
-<div class="box-title">Lemma 2</div>
-
+{% capture lemma_content %}
 For $S \subseteq E$ with $\lvert S\rvert = n-1$,
 
 $$
@@ -206,8 +202,8 @@ $$
 0, & \text{otherwise}.
 \end{cases}
 $$
-
-</div>
+{% endcapture %}
+{% include thms/lemma.html title="2" content=lemma_content %}
 
 With this lemma, the second proof of the Matrix-Tree Theorem becomes extremely short:
 
@@ -228,6 +224,7 @@ Here:
 
 ## Proof of Lemma 2
 
+{% capture proof_content %}
 Assume without loss of generality that the edges in $B_S[i]$ are oriented arbitrarily. That is, we may replace the column corresponding to an edge $(i,j)$ from $e_i-e_j$ to $e_j-e_i$.
 
 This only changes the sign of the determinant, so it does not change the absolute value.
@@ -311,3 +308,5 @@ $$
 $$
 
 This completes the proof of Lemma 2, and hence the second proof of Kirchhoff's Matrix-Tree Theorem.
+{% endcapture %}
+{% include thms/proof.html content=proof_content %}
