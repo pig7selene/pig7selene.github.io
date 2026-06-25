@@ -1,0 +1,62 @@
+/* _sass/custom/thms.scss */
+
+.theorem-box,
+.proof-box,
+.definition-box,
+.lemma-box {
+  padding: 1rem 1.2rem;
+  margin: 1.5rem 0;
+  border-left: 3px solid #888888b0;
+  background: rgba(136, 136, 136, 0.06);
+}
+
+.theorem-box {
+  border-color: #d2a8ff;
+  background: rgba(210, 168, 255, 0.08);
+}
+
+.lemma-box {
+  border-color: #8ab4f8;
+  background: rgba(138, 180, 248, 0.08);
+}
+
+.definition-box {
+  border-color: #7ee787;
+  background: rgba(126, 231, 135, 0.08);
+}
+
+.proof-box {
+  border-color: #888888b0;
+}
+
+.theorem-title,
+.proof-title,
+.definition-title,
+.lemma-title {
+  margin-bottom: 0.5rem;
+  font-family: Charter, Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 1.05em;
+  line-height: 1.35;
+}
+
+.proof-title {
+  font-style: italic;
+}
+
+.proof-qed {
+  text-align: right;
+}
+
+.theorem-box p:last-child,
+.proof-box p:last-child,
+.definition-box p:last-child,
+.lemma-box p:last-child {
+  margin-bottom: 0;
+}
+
+.theorem-box mjx-container,
+.proof-box mjx-container,
+.definition-box mjx-container,
+.lemma-box mjx-container {
+  margin: 1rem 0;
+}
