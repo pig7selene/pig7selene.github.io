@@ -1,19 +1,17 @@
 /* _sass/custom/fonts.scss */
 
 /*
-  If you upload Charter font files later, put them in:
+  Put these font files in:
 
-  assets/fonts/Charter/Charter-Regular.woff2
-  assets/fonts/Charter/Charter-Bold.woff2
-  assets/fonts/Charter/Charter-Italic.woff2
-  assets/fonts/Charter/Charter-BoldItalic.woff2
-
-  Before uploading font files, make sure their license allows web use.
+  assets/fonts/Charter/charter_regular.woff2
+  assets/fonts/Charter/charter_bold.woff2
+  assets/fonts/Charter/charter_italic.woff2
+  assets/fonts/Charter/charter_bold_italic.woff2
 */
 
 @font-face {
   font-family: 'Charter';
-  src: url('/assets/fonts/Charter/Charter-Regular.woff2') format('woff2');
+  src: url('/assets/fonts/Charter/charter_regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -21,7 +19,7 @@
 
 @font-face {
   font-family: 'Charter';
-  src: url('/assets/fonts/Charter/Charter-Bold.woff2') format('woff2');
+  src: url('/assets/fonts/Charter/charter_bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -29,7 +27,7 @@
 
 @font-face {
   font-family: 'Charter';
-  src: url('/assets/fonts/Charter/Charter-Italic.woff2') format('woff2');
+  src: url('/assets/fonts/Charter/charter_italic.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -37,13 +35,13 @@
 
 @font-face {
   font-family: 'Charter';
-  src: url('/assets/fonts/Charter/Charter-BoldItalic.woff2') format('woff2');
+  src: url('/assets/fonts/Charter/charter_bold_italic.woff2') format('woff2');
   font-weight: 700;
   font-style: italic;
   font-display: swap;
 }
 
-/* Use academic serif fonts for posts */
+/* Use Charter for the main blog content */
 body,
 .content,
 .post-content,
@@ -51,7 +49,7 @@ main {
   font-family: Charter, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
-/* Article title */
+/* Article main title */
 main h1,
 .post-title,
 h1.dynamic-title {
@@ -86,4 +84,12 @@ main h3 {
   font-weight: 700;
   line-height: 1.35;
   letter-spacing: -0.01em;
+}
+
+/* Theorem / lemma / proof titles */
+.theorem-title,
+.lemma-title,
+.definition-title,
+.proof-title {
+  font-family: Charter, Georgia, Cambria, "Times New Roman", Times, serif;
 }
