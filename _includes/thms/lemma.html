@@ -1,0 +1,10 @@
+{% assign lemma_type = include.type | default: "Lemma" %}
+
+<div class="lemma-box">
+  <div class="lemma-title">
+    <strong>{{ lemma_type }}</strong>{% if include.title and include.title != "" %} ({{ include.title }}){% endif %}<strong>.</strong>
+  </div>
+  <div class="lemma-content">
+    {{ include.content | markdownify }}
+  </div>
+</div>
