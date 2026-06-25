@@ -168,9 +168,9 @@ We further let $B_S[i]$ denote the matrix obtained from $B[i]$ by keeping only t
 
 We also need the following lemma, whose proof will be given later.
 
-**Lemma 2**
+## Lemma 2
 
-For $S \subseteq E$ with $|S|=n-1$,
+For \(S \subseteq E\) with \(\lvert S\rvert = n-1\),
 
 $$
 \left|\det(B_S[i])\right|
@@ -186,11 +186,10 @@ With this lemma, the second proof of the Matrix-Tree Theorem becomes extremely s
 $$
 \begin{aligned}
 \det(L_G[i])
-    &= \det(B[i]B[i]^T) \\
-    &= \sum_{S\in\binom{E}{n-1}}
-       \left|\det(B_S[i])\right|
-       \left(\det(B_S[i])\right) \\
-    &= \tau(G).
+&= \det(B[i]B[i]^T) \\
+&= \sum_{S\in\binom{E}{n-1}}
+   \det(B_S[i])^2 \\
+&= \tau(G).
 \end{aligned}
 $$
 
@@ -199,70 +198,88 @@ Here:
 - the second equality follows from the Cauchy-Binet formula;
 - the third equality follows from Lemma 2.
 
-**Proof of Lemma 2**
+## Proof of Lemma 2
 
-Assume without loss of generality that the edges in $B_S[i]$ are oriented arbitrarily. That is, we may replace the column corresponding to $(i,j)$ from $e_i-e_j$ to $e_j-e_i$.
+Assume without loss of generality that the edges in \(B_S[i]\) are oriented arbitrarily. That is, we may replace the column corresponding to an edge \((i,j)\) from \(e_i-e_j\) to \(e_j-e_i\).
 
-This only changes the sign of the determinant. If $S\subseteq E$, $|S|=n-1$, and $S$ is not a spanning tree, then it necessarily contains a cycle. We may orient the edges along this cycle.
+This only changes the sign of the determinant, so it does not change the absolute value.
 
-If we sum the columns corresponding to this cycle, we obtain the zero vector. Hence the columns of $B_S[i]$ are linearly dependent, and therefore
+If \(S\subseteq E\), \(\lvert S\rvert=n-1\), and \(S\) is not a spanning tree, then \(S\) necessarily contains a cycle. We may orient the edges along this cycle.
+
+If we sum the columns corresponding to this cycle, we obtain the zero vector. Hence the columns of \(B_S[i]\) are linearly dependent, and therefore
 
 $$
-\det(B_S[i])=0
+\det(B_S[i])=0.
 $$
 
-Now assume that $S$ is a spanning tree, and proceed by induction on $n$.
+Now assume that \(S\) is a spanning tree. We prove
 
-**Base case**
+$$
+\left|\det(B_S[i])\right|=1
+$$
 
-If $n=2$, then
+by induction on \(n\).
+
+### Base Case
+
+If \(n=2\), then
 
 $$
 B_S=
 \begin{bmatrix}
 1\\
 -1
-\end{bmatrix},
+\end{bmatrix}.
 $$
 
-hence $B_S[i]=\pm1$, and therefore
+After deleting one row, we get
 
 $$
-\det(B_S[i])=1
+B_S[i]=[\pm 1],
 $$
 
-**Inductive case**
+and therefore
 
-Assume the lemma holds for graphs of size $n-1$. Let $j\neq i$ be a leaf vertex in the tree, and let $(k,j)$ be the unique edge adjacent to $j$.
+$$
+\left|\det(B_S[i])\right|=1.
+$$
+
+### Inductive Case
+
+Assume the lemma holds for trees with \(n-1\) vertices.
+
+Let \(j\ne i\) be a leaf vertex of the tree, and let \((k,j)\) be the unique edge adjacent to \(j\). Such a leaf vertex exists because every tree with at least two vertices has at least two leaves.
 
 Permute rows and columns so that:
 
-- $(k,j)$ becomes the last column;
-- $j$ becomes the last row.
+- the edge \((k,j)\) becomes the last column;
+- the vertex \(j\) becomes the last row.
 
-This may change the sign of the determinant, but that is irrelevant. Then
+These permutations may change the sign of the determinant, but they do not affect its absolute value.
 
-$$
-B_S[i]=
-\begin{bmatrix}
- &  &  & 0\\
- &  &  & 0\\
- & B_{S-\{(k,j)\}}[i,j] &  & 1\\
- &  &  & 0\\
-0 & \cdots & 0 & -1
-\end{bmatrix}
-$$
-
-Expanding the determinant along the last row gives
+Since \(j\) is a leaf, the last row has only one nonzero entry. Expanding the determinant along the last row gives
 
 $$
 \left|\det(B_S[i])\right|
 =
 \left|
 \det(B_{S-\{(k,j)\}}[i,j])
-\right|
-=
-1.
+\right|.
 $$
 
-The last equality follows from the induction hypothesis, since $S-\{(k,j)\}$ is a tree on the vertex set obtained after deleting vertex $j$, and we assumed that $i$ is not the leaf vertex.
+By the induction hypothesis,
+
+$$
+\left|
+\det(B_{S-\{(k,j)\}}[i,j])
+\right|
+=1.
+$$
+
+Therefore,
+
+$$
+\left|\det(B_S[i])\right|=1.
+$$
+
+This completes the proof of Lemma 2, and hence the second proof of Kirchhoff's Matrix-Tree Theorem.
