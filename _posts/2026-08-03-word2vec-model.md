@@ -7,7 +7,7 @@ math: true
 description: "A note on word representation, distributional semantics, and the Skip-gram Word2Vec model（from cs224N lec1）"
 ---
 
-> from Selene, my blog: [Selene's Blog](https://pig7selene.github.io/)
+> from Selene, Chinese version: [Chinese version][(https://pig7selene.github.io/](https://notes.sjtu.edu.cn/s/9d4Zemo0c))
 
 ## Word Representation
 
