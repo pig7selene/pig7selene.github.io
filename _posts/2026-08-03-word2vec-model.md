@@ -58,7 +58,11 @@ Suppose the vocabulary is $V$. Each word has two $d$-dimensional vector represen
 - $u_w$: the vector of word $w$ when it is used as a context word;
 - $v_w$: the vector of word $w$ when it is used as a center word.
 
-We arrange all word vectors into matrices $U,V\in\mathbb R^{|V|\times d}$
+We arrange all word vectors into matrices
+
+$$
+U,V\in\mathbb{R}^{\lvert V\rvert\times d}.
+$$
 
 Given center word $c$, the probability that the context word is $o$ is defined as
 
