@@ -7,6 +7,8 @@ math: true
 description: "A note on the GloVe model, co-occurrence matrices, least-squares objectives, and the evaluation of word vectors."
 ---
 
+> from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/SW1CcdBqW)
+
 # GloVe Model
 
 ## 1.1 Comparison with Previous Models
