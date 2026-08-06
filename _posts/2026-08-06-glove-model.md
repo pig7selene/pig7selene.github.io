@@ -17,7 +17,23 @@ The GloVe model, on the other hand, uses global statistical information and pred
 
 ## 1.2 Co-occurrence Matrix
 
-Let $X$ be the word-word co-occurrence matrix, where $X_{ij}$ denotes the number of times word $j$ appears in the context of word $i$. Let $X_{i} = \sum_{k} X_{ik}$ denote the total number of times any word $k$ appears in the context of word $i$. Finally, let $P_{ij} = P(w_j | w_i) = \frac{X_{ij}}{X_i}$ denote the probability that word $j$ appears in the context of word $i$.
+Let $X$ be the word-word co-occurrence matrix, where $X_{ij}$ denotes the number of times word $j$ appears in the context of word $i$.
+
+Let
+
+$$
+X_i = \sum_k X_{ik}
+$$
+
+denote the total number of times any word $k$ appears in the context of word $i$.
+
+Finally, let
+
+$$
+P_{ij}=P(w_j \mid w_i)=\frac{X_{ij}}{X_i}
+$$
+
+denote the probability that word $j$ appears in the context of word $i$.
 
 ## 1.3 Least-Squares Objective Function
 
