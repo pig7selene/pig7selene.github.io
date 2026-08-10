@@ -131,7 +131,7 @@ $$
 
 The chain rule allows us to calculate the loss gradient for any parameter used in the feedforward computation.
 
-![A three-layer neural network and its feedforward connections](/assets/img/posts/neural-networks-and-backpropagation/network-architecture.png)
+![A three-layer neural network and its feedforward connections](/assets/img/posts/neural-networks-and-backpropagation/network-architecture.png){: width="640" }
 
 **Notation**
 
@@ -272,7 +272,7 @@ $$
 
 1. The error $\delta_i^{(k)}$ at neuron $i$ in layer $k$ propagates toward the preceding layer along the weight $W_{ij}^{(k-1)}$.
 
-   ![An error signal propagating backward through a weighted connection](/assets/img/posts/neural-networks-and-backpropagation/backpropagation-connection.png)
+   ![An error signal propagating backward through a weighted connection](/assets/img/posts/neural-networks-and-backpropagation/backpropagation-connection.png){: width="680" }
 
 2. Along one connection to neuron $j$ in layer $k-1$, the path contributes the error $\delta_i^{(k)}W_{ij}^{(k-1)}$.
 
