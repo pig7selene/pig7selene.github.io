@@ -18,16 +18,23 @@ Previously, we studied the skip-gram model, which mainly learns word embeddings 
 The GloVe model, on the other hand, uses global statistical information and predicts the probability that word $j$ appears in the context of word $i$ through a least-squares objective.
 
 ## 1.2 Co-occurrence Matrix
+
 Let $X$ be the word-word co-occurrence matrix, where $X_{ij}$ denotes the number of times word $j$ appears in the context of word $i$
+
 Let
+
 $$
 X_i = \sum_k X_{ik}
 $$
+
 denote the total number of times any word $k$ appears in the context of word $i$
+
 Finally, let
+
 $$
 P_{ij}=P(w_j \mid w_i)=\frac{X_{ij}}{X_i}
 $$
+
 denote the probability that word $j$ appears in the context of word $i$.
 
 ## 1.3 Least-Squares Objective Function
@@ -50,7 +57,14 @@ $$
 \hat{J}=\sum_{i=1}^{W}\sum_{j=1}^{W}X_i\left(\hat{p}_{ij}-\hat{Q}_{ij}\right)^2
 $$
 
-where $\hat{P}_{ij}=X_{ij},\hat{Q}_{ij}=\exp\left(u_j^{T}v_i\right)$ are both unnormalized distributions. Since $X_{ij}$ is often very large, optimization becomes difficult. An effective modification is to minimize the squared error between the logarithms of $\hat{P}$ and $\hat{Q}$:
+where
+
+$$
+\hat{P}_{ij}=X_{ij},\qquad
+\hat{Q}_{ij}=\exp\left(u_j^{T}v_i\right)
+$$
+
+are both unnormalized distributions. Since $X_{ij}$ is often very large, optimization becomes difficult. An effective modification is to minimize the squared error between the logarithms of $\hat{P}$ and $\hat{Q}$:
 
 $$
 \hat{J}=\sum_{i=1}^{W}\sum_{j=1}^{W}X_i\left(\log\hat{P}_{ij}-\log\hat{Q}_{ij}\right)^2=\sum_{i=1}^{W}\sum_{j=1}^{W}X_i\left(u_j^{T}v_i-\log X_{ij}\right)^2

@@ -77,7 +77,7 @@ Here, $u_o^\top v_c$ represents the similarity between two word vectors. The lar
 Softmax converts the dot-product scores of all words into a probability distribution:
 
 $$
-p_{U,V}(\cdot\mid c)\in\mathbb R^{|V|}.
+p_{U,V}(\cdot\mid c)\in\mathbb R^{\lvert V\rvert}.
 $$
 
 The goal of training Word2Vec is to make the predicted probability distribution close to the true distribution of context words for word $c$ in the corpus, namely the row of the word co-occurrence matrix corresponding to $c$.
@@ -138,7 +138,7 @@ For a scalar function $f$, its gradient with respect to the parameter matrix $U$
 Before training starts, the word vector matrices $U,V$ are usually initialized as small random numbers:
 
 $$
-U^{(0)},V^{(0)}\sim N(0,0.001)^{|V|\times d}.
+U^{(0)},V^{(0)}\sim N(0,0.001)^{\lvert V\rvert\times d}.
 $$
 
 In other words, each entry of the matrices is independently sampled from a normal distribution with mean $0$ and small variance. Then gradient descent is used to update the parameters repeatedly. For example, the update formula for matrix $U$ is
