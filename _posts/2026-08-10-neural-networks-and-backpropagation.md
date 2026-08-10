@@ -364,7 +364,7 @@ $$
 =\sigma(z)\left(1-\sigma(z)\right).
 $$
 
-![The sigmoid activation function](/assets/img/posts/neural-networks-and-backpropagation/sigmoid.png)
+![The sigmoid activation function](/assets/img/posts/neural-networks-and-backpropagation/sigmoid.png){: width="370" }
 
 **Tanh.** The hyperbolic tangent is an alternative to the sigmoid and often converges faster in practice. Tanh outputs values between $-1$ and $1$, whereas sigmoid outputs values between $0$ and $1$:
 
