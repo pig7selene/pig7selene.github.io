@@ -7,7 +7,7 @@ math: true
 description: "CS224n lec3,neural networks, backpropagation, regularization, activation functions, and data preprocessing."
 ---
 
-> A dream in search of the sun, daring to imagine becoming the sun itself.
+> 寻找太阳的梦 自不量力说 自己也变成太阳的念头
 > from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/N-NJOZkhJ)
 
 # Neural Networks and Backpropagation
