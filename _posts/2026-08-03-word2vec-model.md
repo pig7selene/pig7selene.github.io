@@ -4,7 +4,7 @@ date: 2026-08-03 20:16:00 +0800
 categories: [Machine Learning]
 tags: [NLP]
 math: true
-description: "A note on word representation, distributional semantics, and the Skip-gram Word2Vec model（from cs224N lec1）"
+description: "CS224n lec1,word representation, distributional semantics, and the Skip-gram Word2Vec model"
 ---
 
 > from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/9d4Zemo0c)
