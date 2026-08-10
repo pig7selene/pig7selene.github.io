@@ -2,12 +2,13 @@
 title: "Neural Networks and Backpropagation"
 date: 2026-08-10 21:48:10 +0800
 categories: [Machine Learning]
-tags: [Neural Networks, Backpropagation]
+tags: [NLP]
 math: true
-description: "A note on neural networks, backpropagation, regularization, activation functions, and data preprocessing."
+description: "CS224n lec3,neural networks, backpropagation, regularization, activation functions, and data preprocessing."
 ---
 
 > A dream in search of the sun, daring to imagine becoming the sun itself.
+> from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/N-NJOZkhJ)
 
 # Neural Networks and Backpropagation
 
