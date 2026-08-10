@@ -4,7 +4,7 @@ date: 2026-08-06 16:35:00 +0800
 categories: [Machine Learning]
 tags: [NLP]
 math: true
-description: "A note on the GloVe model, co-occurrence matrices, least-squares objectives, and the evaluation of word vectors."
+description: "CS224n lec2,the GloVe model, co-occurrence matrices, least-squares objectives, and the evaluation of word vectors."
 ---
 
 > from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/SW1CcdBqW)
