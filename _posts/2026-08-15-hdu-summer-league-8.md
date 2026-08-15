@@ -8,7 +8,7 @@ description: "Solutions and notes for HDU Summer League(8)."
 ---
 
 ## HDU Summer League(8)
-> [Code Implementation for This Contest](https://github.com/pig7selene/xcpc-code/tree/main/summer08). 
+> [Code Implementation for This Contest](https://github.com/pig7selene/xcpc-code/tree/main/summer08)  
 > from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/WTuny4iBr)
 
 ### 1001
