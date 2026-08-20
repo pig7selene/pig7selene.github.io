@@ -2,12 +2,13 @@
 title: "Language Models and Recurrent Neural Networks"
 date: 2026-08-20 23:48:19 +0800
 categories: [Machine Learning]
-tags: [NLP, RNN]
+tags: [NLP]
 math: true
-description: "A note on n-gram and neural language models, recurrent neural networks, bidirectional RNNs, GRUs, and LSTMs."
+description: "CS224n lec4,A note on n-gram and neural language models, recurrent neural networks, bidirectional RNNs, GRUs, and LSTMs."
 ---
 
-> In this human world, in this fleeting moment, between heaven and earth—who will I be next time?
+> 人间 瞬间 天地之间 下次我 又是谁
+> from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/WdOsAAXpd)
 
 ## Language Models
 
@@ -274,7 +275,7 @@ $$
 
 ![A deep bidirectional RNN](/assets/img/posts/language-models-and-rnns/deep-bidirectional-rnn.png){: width="440" }
 
-### Gated Recurrent Units (GRUs)
+## Gated Recurrent Units (GRUs)
 
 Beyond these extensions, researchers have found that more complex activation units can improve RNN performance. So far, we have transformed $h_{t-1}$ into $h_t$ using an affine transformation followed by an element-wise nonlinearity. A GRU changes this structure by introducing **gated activation functions**.
 
@@ -313,7 +314,7 @@ Although an RNN can theoretically capture long-term dependencies, it is difficul
 
 ![The gated structure of a GRU](/assets/img/posts/language-models-and-rnns/gru.png){: width="720" }
 
-### Long Short-Term Memory Networks (LSTMs)
+## Long Short-Term Memory Networks (LSTMs)
 
 An LSTM controls information flow with an **input gate**, a **forget gate**, and an **output gate**. It also maintains a memory cell $c_t$ that stores long-term information. The LSTM can be understood in the following stages:
 
