@@ -7,7 +7,7 @@ math: true
 description: "CS224n lec4,A note on n-gram and neural language models, recurrent neural networks, bidirectional RNNs, GRUs, and LSTMs."
 ---
 
-> 人间 瞬间 天地之间 下次我 又是谁
+> 人间 瞬间 天地之间 下次我 又是谁  
 > from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/WdOsAAXpd)
 
 ## Language Models
