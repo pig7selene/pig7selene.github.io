@@ -1,5 +1,5 @@
 ---
-title: "Language Models and Recurrent Neural Networks"
+title: "CS224N | Language Models and Recurrent Neural Networks"
 date: 2026-08-20 23:48:19 +0800
 categories: [Machine Learning]
 tags: [NLP]
