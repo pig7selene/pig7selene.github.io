@@ -8,7 +8,7 @@ description: "CS224n lec4,A note on n-gram and neural language models, recurrent
 ---
 
 > 人间 瞬间 天地之间 下次我 又是谁  
-> from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/WdOsAAXpd)
+> from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/G0gesfJHt)
 
 ## Language Models
 
