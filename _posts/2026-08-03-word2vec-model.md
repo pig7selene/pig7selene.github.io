@@ -1,5 +1,5 @@
 ---
-title: "Word2Vec Model"
+title: "CS224N | Word2Vec Model"
 date: 2026-08-03 20:16:00 +0800
 categories: [Machine Learning]
 tags: [NLP]
