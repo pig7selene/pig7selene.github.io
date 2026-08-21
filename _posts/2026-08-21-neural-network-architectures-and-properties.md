@@ -1,11 +1,14 @@
 ---
-title: "Neural Network Architectures and Their Properties"
+title: "Transformer"
 date: 2026-08-21 20:54:51 +0800
 categories: [Machine Learning]
 tags: [NLP, Transformer]
 math: true
-description: "A note on self-attention, positional representations, Transformer components, and encoder-decoder architectures."
+description: "CS224n lec5,A note on self-attention, positional representations, Transformer components, and encoder-decoder architectures."
 ---
+
+> 天雨粟 鬼夜哭 思念漫太古  
+>  from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/WdOsAAXpd)
 
 ## Foundations
 
