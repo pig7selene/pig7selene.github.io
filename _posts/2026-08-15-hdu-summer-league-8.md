@@ -2,7 +2,7 @@
 title: "HDU Summer League (8)"
 date: 2026-08-15 22:09:00 +0800
 categories: [xcpc]
-tags: [xcpc,hdu summer leagur2026]
+tags: [xcpc,hdu summer league2026]
 math: true
 description: "Solutions and notes for HDU Summer League(8)."
 ---
