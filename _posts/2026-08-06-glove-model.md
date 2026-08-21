@@ -1,5 +1,5 @@
 ---
-title: "GloVe Model"
+title: "CS224N | GloVe Model"
 date: 2026-08-06 16:35:00 +0800
 categories: [Machine Learning]
 tags: [NLP]
