@@ -2,7 +2,7 @@
 title: "CS224N | Transformer"
 date: 2026-08-21 20:54:51 +0800
 categories: [Machine Learning]
-tags: [NLP, Transformer]
+tags: [NLP,CS224N, Transformer]
 math: true
 description: "CS224n lec5,A note on self-attention, positional representations, Transformer components, and encoder-decoder architectures."
 ---
