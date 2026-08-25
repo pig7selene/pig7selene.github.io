@@ -9,7 +9,7 @@ description: "personal solution to CS224N assignment 2"
 
 ## Problem 1
 
-Let $y \in \mathbb{R}^{|V|}$ be the one-hot true distribution, let$\hat{y} \in \mathbb{R}^{|V|}$ be the predicted distribution, and let
+Let $y \in \mathbb{R}^{\lvert V\rvert}$ be the one-hot true distribution, let $\hat{y} \in \mathbb{R}^{\lvert V\rvert}$ be the predicted distribution, and let
 
 $$
 \hat{y}_w
@@ -21,7 +21,7 @@ $$
 The matrix $U$ contains the outside-word vectors as its columns:
 
 $$
-U = \begin{bmatrix}u_1 & u_2 & \cdots & u_{|V|}\end{bmatrix}.
+U = \begin{bmatrix}u_1 & u_2 & \cdots & u_{\lvert V\rvert}\end{bmatrix}.
 $$
 
 ### (a)
@@ -89,11 +89,11 @@ v_c
 \end{aligned}
 $$
 
-The $+\eta u_o$ term moves the center-word vector $v_c$ toward the trueoutside-word vector $u_o$, increasing their similarity. The$-\eta\sum_w\hat{y}_w u_w$ term moves $v_c$ away from the probability-weighted average of the predicted outside-word vectors, with a larger correction for words to which the model currently assigns more probability. Together, these changes increase the score of the true outside word relative to the scores of the other words.
+The $+\eta u_o$ term moves the center-word vector $v_c$ toward the true outside-word vector $u_o$, increasing their similarity. The $-\eta\sum_w\hat{y}_w u_w$ term moves $v_c$ away from the probability-weighted average of the predicted outside-word vectors, with a larger correction for words to which the model currently assigns more probability. Together, these changes increase the score of the true outside word relative to the scores of the other words.
 
 ### (c)
 
-Suppose $u_x=\alpha u_y$ for $x\neq y$.If $\alpha>0$, then
+Suppose $u_x=\alpha u_y$ for $x\neq y$. If $\alpha>0$, then
 
 $$
 \frac{u_x}{\lVert u_x\rVert_2}
@@ -114,7 +114,7 @@ $$
 \dfrac{\partial J(v_c,o,U)}{\partial u_1} &
 \dfrac{\partial J(v_c,o,U)}{\partial u_2} &
 \cdots &
-\dfrac{\partial J(v_c,o,U)}{\partial u_{|V|}}
+\dfrac{\partial J(v_c,o,U)}{\partial u_{\lvert V\rvert}}
 \end{bmatrix}
 $$
 
