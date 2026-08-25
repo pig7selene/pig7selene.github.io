@@ -40,18 +40,18 @@ $$
 First, rewrite the naive-softmax loss as
 
 $$
-\begin{aligned}
-J_{\text{naive-softmax}}(v_c,o,U)&= -\log \hat{y}_o \\&= -u_o^\top v_c+ \log\left(\sum_{w\in V}\exp(u_w^\top v_c)\right).
-\end{aligned}
+J_{\text{naive-softmax}}(v_c,o,U)
+= -\log \hat{y}_o
+= -u_o^\top v_c+ \log\left(\sum_{w\in V}\exp(u_w^\top v_c)\right).
 $$
 
 Taking the derivative with respect to $v_c$,
 
 $$
-\begin{aligned}
-\frac{\partial J}{\partial v_c}&= -u_o+ \frac{\sum_{w\in V}\exp(u_w^\top v_c)u_w}
-          {\sum_{j\in V}\exp(u_j^\top v_c)} \\&= -u_o + \sum_{w\in V}\hat{y}_w u_w.
-\end{aligned}
+\frac{\partial J}{\partial v_c}
+= -u_o+ \frac{\sum_{w\in V}\exp(u_w^\top v_c)u_w}
+{\sum_{j\in V}\exp(u_j^\top v_c)}
+= -u_o + \sum_{w\in V}\hat{y}_w u_w.
 $$
 
 Because $y$ is one-hot,
@@ -82,11 +82,9 @@ Equivalently, $\hat{y}-y\in\operatorname{Null}(U)$. In particular,$\hat{y}=y$ is
 Using a learning rate $\eta>0$, gradient descent gives
 
 $$
-\begin{aligned}
 v_c
-&\leftarrow v_c-\eta\left(U\hat{y}-Uy\right) \\
-&=v_c+\eta u_o-\eta\sum_{w\in V}\hat{y}_w u_w.
-\end{aligned}
+\leftarrow v_c-\eta\left(U\hat{y}-Uy\right)
+=v_c+\eta u_o-\eta\sum_{w\in V}\hat{y}_w u_w.
 $$
 
 The $+\eta u_o$ term moves the center-word vector $v_c$ toward the true outside-word vector $u_o$, increasing their similarity. The $-\eta\sum_w\hat{y}_w u_w$ term moves $v_c$ away from the probability-weighted average of the predicted outside-word vectors, with a larger correction for words to which the model currently assigns more probability. Together, these changes increase the score of the true outside word relative to the scores of the other words.
@@ -129,21 +127,17 @@ $$
 For the true outside word $w=o$,
 
 $$
-\begin{aligned}
 \frac{\partial J}{\partial u_o}
-&=-v_c+\frac{\exp(u_o^\top v_c)}{\sum_{j\in V}\exp(u_j^\top v_c)}v_c \\
-&=(\hat{y}_o-1)v_c.
-\end{aligned}
+=-v_c+\frac{\exp(u_o^\top v_c)}{\sum_{j\in V}\exp(u_j^\top v_c)}v_c
+=(\hat{y}_o-1)v_c.
 $$
 
 For every $w\neq o$,
 
 $$
-\begin{aligned}
 \frac{\partial J}{\partial u_w}
-&=\frac{\exp(u_w^\top v_c)}{\sum_{j\in V}\exp(u_j^\top v_c)}v_c \\
-&=\hat{y}_w v_c.
-\end{aligned}
+=\frac{\exp(u_w^\top v_c)}{\sum_{j\in V}\exp(u_j^\top v_c)}v_c
+=\hat{y}_w v_c.
 $$
 
 Therefore,
@@ -182,11 +176,9 @@ $$
 we obtain
 
 $$
-\begin{aligned}
 \sigma'(x)
-&=\frac{e^{-x}}{(1+e^{-x})^2} \\
-&=\frac{1}{1+e^{-x}}\left(1-\frac{1}{1+e^{-x}}\right).
-\end{aligned}
+=\frac{e^{-x}}{(1+e^{-x})^2}
+=\frac{1}{1+e^{-x}}\left(1-\frac{1}{1+e^{-x}}\right).
 $$
 
 Hence,
