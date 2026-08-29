@@ -7,7 +7,7 @@ math: true
 description: "personal solution to CS224N assignment 2"
 ---
 
-> LaTeX edition: [Read or download PDF](/output/pdf/cs224n-assignment-2.pdf) · [TeX source](/output/pdf/cs224n-assignment-2.tex)
+> You can download the [TeX (LaTeX source)](/output/pdf/cs224n-assignment-2.tex) and [PDF (PDF file)](/output/pdf/cs224n-assignment-2.pdf).
 {: .chinese-version-link }
 
 ## Problem 1

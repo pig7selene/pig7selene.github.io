@@ -7,7 +7,7 @@ math: true
 description: "This chapter introduces the Matrix-Tree Theorem and presents two proofs, using induction and the Cauchy-Binet formula, to show how determinants can be used to count spanning trees in a graph."
 ---
 
-> LaTeX edition: [Read or download PDF](/output/pdf/two-proofs-of-the-matrix-tree-theorem.pdf) · [TeX source](/output/pdf/two-proofs-of-the-matrix-tree-theorem.tex)
+> You can download the [TeX (LaTeX source)](/output/pdf/two-proofs-of-the-matrix-tree-theorem.tex) and [PDF (PDF file)](/output/pdf/two-proofs-of-the-matrix-tree-theorem.pdf).
 {: .chinese-version-link }
 
 This chapter introduces the Matrix-Tree Theorem and presents two proofs, using induction and the Cauchy-Binet formula, to show how determinants can be used to count spanning trees in a graph.

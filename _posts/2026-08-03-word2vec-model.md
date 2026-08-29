@@ -7,8 +7,7 @@ math: true
 description: "CS224n lec1,word representation, distributional semantics, and the Skip-gram Word2Vec model"
 ---
 
-> from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/9d4Zemo0c)<br>
-> LaTeX edition: [Read or download PDF](/output/pdf/word2vec-model.pdf) · [TeX source](/output/pdf/word2vec-model.tex)
+> You can download the [TeX (LaTeX source)](/output/pdf/word2vec-model.tex) and [PDF (PDF file)](/output/pdf/word2vec-model.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/9d4Zemo0c) here.
 {: .chinese-version-link }
 
 ## Word Representation

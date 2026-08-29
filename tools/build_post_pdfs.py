@@ -138,6 +138,11 @@ def preprocess_post(post: Path) -> tuple[dict[str, str], str]:
         body,
         count=1,
     )
+    body = re.sub(
+        r"(?m)^[^\n]+\n^\{: \.web-only \}\s*\n?",
+        "",
+        body,
+    )
     body = re.sub(r"^\{: \.chinese-version-link \}\s*$", "", body, flags=re.M)
     body = convert_liquid_boxes(body)
     body = normalize_images(body)
