@@ -8,7 +8,7 @@ description: "Solutions and notes for HDU Summer League(8)."
 ---
 
 ## HDU Summer League(8)
-> You can download the [TeX (LaTeX source)](/output/pdf/hdu-summer-league-8.tex) and [PDF (PDF file)](/output/pdf/hdu-summer-league-8.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/WTuny4iBr) here.
+> You can download the [LaTeX](/output/pdf/hdu-summer-league-8.tex) and [PDF](/output/pdf/hdu-summer-league-8.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/WTuny4iBr) here.
 {: .chinese-version-link }
 
 [Code Implementation for This Contest](https://github.com/pig7selene/xcpc-code/tree/main/summer08)
