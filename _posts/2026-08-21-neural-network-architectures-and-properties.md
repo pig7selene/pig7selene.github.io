@@ -9,6 +9,7 @@ description: "CS224n lec5,A note on self-attention, positional representations, 
 
 > 天雨粟 鬼夜哭 思念漫太古  
 >  from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/WdOsAAXpd)
+{: .chinese-version-link }
 
 ## Foundations
 

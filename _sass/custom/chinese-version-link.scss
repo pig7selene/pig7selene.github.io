@@ -1,0 +1,24 @@
+/* Highlight the opening link to the Chinese version of a post. */
+blockquote.chinese-version-link {
+  margin: 1.25rem 0 1.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(88, 166, 255, 0.45);
+  border-left: 4px solid #58a6ff;
+  border-radius: 0.5rem;
+  background: rgba(88, 166, 255, 0.08);
+  color: var(--text-color);
+}
+
+blockquote.chinese-version-link p:last-child {
+  margin-bottom: 0;
+}
+
+blockquote.chinese-version-link a {
+  color: var(--link-color);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+blockquote.chinese-version-link a:hover {
+  text-decoration: underline;
+}

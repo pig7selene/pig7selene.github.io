@@ -8,6 +8,7 @@ description: "CS224n lec2,the GloVe model, co-occurrence matrices, least-squares
 ---
 
 > from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/SW1CcdBqW)
+{: .chinese-version-link }
 
 # GloVe Model
 

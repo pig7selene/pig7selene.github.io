@@ -8,6 +8,7 @@ description: "CS224n lec1,word representation, distributional semantics, and the
 ---
 
 > from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/9d4Zemo0c)
+{: .chinese-version-link }
 
 ## Word Representation
 
