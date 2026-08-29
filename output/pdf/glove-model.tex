@@ -1,0 +1,274 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+\PassOptionsToPackage{space}{xeCJK}
+\documentclass[
+  a4paper,
+  10pt]{article}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Times New Roman}
+  \setmonofont[]{Menlo}
+  \setmathfont[]{STIX Two Math}
+  \ifXeTeX
+    \usepackage{xeCJK}
+    \setCJKmainfont[]{Songti SC}
+  \fi
+  \ifLuaTeX
+    \usepackage[]{luatexja-fontspec}
+    \setmainjfont[]{Songti SC}
+  \fi
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage[a4paper,top=24mm,bottom=25mm,left=23mm,right=23mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,longtable,array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{mdframed}
+\usepackage{xcolor}
+\usepackage{xurl}
+\usepackage{hyperref}
+\graphicspath{{../../}}
+
+\definecolor{PaperBlue}{HTML}{000000}
+\definecolor{PaperRule}{HTML}{B7C6D5}
+\definecolor{PaperShade}{HTML}{F4F7FA}
+\definecolor{PaperText}{HTML}{000000}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=PaperBlue,
+  urlcolor=PaperBlue,
+  citecolor=PaperBlue,
+  pdfborder={0 0 0}
+}
+
+\color{PaperText}
+\linespread{1.08}
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0.25em}
+\setlength{\emergencystretch}{3em}
+\setlist{itemsep=0.2em,topsep=0.45em}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\titleformat{\section}
+  {\Large\bfseries\color{PaperBlue}}
+  {\thesection}{0.7em}{}
+\titleformat{\subsection}
+  {\large\bfseries\color{PaperText}}
+  {\thesubsection}{0.65em}{}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{PaperText}}
+  {\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{2.2ex plus 0.5ex}{0.9ex}
+\titlespacing*{\subsection}{0pt}{1.8ex plus 0.4ex}{0.7ex}
+\titlespacing*{\subsubsection}{0pt}{1.5ex plus 0.3ex}{0.5ex}
+
+\captionsetup{
+  font=small,
+  labelfont=bf,
+  textfont=it,
+  justification=centering,
+  skip=6pt
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyhead[R]{\small Selene's Blog}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[R]{\small Selene's Blog}
+  \fancyfoot[C]{\small\thepage}
+  \renewcommand{\headrulewidth}{0.4pt}
+}
+
+\renewenvironment{quote}
+  {\begin{mdframed}[
+      linewidth=0.7pt,
+      linecolor=PaperRule,
+      backgroundcolor=PaperShade,
+      leftline=true,
+      rightline=false,
+      topline=false,
+      bottomline=false,
+      innerleftmargin=10pt,
+      innerrightmargin=8pt,
+      innertopmargin=7pt,
+      innerbottommargin=7pt,
+      skipabove=8pt,
+      skipbelow=10pt
+    ]\itshape}
+  {\end{mdframed}}
+
+\newenvironment{theorembox}[1]
+  {\par\medskip\noindent\textbf{Theorem (#1).}\quad}
+  {\par\medskip}
+
+\newenvironment{lemmabox}[1]
+  {\par\medskip\noindent\textbf{Lemma #1.}\quad}
+  {\par\medskip}
+
+\newenvironment{proofbox}
+  {\par\medskip\noindent\textit{Proof.}\quad}
+  {\hfill$\square$\par\medskip}
+
+\AtBeginDocument{\allowdisplaybreaks[2]}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+% fallback for those not using the hyperref driver hyperxmp:
+\makeatletter
+\@ifundefined{xmpquote}{\newcommand{\xmpquote}[1]{#1}}{}
+\makeatother
+\hypersetup{
+  pdftitle={CS224N \textbar{} GloVe Model},
+  pdfauthor={Selene},
+  colorlinks=true,
+  linkcolor={black},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={black},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{CS224N \textbar{} GloVe Model}
+\author{Selene}
+\date{August 6, 2026}
+
+\begin{document}
+\maketitle
+
+\section{GloVe Model}\label{glove-model}
+
+\subsection{Comparison with Previous
+Models}\label{comparison-with-previous-models}
+
+Previously, we studied the skip-gram model, which mainly learns word
+embeddings by making predictions within local context windows. It can
+capture complex linguistic patterns beyond word similarity, but it does
+not make use of global co-occurrence statistics.
+
+The GloVe model, on the other hand, uses global statistical information
+and predicts the probability that word \(j\) appears in the context of
+word \(i\) through a least-squares objective.
+
+\subsection{Co-occurrence Matrix}\label{co-occurrence-matrix}
+
+Let \(X\) be the word-word co-occurrence matrix, where \(X_{ij}\)
+denotes the number of times word \(j\) appears in the context of word
+\(i\)
+
+Let
+
+\[
+X_i = \sum_k X_{ik}
+\]
+
+denote the total number of times any word \(k\) appears in the context
+of word \(i\)
+
+Finally, let
+
+\[
+P_{ij}=P(w_j \mid w_i)=\frac{X_{ij}}{X_i}
+\]
+
+denote the probability that word \(j\) appears in the context of word
+\(i\).
+
+\subsection{Least-Squares Objective
+Function}\label{least-squares-objective-function}
+
+In the skip-gram model, we use softmax to compute the probability that
+word \(j\) appears in the context of word \(i\):
+
+\[
+Q_{ij} = \frac{exp(u_{j}^{T}x_i)}{\sum_{w=1}^{W}exp(u_w^T v_i)}
+\]
+
+Training is performed in an online and stochastic manner, using the
+following global cross-entropy loss function:
+
+\[
+J = -\sum_{j \in corpus}\sum_{j \in context(i)} logQ_{ij}
+\]
+
+A significant disadvantage of cross-entropy is that it requires the
+distribution \(Q\) to be properly normalized, which requires an
+expensive summation over the entire vocabulary. For this reason, we
+instead use a least-squares objective and discard the normalization
+factors in \(P\) and \(Q\):
+
+\[
+\hat{J}=\sum_{i=1}^{W}\sum_{j=1}^{W}X_i\left(\hat{p}_{ij}-\hat{Q}_{ij}\right)^2
+\]
+
+where
+
+\[
+\hat{P}_{ij}=X_{ij},\qquad
+\hat{Q}_{ij}=\exp\left(u_j^{T}v_i\right)
+\]
+
+are both unnormalized distributions. Since \(X_{ij}\) is often very
+large, optimization becomes difficult. An effective modification is to
+minimize the squared error between the logarithms of \(\hat{P}\) and
+\(\hat{Q}\):
+
+\[
+\hat{J}=\sum_{i=1}^{W}\sum_{j=1}^{W}X_i\left(\log\hat{P}_{ij}-\log\hat{Q}_{ij}\right)^2=\sum_{i=1}^{W}\sum_{j=1}^{W}X_i\left(u_j^{T}v_i-\log X_{ij}\right)^2
+\]
+
+\section{Evaluation of Word Vectors}\label{evaluation-of-word-vectors}
+
+\subsection{Intrinsic Evaluation}\label{intrinsic-evaluation}
+
+Intrinsic evaluation of word vectors evaluates a set of word vectors
+produced by an embedding method on a specific intermediate subtask. Such
+subtasks are usually simple and fast to compute, so they can help us
+understand the system that generates the word vectors. Intrinsic
+evaluation should usually return a numerical value that indicates how
+well these word vectors perform on the evaluation subtask.
+
+\subsection{Extrinsic Evaluation}\label{extrinsic-evaluation}
+
+Extrinsic evaluation of word vectors evaluates a set of word vectors
+produced by an embedding method on the real task at hand. Such tasks are
+usually more complex and slower to compute. In general, optimizing only
+for a poorly performing extrinsic evaluation system cannot determine
+exactly which specific subsystem has gone wrong. This also illustrates
+the necessity of intrinsic evaluation.
+
+\end{document}

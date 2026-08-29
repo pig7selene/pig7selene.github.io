@@ -1,0 +1,339 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+\PassOptionsToPackage{space}{xeCJK}
+\documentclass[
+  a4paper,
+  10pt]{article}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Times New Roman}
+  \setmonofont[]{Menlo}
+  \setmathfont[]{STIX Two Math}
+  \ifXeTeX
+    \usepackage{xeCJK}
+    \setCJKmainfont[]{Songti SC}
+  \fi
+  \ifLuaTeX
+    \usepackage[]{luatexja-fontspec}
+    \setmainjfont[]{Songti SC}
+  \fi
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage[a4paper,top=24mm,bottom=25mm,left=23mm,right=23mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,longtable,array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{mdframed}
+\usepackage{xcolor}
+\usepackage{xurl}
+\usepackage{hyperref}
+\graphicspath{{../../}}
+
+\definecolor{PaperBlue}{HTML}{000000}
+\definecolor{PaperRule}{HTML}{B7C6D5}
+\definecolor{PaperShade}{HTML}{F4F7FA}
+\definecolor{PaperText}{HTML}{000000}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=PaperBlue,
+  urlcolor=PaperBlue,
+  citecolor=PaperBlue,
+  pdfborder={0 0 0}
+}
+
+\color{PaperText}
+\linespread{1.08}
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0.25em}
+\setlength{\emergencystretch}{3em}
+\setlist{itemsep=0.2em,topsep=0.45em}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\titleformat{\section}
+  {\Large\bfseries\color{PaperBlue}}
+  {\thesection}{0.7em}{}
+\titleformat{\subsection}
+  {\large\bfseries\color{PaperText}}
+  {\thesubsection}{0.65em}{}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{PaperText}}
+  {\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{2.2ex plus 0.5ex}{0.9ex}
+\titlespacing*{\subsection}{0pt}{1.8ex plus 0.4ex}{0.7ex}
+\titlespacing*{\subsubsection}{0pt}{1.5ex plus 0.3ex}{0.5ex}
+
+\captionsetup{
+  font=small,
+  labelfont=bf,
+  textfont=it,
+  justification=centering,
+  skip=6pt
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyhead[R]{\small Selene's Blog}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[R]{\small Selene's Blog}
+  \fancyfoot[C]{\small\thepage}
+  \renewcommand{\headrulewidth}{0.4pt}
+}
+
+\renewenvironment{quote}
+  {\begin{mdframed}[
+      linewidth=0.7pt,
+      linecolor=PaperRule,
+      backgroundcolor=PaperShade,
+      leftline=true,
+      rightline=false,
+      topline=false,
+      bottomline=false,
+      innerleftmargin=10pt,
+      innerrightmargin=8pt,
+      innertopmargin=7pt,
+      innerbottommargin=7pt,
+      skipabove=8pt,
+      skipbelow=10pt
+    ]\itshape}
+  {\end{mdframed}}
+
+\newenvironment{theorembox}[1]
+  {\par\medskip\noindent\textbf{Theorem (#1).}\quad}
+  {\par\medskip}
+
+\newenvironment{lemmabox}[1]
+  {\par\medskip\noindent\textbf{Lemma #1.}\quad}
+  {\par\medskip}
+
+\newenvironment{proofbox}
+  {\par\medskip\noindent\textit{Proof.}\quad}
+  {\hfill$\square$\par\medskip}
+
+\AtBeginDocument{\allowdisplaybreaks[2]}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+% fallback for those not using the hyperref driver hyperxmp:
+\makeatletter
+\@ifundefined{xmpquote}{\newcommand{\xmpquote}[1]{#1}}{}
+\makeatother
+\hypersetup{
+  pdftitle={HDU Summer League (8)},
+  pdfauthor={Selene},
+  colorlinks=true,
+  linkcolor={black},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={black},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{HDU Summer League (8)}
+\author{Selene}
+\date{August 15, 2026}
+
+\begin{document}
+\maketitle
+
+\section{HDU Summer League(8)}\label{hdu-summer-league8}
+
+\subsection*{1001}\label{section}
+\addcontentsline{toc}{subsection}{1001}
+
+\textbf{Problem}: Given a directed graph with \(n\) vertices and \(m\)
+edges, you need to travel from vertex \(1\) to vertex \(n\). There are
+\(q\) operations. The \(i\)-th operation deletes all outgoing edges of
+vertex \(p_i\). You need to find the maximum number of operations \(k\)
+such that after performing the first \(k\) operations, there is still a
+path from vertex \(1\) to vertex \(n\).
+
+\textbf{Solution}: First assume that all outgoing edges of every \(p_i\)
+have already been deleted. We then add the edges back in reverse order
+while maintaining two arrays
+
+\begin{itemize}
+\tightlist
+\item
+  \(on[u]\): whether the outgoing edges of vertex \(u\) currently exist
+\item
+  \(vis[u]\): whether \(u\) can currently reach \(n\)
+\end{itemize}
+
+When restoring vertex \(u=p[i]\) in reverse order, set \(on[u] = 1\). If
+there exists an edge \(u \to v\) and \(vis[v] = 1\), then
+\(vis[u] = 1\). Then perform a bfs starting from \(u\) on the reverse
+graph.
+
+\subsection*{1002}\label{section-1}
+\addcontentsline{toc}{subsection}{1002}
+
+\textbf{Problem}: Given two sequences \(a\) and \(b\) of length \(n\),
+there are \(m\) days. At the beginning of each day, \(a_i = a_i + b_i\)
+is performed, and there is one query every day
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{1\ l\ r\ x}: for all \(l \le i \le r\), perform
+  \(b_i \leftarrow b_i+x\)
+\item
+  \texttt{2\ l\ r}: calculate \(\sum_{i=l}^{r} a_i \bmod 2^{64}\)
+\end{itemize}
+
+\textbf{Solution}: Maintain prefix sums for both arrays. Since the
+modulus is \(2^{64}\), we can directly use \texttt{ull}. For the first
+operation, use a Fenwick tree to maintain two lazy arrays \texttt{lazy1}
+and \texttt{lazy2}. One stores all modifications \(x\), while the other
+stores \(day \times x\). On day \(t\), the answer for an interval
+\([l,r]\) is
+
+\[
+\sum A_i+t\sum B_i+t\sum lazy1_i-\sum lazy2_i
+\]
+
+\subsection*{1003}\label{section-2}
+\addcontentsline{toc}{subsection}{1003}
+
+\textbf{Problem}: Given a permutation, each query gives \texttt{x\ k}.
+We need to select some positions such that \(x\) is not selected and the
+distance between any two selected positions is at least \(k\). Find the
+number of valid selection schemes.
+
+\textbf{Solution}: We can think about it in reverse and calculate the
+total number of schemes minus the number of schemes in which \(x\) is
+selected.
+
+Let \(f(n,k)\) denote the number of schemes for \(n\) positions where
+the distance between any two selected positions is at least \(k\). For a
+query \((x,k)\), the total number of schemes is \(f(n,k)\). For schemes
+that must contain \(x\), consider the valid positions on the left and
+right of \(x\). The valid length on the left is \(l=\max(0,x-k)\), and
+the valid length on the right is \(r=\max(0,n-x-k+1)\). Therefore, the
+answer is
+
+\[
+f(n,k)-f(l,k)f(r,k)
+\]
+
+There are two ways to calculate \(f\):
+
+Recurrence:
+
+\[
+f(i,k)=f(i-1,k)+f(i-k,k)
+\]
+
+For a fixed \(k\), it can be precomputed in \(O(n)\).
+
+Or enumerate the number \(c\) of selected positions. Transforming the
+condition that adjacent selected positions have distance at least \(k\)
+into an ordinary position-selection problem gives
+
+\[
+f(n,k)=\sum_{c\ge 0}\binom{n-(k-1)(c-1)}{c}
+\]
+
+The complexity is \(O(n/k)\).
+
+If there are many queries with the same \(k\), use the first method;
+otherwise, calculate it using combinations.
+
+\subsection*{1007}\label{section-3}
+\addcontentsline{toc}{subsection}{1007}
+
+\textbf{Problem}: Given an \(n \times m\) grid with obstacles in some
+cells, you can move up, down, left, or right from a cell. There are
+\(k\) directed portals in the grid, and a cell may contain multiple
+portals. You may choose not to use a portal. There are \(q\) queries,
+each asking whether it is possible to reach the destination from the
+starting point.
+
+\textbf{Solution}: First divide all cells into connected components and
+assign an id to the connected component of each cell. Any two cells
+inside the same connected component are mutually reachable. Then
+consider the portals. A portal \((x_1,y_1) \to (x_2,y_2)\) is equivalent
+to adding an edge between the connected components containing these two
+cells. We only need to renumber the connected components and build a new
+graph, then run bfs from each connected component containing a portal to
+determine whether the connected components containing the starting point
+and destination are reachable.
+
+\subsection*{1009}\label{section-4}
+\addcontentsline{toc}{subsection}{1009}
+
+\textbf{Problem}: Given an array \(P\) of length \(2N\), where \(P\) is
+a permutation of \(2N\) and some elements are missing and represented by
+\(0\). Define the value of the permutation as
+
+\[
+|P_1-P_2|+|P_3-P_4|+\cdots+|P_{2N-1}-P_{2N}|
+\]
+
+Find the number of ways to complete the permutation such that its value
+is maximized.
+
+\textbf{Solution}: Divide the array into \(N\) pairs of adjacent
+positions. If both numbers in a pair are non-zero, its contribution is
+already fixed, so we can ignore it. We only consider pairs containing at
+least one \(0\). Suppose there are \(k\) such pairs. Sort the
+corresponding \(2k\) numbers and divide them into a lower half and an
+upper half. To maximize the contribution, each pair must contain one
+large number and one small number. Let \(cnt\) be the number of pairs
+where both numbers are \(0\). The answer is
+
+\[
+l!\times r!\times 2^{cnt}
+\]
+
+\subsection*{1012}\label{section-5}
+\addcontentsline{toc}{subsection}{1012}
+
+\textbf{Problem}: Given an undirected graph with \(n\) vertices and
+\(m\) edges numbered \(1,2,\dots,n\). There may be multiple edges
+connecting the same pair of vertices. The input graph is guaranteed to
+be bipartite. A cycle is a connected subgraph in which every vertex has
+degree \(2\). If a cycle contains exactly \(k\) vertices, it is called a
+\(k\)-cycle. The input guarantees that \(k\) is prime. Find the number
+of different \(k\)-cycles in the graph.
+
+\textbf{Solution}: Since the graph is bipartite, every cycle must have
+even length. Since \(k\) is also prime, the cycle length can only be
+\(2\). Therefore, we only need to count the number of ways to choose two
+different parallel edges between the same pair of vertices.
+
+\end{document}

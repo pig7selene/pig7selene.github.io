@@ -8,7 +8,8 @@ description: "CS224n lec3,neural networks, backpropagation, regularization, acti
 ---
 
 > 寻找太阳的梦 自不量力说 自己也变成太阳的念头  
-> from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/N-NJOZkhJ)
+> from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/N-NJOZkhJ)<br>
+> LaTeX edition: [Read or download PDF](/output/pdf/neural-networks-and-backpropagation.pdf) · [TeX source](/output/pdf/neural-networks-and-backpropagation.tex)
 {: .chinese-version-link }
 
 # Neural Networks and Backpropagation

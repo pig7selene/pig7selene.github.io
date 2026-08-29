@@ -1,0 +1,547 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+\PassOptionsToPackage{space}{xeCJK}
+\documentclass[
+  a4paper,
+  10pt]{article}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Times New Roman}
+  \setmonofont[]{Menlo}
+  \setmathfont[]{STIX Two Math}
+  \ifXeTeX
+    \usepackage{xeCJK}
+    \setCJKmainfont[]{Songti SC}
+  \fi
+  \ifLuaTeX
+    \usepackage[]{luatexja-fontspec}
+    \setmainjfont[]{Songti SC}
+  \fi
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage[a4paper,top=24mm,bottom=25mm,left=23mm,right=23mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,longtable,array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{mdframed}
+\usepackage{xcolor}
+\usepackage{xurl}
+\usepackage{hyperref}
+\graphicspath{{../../}}
+
+\definecolor{PaperBlue}{HTML}{000000}
+\definecolor{PaperRule}{HTML}{B7C6D5}
+\definecolor{PaperShade}{HTML}{F4F7FA}
+\definecolor{PaperText}{HTML}{000000}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=PaperBlue,
+  urlcolor=PaperBlue,
+  citecolor=PaperBlue,
+  pdfborder={0 0 0}
+}
+
+\color{PaperText}
+\linespread{1.08}
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0.25em}
+\setlength{\emergencystretch}{3em}
+\setlist{itemsep=0.2em,topsep=0.45em}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\titleformat{\section}
+  {\Large\bfseries\color{PaperBlue}}
+  {\thesection}{0.7em}{}
+\titleformat{\subsection}
+  {\large\bfseries\color{PaperText}}
+  {\thesubsection}{0.65em}{}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{PaperText}}
+  {\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{2.2ex plus 0.5ex}{0.9ex}
+\titlespacing*{\subsection}{0pt}{1.8ex plus 0.4ex}{0.7ex}
+\titlespacing*{\subsubsection}{0pt}{1.5ex plus 0.3ex}{0.5ex}
+
+\captionsetup{
+  font=small,
+  labelfont=bf,
+  textfont=it,
+  justification=centering,
+  skip=6pt
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyhead[R]{\small Selene's Blog}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[R]{\small Selene's Blog}
+  \fancyfoot[C]{\small\thepage}
+  \renewcommand{\headrulewidth}{0.4pt}
+}
+
+\renewenvironment{quote}
+  {\begin{mdframed}[
+      linewidth=0.7pt,
+      linecolor=PaperRule,
+      backgroundcolor=PaperShade,
+      leftline=true,
+      rightline=false,
+      topline=false,
+      bottomline=false,
+      innerleftmargin=10pt,
+      innerrightmargin=8pt,
+      innertopmargin=7pt,
+      innerbottommargin=7pt,
+      skipabove=8pt,
+      skipbelow=10pt
+    ]\itshape}
+  {\end{mdframed}}
+
+\newenvironment{theorembox}[1]
+  {\par\medskip\noindent\textbf{Theorem (#1).}\quad}
+  {\par\medskip}
+
+\newenvironment{lemmabox}[1]
+  {\par\medskip\noindent\textbf{Lemma #1.}\quad}
+  {\par\medskip}
+
+\newenvironment{proofbox}
+  {\par\medskip\noindent\textit{Proof.}\quad}
+  {\hfill$\square$\par\medskip}
+
+\AtBeginDocument{\allowdisplaybreaks[2]}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+% fallback for those not using the hyperref driver hyperxmp:
+\makeatletter
+\@ifundefined{xmpquote}{\newcommand{\xmpquote}[1]{#1}}{}
+\makeatother
+\hypersetup{
+  pdftitle={Two Proofs of the Matrix-Tree Theorem},
+  pdfauthor={Selene},
+  colorlinks=true,
+  linkcolor={black},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={black},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Two Proofs of the Matrix-Tree Theorem}
+\author{Selene}
+\date{June 25, 2026}
+
+\begin{document}
+\maketitle
+
+This chapter introduces the Matrix-Tree Theorem and presents two proofs,
+using induction and the Cauchy-Binet formula, to show how determinants
+can be used to count spanning trees in a graph.
+
+We denote by \(A[i]\) the matrix obtained from \(A\) by deleting the
+\(i\)-th row and the \(i\)-th column.
+
+\section{Kirchhoff's Matrix-Tree
+Theorem}\label{kirchhoffs-matrix-tree-theorem}
+
+\begin{theorembox}{Kirchhoff's Matrix-Tree Theorem}
+
+The number of spanning trees of a graph \(G\) is given by
+
+\[
+\tau(G)=\det(L_G[i]),
+\]
+
+where \(i\) can be any vertex.
+
+\end{theorembox}
+
+Here \(L_G\) denotes the Laplacian matrix of \(G\).
+
+\section{Fact 1}\label{fact-1}
+
+Let \(A \in \mathbb{R}^{n \times n}\), and let \(E_{ii}\) be the matrix
+whose \((i,i)\) entry is \(1\) and all other entries are \(0\). Then
+
+\[
+\det(A + E_{ii})
+=
+\det(A) + \det(A[i]).
+\]
+
+Consider the permutation expansion definition of the determinant:
+
+\[
+\det(A=(a_{ij}))
+=
+\sum_{\pi}
+\operatorname{sgn}(\pi)
+a_{1\pi(1)}
+a_{2\pi(2)}
+\cdots
+a_{n\pi(n)}.
+\]
+
+This fact is not difficult to see. We replace the \((i,i)\) entry by
+\(a_{ii}+1\), so we obtain the original determinant plus one extra term.
+
+This extra term corresponds exactly to the sum over all permutations on
+the set \([n]\setminus\{i\}\), namely the determinant obtained by
+deleting the \(i\)-th row and the \(i\)-th column. Hence this term is
+precisely \(\det(A[i])\).
+
+\section{First Proof}\label{first-proof}
+
+Now we begin the first proof of Kirchhoff's Matrix-Tree Theorem.
+
+Our first proof proceeds by induction on both the number of vertices and
+the number of edges of the graph \(G\).
+
+If \(G\) is an empty graph with two vertices, then
+
+\[
+L_G=
+\begin{bmatrix}
+0 & 0\\
+0 & 0
+\end{bmatrix}.
+\]
+
+Hence \(L_G[i]=[0]\), and
+
+\[
+\det(L_G[i])=0,
+\]
+
+which agrees with the theorem.
+
+Throughout the proof:
+
+\begin{itemize}
+\tightlist
+\item
+  \(\tau(G)\) denotes the number of spanning trees of \(G\);
+\item
+  \(G-e\) denotes the graph obtained by deleting the edge \(e\);
+\item
+  \(G/e\) denotes the graph obtained by contracting the edge \(e\), that
+  is, merging its two endpoints into a single vertex.
+\end{itemize}
+
+If \(i\) is an isolated vertex, then \(G\) has no spanning trees, and
+the \(i\)-th row and the \(i\)-th column of \(L_G\) are entirely zero.
+Therefore
+
+\[
+\det(L_G[i])=\det(L_{G-i})=0.
+\]
+
+Otherwise, we may assume there exists an edge \(e=(i,j)\) adjacent to
+\(i\). For any spanning tree \(T\), either \(e \in T\) or
+\(e \notin T\), so
+
+\[
+\tau(G)=\tau(G/e)+\tau(G-e).
+\]
+
+The first term reduces the number of vertices by \(1\), while the second
+term reduces the number of edges by \(1\), so this gives us an induction
+framework.
+
+First, we establish the relation between \(L_G\) and \(L_{G-e}\).
+Observe that
+
+\[
+L_G[i]=L_{G-e}[i]+E_{jj}.
+\]
+
+That is, after deleting the edge \(e\), the only difference between the
+resulting Laplacian matrix and \(L_G[i]\) lies in the degree of vertex
+\(j\). By Fact 1, we obtain
+
+\[
+\begin{aligned}
+\det(L_G[i])
+&= \det(L_{G-e}[i]+E_{jj}) \\
+&= \det(L_{G-e}[i])+\det(L_{G-e}[i,j]) \\
+&= \det(L_{G-e}[i])+\det(L_G[i,j]).
+\end{aligned}
+\]
+
+Here \(L_G[i,j]\) denotes the matrix obtained by deleting both the
+\(i\)-th and \(j\)-th rows and columns. The last equality holds because
+once the \(i,j\) rows and columns are removed, there is no remaining
+difference between \(L_G\) and \(L_{G-e}\).
+
+Next, we establish the relation between \(L_G\) and \(L_{G/e}\). Suppose
+we contract vertex \(i\) into vertex \(j\). Then
+
+\[
+L_{G/e}[j]=L_G[i,j].
+\]
+
+Hence
+
+\[
+\begin{aligned}
+\det(L_G[i])
+&= \det(L_{G-e}[i])+\det(L_{G/e}[j]) \\
+&= \tau(G-e)+\tau(G/e) \\
+&= \tau(G).
+\end{aligned}
+\]
+
+The second equality follows from the induction hypothesis, completing
+the first proof.
+
+\section{Fact 2: Cauchy-Binet
+Formula}\label{fact-2-cauchy-binet-formula}
+
+Let
+
+\[
+A \in \mathbb{R}^{n \times m},
+\qquad
+B \in \mathbb{R}^{m \times n},
+\]
+
+where \(m \ge n\). Define:
+
+\begin{itemize}
+\tightlist
+\item
+  \(A_S\): the submatrix of \(A\) consisting of the columns indexed by
+  \(S\subseteq[m]\);
+\item
+  \(B_S\): the submatrix of \(B\) consisting of the rows indexed by
+  \(S\subseteq[m]\).
+\end{itemize}
+
+Let \(\binom{[m]}{n}\) denote the collection of all subsets of \([m]\)
+of size \(n\). Then
+
+\[
+\det(AB)
+=
+\sum_{S \in \binom{[m]}{n}}
+\det(A_S)\det(B_S).
+\]
+
+\section{Second Proof}\label{second-proof}
+
+Since
+
+\[
+L_G = \sum_{(i,j) \in E}(e_i - e_j)(e_i-e_j)^T,
+\]
+
+we may write
+
+\[
+L_G=BB^T,
+\]
+
+where \(B \in \mathbb{R}^{n \times m}\) is an incidence matrix of \(G\).
+Each edge \((i,j)\) corresponds to a column vector
+
+\[
+e_i-e_j.
+\]
+
+Since \(L_G=BB^T\), this once again proves that \(L_G\) is positive
+semidefinite.
+
+If \(B[i]\) denotes the matrix obtained by deleting the \(i\)-th row of
+\(B\), then
+
+\[
+L_G[i]=B[i]B[i]^T.
+\]
+
+We further let \(B_S[i]\) denote the matrix obtained from \(B[i]\) by
+keeping only the columns indexed by \(S\subseteq E\).
+
+We also need the following lemma.
+
+\begin{lemmabox}{2}
+
+For \(S \subseteq E\) with \(\lvert S\rvert = n-1\),
+
+\[
+\left|\det(B_S[i])\right|
+=
+\begin{cases}
+1, & \text{if } S \text{ is a spanning tree},\\
+0, & \text{otherwise}.
+\end{cases}
+\]
+
+\end{lemmabox}
+
+With this lemma, the second proof of the Matrix-Tree Theorem becomes
+extremely short:
+
+\[
+\begin{aligned}
+\det(L_G[i])
+&= \det(B[i]B[i]^T) \\
+&= \sum_{S\in\binom{E}{n-1}}
+   \det(B_S[i])^2 \\
+&= \tau(G).
+\end{aligned}
+\]
+
+Here:
+
+\begin{itemize}
+\tightlist
+\item
+  the second equality follows from the Cauchy-Binet formula;
+\item
+  the third equality follows from Lemma 2.
+\end{itemize}
+
+\section{Proof of Lemma 2}\label{proof-of-lemma-2}
+
+\begin{proofbox}
+
+Assume without loss of generality that the edges in \(B_S[i]\) are
+oriented arbitrarily. That is, we may replace the column corresponding
+to an edge \((i,j)\) from \(e_i-e_j\) to \(e_j-e_i\).
+
+This only changes the sign of the determinant, so it does not change the
+absolute value.
+
+If \(S\subseteq E\), \(\lvert S\rvert=n-1\), and \(S\) is not a spanning
+tree, then \(S\) necessarily contains a cycle. We may orient the edges
+along this cycle.
+
+If we sum the columns corresponding to this cycle, we obtain the zero
+vector. Hence the columns of \(B_S[i]\) are linearly dependent, and
+therefore
+
+\[
+\det(B_S[i])=0.
+\]
+
+Now assume that \(S\) is a spanning tree. We prove
+
+\[
+\left|\det(B_S[i])\right|=1
+\]
+
+by induction on \(n\).
+
+\subsection{Base Case}\label{base-case}
+
+If \(n=2\), then
+
+\[
+B_S=
+\begin{bmatrix}
+1\\
+-1
+\end{bmatrix}.
+\]
+
+After deleting one row, we get
+
+\[
+B_S[i]=[\pm 1],
+\]
+
+and therefore
+
+\[
+\left|\det(B_S[i])\right|=1.
+\]
+
+\subsection{Inductive Case}\label{inductive-case}
+
+Assume the lemma holds for trees with \(n-1\) vertices.
+
+Let \(j\ne i\) be a leaf vertex of the tree, and let \((k,j)\) be the
+unique edge adjacent to \(j\). Such a leaf vertex exists because every
+tree with at least two vertices has at least two leaves.
+
+Permute rows and columns so that:
+
+\begin{itemize}
+\tightlist
+\item
+  the edge \((k,j)\) becomes the last column;
+\item
+  the vertex \(j\) becomes the last row.
+\end{itemize}
+
+These permutations may change the sign of the determinant, but they do
+not affect its absolute value.
+
+Since \(j\) is a leaf, the last row has only one nonzero entry.
+Expanding the determinant along the last row gives
+
+\[
+\left|\det(B_S[i])\right|
+=
+\left|
+\det(B_{S-\{(k,j)\}}[i,j])
+\right|.
+\]
+
+By the induction hypothesis,
+
+\[
+\left|
+\det(B_{S-\{(k,j)\}}[i,j])
+\right|
+=1.
+\]
+
+Therefore,
+
+\[
+\left|\det(B_S[i])\right|=1.
+\]
+
+This completes the proof of Lemma 2, and hence the second proof of
+Kirchhoff's Matrix-Tree Theorem.
+
+\end{proofbox}
+
+\end{document}

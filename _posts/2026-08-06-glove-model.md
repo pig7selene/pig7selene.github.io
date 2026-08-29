@@ -7,7 +7,8 @@ math: true
 description: "CS224n lec2,the GloVe model, co-occurrence matrices, least-squares objectives, and the evaluation of word vectors."
 ---
 
-> from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/SW1CcdBqW)
+> from Selene, Chinese version: [Chinese version](https://notes.sjtu.edu.cn/s/SW1CcdBqW)<br>
+> LaTeX edition: [Read or download PDF](/output/pdf/glove-model.pdf) · [TeX source](/output/pdf/glove-model.tex)
 {: .chinese-version-link }
 
 # GloVe Model

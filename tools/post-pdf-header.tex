@@ -1,0 +1,103 @@
+\usepackage[a4paper,top=24mm,bottom=25mm,left=23mm,right=23mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,longtable,array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{mdframed}
+\usepackage{xcolor}
+\usepackage{xurl}
+\usepackage{hyperref}
+\graphicspath{{../../}}
+
+\definecolor{PaperBlue}{HTML}{000000}
+\definecolor{PaperRule}{HTML}{B7C6D5}
+\definecolor{PaperShade}{HTML}{F4F7FA}
+\definecolor{PaperText}{HTML}{000000}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=PaperBlue,
+  urlcolor=PaperBlue,
+  citecolor=PaperBlue,
+  pdfborder={0 0 0}
+}
+
+\color{PaperText}
+\linespread{1.08}
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0.25em}
+\setlength{\emergencystretch}{3em}
+\setlist{itemsep=0.2em,topsep=0.45em}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\titleformat{\section}
+  {\Large\bfseries\color{PaperBlue}}
+  {\thesection}{0.7em}{}
+\titleformat{\subsection}
+  {\large\bfseries\color{PaperText}}
+  {\thesubsection}{0.65em}{}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{PaperText}}
+  {\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{2.2ex plus 0.5ex}{0.9ex}
+\titlespacing*{\subsection}{0pt}{1.8ex plus 0.4ex}{0.7ex}
+\titlespacing*{\subsubsection}{0pt}{1.5ex plus 0.3ex}{0.5ex}
+
+\captionsetup{
+  font=small,
+  labelfont=bf,
+  textfont=it,
+  justification=centering,
+  skip=6pt
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyhead[R]{\small Selene's Blog}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[R]{\small Selene's Blog}
+  \fancyfoot[C]{\small\thepage}
+  \renewcommand{\headrulewidth}{0.4pt}
+}
+
+\renewenvironment{quote}
+  {\begin{mdframed}[
+      linewidth=0.7pt,
+      linecolor=PaperRule,
+      backgroundcolor=PaperShade,
+      leftline=true,
+      rightline=false,
+      topline=false,
+      bottomline=false,
+      innerleftmargin=10pt,
+      innerrightmargin=8pt,
+      innertopmargin=7pt,
+      innerbottommargin=7pt,
+      skipabove=8pt,
+      skipbelow=10pt
+    ]\itshape}
+  {\end{mdframed}}
+
+\newenvironment{theorembox}[1]
+  {\par\medskip\noindent\textbf{Theorem (#1).}\quad}
+  {\par\medskip}
+
+\newenvironment{lemmabox}[1]
+  {\par\medskip\noindent\textbf{Lemma #1.}\quad}
+  {\par\medskip}
+
+\newenvironment{proofbox}
+  {\par\medskip\noindent\textit{Proof.}\quad}
+  {\hfill$\square$\par\medskip}
+
+\AtBeginDocument{\allowdisplaybreaks[2]}

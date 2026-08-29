@@ -7,6 +7,9 @@ math: true
 description: "personal solution to CS224N assignment 2"
 ---
 
+> LaTeX edition: [Read or download PDF](/output/pdf/cs224n-assignment-2.pdf) · [TeX source](/output/pdf/cs224n-assignment-2.tex)
+{: .chinese-version-link }
+
 ## Problem 1
 
 Let $y \in \mathbb{R}^{\lvert V\rvert}$ be the one-hot true distribution, let $\hat{y} \in \mathbb{R}^{\lvert V\rvert}$ be the predicted distribution, and let
