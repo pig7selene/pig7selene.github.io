@@ -7,10 +7,8 @@ math: true
 description: "CS224n lec5,A note on self-attention, positional representations, Transformer components, and encoder-decoder architectures."
 ---
 
-*天雨粟 鬼夜哭 思念漫太古*
-{: .web-only }
-
-> You can download the [TeX (LaTeX source)](/output/pdf/neural-network-architectures-and-properties.tex) and [PDF (PDF file)](/output/pdf/neural-network-architectures-and-properties.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/WdOsAAXpd) here.
+>天雨粟 鬼夜哭 思念漫太古  
+> You can download the [LaTeX](/output/pdf/neural-network-architectures-and-properties.tex) and [PDF](/output/pdf/neural-network-architectures-and-properties.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/WdOsAAXpd) here.
 {: .chinese-version-link }
 
 ## Foundations
