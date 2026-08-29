@@ -7,10 +7,8 @@ math: true
 description: "CS224n lec4,A note on n-gram and neural language models, recurrent neural networks, bidirectional RNNs, GRUs, and LSTMs."
 ---
 
-*人间 瞬间 天地之间 下次我 又是谁*
-{: .web-only }
-
-> You can download the [TeX (LaTeX source)](/output/pdf/language-models-and-recurrent-neural-networks.tex) and [PDF (PDF file)](/output/pdf/language-models-and-recurrent-neural-networks.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/G0gesfJHt) here.
+>人间 瞬间 天地之间 下次我 又是谁  
+> You can download the [LaTeX](/output/pdf/language-models-and-recurrent-neural-networks.tex) and [PDF](/output/pdf/language-models-and-recurrent-neural-networks.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/G0gesfJHt) here.
 {: .chinese-version-link }
 
 ## Language Models
