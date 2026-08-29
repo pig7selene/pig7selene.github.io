@@ -7,10 +7,8 @@ math: true
 description: "CS224n lec3,neural networks, backpropagation, regularization, activation functions, and data preprocessing."
 ---
 
-*寻找太阳的梦 自不量力说 自己也变成太阳的念头*
-{: .web-only }
-
-> You can download the [TeX (LaTeX source)](/output/pdf/neural-networks-and-backpropagation.tex) and [PDF (PDF file)](/output/pdf/neural-networks-and-backpropagation.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/N-NJOZkhJ) here.
+> 寻找太阳的梦 自不量力说 自己也变成太阳的念头  
+> You can download the [LaTeX](/output/pdf/neural-networks-and-backpropagation.tex) and [PDF](/output/pdf/neural-networks-and-backpropagation.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/N-NJOZkhJ) here.
 {: .chinese-version-link }
 
 # Neural Networks and Backpropagation
