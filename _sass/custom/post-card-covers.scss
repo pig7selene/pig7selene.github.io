@@ -6,7 +6,6 @@
 #post-list .post-preview.has-card-image {
   position: relative;
   display: block;
-  min-height: 19rem;
   overflow: hidden;
   color: #f5f7fb;
 }
@@ -23,26 +22,21 @@
   position: absolute;
   inset: 0;
   content: '';
-  background: linear-gradient(90deg, rgba(18, 24, 38, 0.88) 0%, rgba(18, 24, 38, 0.66) 48%, rgba(18, 24, 38, 0.28) 100%);
+  background: linear-gradient(90deg, rgba(12, 15, 24, 0.98) 0%, rgba(12, 15, 24, 0.93) 30%, rgba(12, 15, 24, 0.7) 50%, rgba(12, 15, 24, 0.22) 75%, rgba(12, 15, 24, 0.06) 100%);
 }
 
 #post-list .post-preview.has-card-image .post-card-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 30%;
+  object-position: right 30%;
 }
 
 #post-list .post-preview.has-card-image > .col-md-7 {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 70%;
-}
-
-#post-list .post-preview.has-card-image .card-body {
-  min-height: 19rem;
-  padding: 1.8rem 2rem;
+  max-width: 65%;
 }
 
 #post-list .post-preview.has-card-image .card-title,
@@ -63,16 +57,7 @@
 }
 
 @media (max-width: 767.98px) {
-  #post-list .post-preview.has-card-image,
-  #post-list .post-preview.has-card-image .card-body {
-    min-height: 17rem;
-  }
-
   #post-list .post-preview.has-card-image > .col-md-7 {
-    max-width: 100%;
-  }
-
-  #post-list .post-preview.has-card-image .card-body {
-    padding: 1.5rem;
+    max-width: 72%;
   }
 }
