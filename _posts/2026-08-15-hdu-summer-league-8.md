@@ -5,6 +5,9 @@ categories: [xcpc]
 tags: [xcpc,hdu summer league2026]
 math: true
 description: "Solutions and notes for HDU Summer League(8)."
+card_image:
+  path: /assets/img/posts/foundation-model-handbook/handbook-card-cover.png
+  alt: "Anime-style figure in a hood overlooking a city at sunset"
 ---
 
 ## HDU Summer League(8)
