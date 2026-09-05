@@ -44,11 +44,13 @@
   height: 100%;
   object-fit: cover;
   object-position: right 30%;
-  transition: transform 240ms ease;
+  filter: brightness(0.82);
+  transition: filter 240ms ease, transform 240ms ease;
 }
 
 #post-list .post-preview.has-card-image:hover .post-card-image img,
 #post-list .post-preview.has-card-image:focus-visible .post-card-image img {
+  filter: brightness(0.88);
   transform: scale(1.025);
 }
 
