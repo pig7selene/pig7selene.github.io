@@ -5,6 +5,9 @@ categories: [Machine Learning]
 tags: [NLP,CS224N, Transformer]
 math: true
 description: "CS224n lec5,A note on self-attention, positional representations, Transformer components, and encoder-decoder architectures."
+card_image:
+  path: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
+  alt: "Sunset cityscape with a figure looking over the skyline"
 ---
 
 >天雨粟 鬼夜哭 思念漫太古  

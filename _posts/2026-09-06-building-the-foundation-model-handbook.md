@@ -5,8 +5,8 @@ categories: [Machine Learning]
 tags: [Foundation Models, LLM, Project]
 description: "Introducing The Foundation Model Handbook, a long-term set of structured notes for learning modern foundation models."
 card_image:
-  path: /assets/img/posts/foundation-model-handbook/handbook-card-cover.png
-  alt: "Anime-style figure in a hood overlooking a city at sunset"
+  path: /assets/img/posts/foundation-model-handbook/handbook-card-cover-pink.png
+  alt: "Pink moonlit lake with lanterns and a figure in traditional dress"
 ---
 
 I have been working on a long-term project called [**The Foundation Model Handbook**](https://github.com/pig7selene/the-foundation-model-handbook). It is not a finished textbook or an attempt to be an authoritative reference. It is a structured record of what I have learned about modern foundation models, written so that I can return to it, revise it, and keep extending it over time.

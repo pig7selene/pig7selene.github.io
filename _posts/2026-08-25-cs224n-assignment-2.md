@@ -5,6 +5,9 @@ categories: [Machine Learning]
 tags: [NLP,CS224N]
 math: true
 description: "personal solution to CS224N assignment 2"
+card_image:
+  path: /assets/img/posts/cs224n-assignment-2/assignment-2-card-cover.png
+  alt: "Moonlit cityscape with a silver-haired figure"
 ---
 
 > You can download the [LaTeX](/output/pdf/cs224n-assignment-2.tex) and [PDF](/output/pdf/cs224n-assignment-2.pdf).
