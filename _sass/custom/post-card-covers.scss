@@ -1,0 +1,78 @@
+/* Optional home-page cover images that place post details over the image. */
+#post-list .card-wrapper:has(.has-card-image) {
+  overflow: hidden;
+}
+
+#post-list .post-preview.has-card-image {
+  position: relative;
+  display: block;
+  min-height: 19rem;
+  overflow: hidden;
+  color: #f5f7fb;
+}
+
+#post-list .post-preview.has-card-image .post-card-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+}
+
+#post-list .post-preview.has-card-image .post-card-image::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(90deg, rgba(18, 24, 38, 0.88) 0%, rgba(18, 24, 38, 0.66) 48%, rgba(18, 24, 38, 0.28) 100%);
+}
+
+#post-list .post-preview.has-card-image .post-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+#post-list .post-preview.has-card-image > .col-md-7 {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 70%;
+}
+
+#post-list .post-preview.has-card-image .card-body {
+  min-height: 19rem;
+  padding: 1.8rem 2rem;
+}
+
+#post-list .post-preview.has-card-image .card-title,
+#post-list .post-preview.has-card-image .card-text,
+#post-list .post-preview.has-card-image .post-meta,
+#post-list .post-preview.has-card-image .categories,
+#post-list .post-preview.has-card-image .pin {
+  color: #f5f7fb;
+}
+
+#post-list .post-preview.has-card-image .card-title {
+  color: #f5f7fb !important;
+}
+
+#post-list .post-preview.has-card-image .card-text,
+#post-list .post-preview.has-card-image .post-meta {
+  color: rgba(245, 247, 251, 0.86);
+}
+
+@media (max-width: 767.98px) {
+  #post-list .post-preview.has-card-image,
+  #post-list .post-preview.has-card-image .card-body {
+    min-height: 17rem;
+  }
+
+  #post-list .post-preview.has-card-image > .col-md-7 {
+    max-width: 100%;
+  }
+
+  #post-list .post-preview.has-card-image .card-body {
+    padding: 1.5rem;
+  }
+}
