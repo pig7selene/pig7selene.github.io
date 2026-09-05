@@ -1,8 +1,8 @@
 ---
 title: "Building The Foundation Model Handbook"
 date: 2026-09-06 01:00:00 +0800
-categories: [Machine Learning]
-tags: [Foundation Models, LLM, Project]
+categories: [Project]
+tags: [Foundation Models Handbook, LLM, Project]
 description: "Introducing The Foundation Model Handbook, a long-term set of structured notes for learning modern foundation models."
 card_image:
   path: /assets/img/posts/foundation-model-handbook/handbook-card-cover-pink.png
