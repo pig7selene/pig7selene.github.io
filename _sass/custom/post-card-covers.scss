@@ -70,11 +70,13 @@
   color: #f5f7fb !important;
 }
 
-#post-list .post-preview.has-card-image .card-text,
-#post-list .post-preview.has-card-image .post-meta {
+#post-list .post-preview.has-card-image .card-text {
   color: rgba(245, 247, 251, 0.86);
 }
 
+#post-list .post-preview.has-card-image .post-meta,
+#post-list .post-preview.has-card-image .post-meta time,
+#post-list .post-preview.has-card-image .post-meta i,
 #post-list .post-preview.has-card-image .categories {
-  color: rgba(245, 247, 251, 0.86);
+  color: #f5f7fb !important;
 }
