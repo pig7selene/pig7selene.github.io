@@ -5,14 +5,20 @@ order: 5
 ---
 
 ## About Me
+I'm a third-year undergraduate student majoring in Computer Science and Technology.I’m interested in machine learning,theoretical computer science, and mathematics**. I’m especially drawn to the foundations of modern language models—from **Transformers** and pre-training to post-training, reinforcement learning, RAG, and agents—and to the algorithms, proofs that make these systems work.
 
-Student. Learner. Builder.
+I’m building [**the-foundation-model-handbook**](https://github.com/pig7selene/the-foundation-model-handbook), an AI-assisted collection of notes for LLM internship preparation, coursework, and exploring foundation models.  
+Beyond studying and coding, I enjoy football,my favourite team is Chelsea FC. 💙
 
-I’m interested in **machine learning, natural language processing, large language models, theoretical computer science, and mathematics**. I’m especially drawn to the foundations of modern language models—from **Transformers** and pre-training to post-training, reinforcement learning, RAG, and agents—and to the algorithms, proofs, and mathematical structures that make these systems work.
+Currently learning:
 
-I’m currently working through CS224N and building **the-foundation-model-handbook**, a growing AI-assisted collection of structured notes on foundation models. Beyond studying and coding, I enjoy football, traveling, and following Chelsea FC. 💙
-
-`LLM` `NLP` `Deep Learning` `Algorithms` `Theoretical CS` `Mathematics` `Competitive Programming`
+- Foundation Models
+- Reinforcement Learning
+- Theoretical Computer Science
+- Stochastic Processes
+- Optimization
+- Probability Theory
+- Machine Learning
 
 [GitHub](https://github.com/pig7selene) · [Email](mailto:thomasejl748@gmail.com)
 
