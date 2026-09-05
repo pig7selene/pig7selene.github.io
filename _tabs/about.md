@@ -5,7 +5,7 @@ order: 5
 ---
 
 ## About Me
-I'm a third-year undergraduate student majoring in Computer Science and Technology.I’m interested in machine learning,theoretical computer science, and mathematics**. I’m especially drawn to the foundations of modern language models—from **Transformers** and pre-training to post-training, reinforcement learning, RAG, and agents—and to the algorithms, proofs that make these systems work.
+I'm a third-year undergraduate student majoring in Computer Science and Technology.I’m interested in machine learning,theoretical computer science, and mathematics**. I’m especially drawn to the foundations of modern language models—from Transformers and pre-training to post-training, reinforcement learning, RAG, and agents—and to the algorithms, proofs that make these systems work.
 
 I’m building [**the-foundation-model-handbook**](https://github.com/pig7selene/the-foundation-model-handbook), an AI-assisted collection of notes for LLM internship preparation, coursework, and exploring foundation models.  
 Beyond studying and coding, I enjoy football,my favourite team is Chelsea FC. 💙
