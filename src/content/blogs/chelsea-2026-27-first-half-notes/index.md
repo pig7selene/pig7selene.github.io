@@ -5,6 +5,10 @@ category: daily
 tags: [Chelsea, Football, 2026-27]
 language: en
 description: 'A living Chelsea fan journal for the 2026/27 first half — match reactions, tactical notes and player thoughts, updated after every matchday.'
+heroImage:
+  src: /assets/img/posts/chelsea-2026-27-first-half-notes/chelsea-2026-27-card-cover.webp
+  alt: 'Chelsea players celebrate with the FIFA Club World Cup trophy'
+  color: '#294b82'
 ---
 
 This is my living journal for Chelsea's 2026/27 season — first half only. One article instead of one post per match: whenever I find time after a matchday, I'll add a few notes under the month below. It's written from the sofa, not the press box — moods, hunches, tactical nitpicks and all. Nothing here is trying to be neutral or complete.
