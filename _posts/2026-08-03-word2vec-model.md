@@ -5,6 +5,9 @@ categories: [Machine Learning]
 tags: [NLP,CS224N]
 math: true
 description: "CS224n lec1,word representation, distributional semantics, and the Skip-gram Word2Vec model"
+card_image:
+  path: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
+  alt: "Sunset cityscape with a figure looking over the skyline"
 ---
 
 > You can download the [LaTeX](/output/pdf/word2vec-model.tex) and [PDF](/output/pdf/word2vec-model.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/9d4Zemo0c) here.

@@ -5,6 +5,9 @@ categories: [Machine Learning]
 tags: [NLP,CS224N]
 math: true
 description: "CS224n lec3,neural networks, backpropagation, regularization, activation functions, and data preprocessing."
+card_image:
+  path: /assets/img/posts/foundation-model-handbook/handbook-card-cover-pink.png
+  alt: "Pink moonlit lake with lanterns and a figure in traditional dress"
 ---
 
 > 寻找太阳的梦 自不量力说 自己也变成太阳的念头  
