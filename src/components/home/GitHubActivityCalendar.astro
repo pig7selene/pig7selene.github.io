@@ -5,7 +5,6 @@ import {
   formatISO,
   getDay,
   getMonth,
-  getYear,
   nextDay,
   parseISO,
   subWeeks
@@ -29,15 +28,46 @@ interface Props {
   username: string
 }
 
-async function fetchData(username: string): Promise<GitHubActivityApiResponse> {
-  const apiUrl = 'https://github-contributions-api.jogruber.de/v4/'
-  const response = await fetch(`${apiUrl}${username}?y=last`)
-  const data = (await response.json()) as GitHubActivityApiResponse
+/** Scrape the real contribution calendar from the GitHub profile page. */
+async function fetchFromGitHub(username: string): Promise<GitHubActivityApiResponse> {
+  const response = await fetch(`https://github.com/users/${username}/contributions`, {
+    headers: { 'User-Agent': `${username}.github.io (site build)` }
+  })
   if (!response.ok) {
-    const message = (data as any).error || 'Unknown error'
-    throw Error(`Fetching GitHub contribution data for "${username}" failed: ${message}`)
+    throw new Error(`GitHub contributions request failed with status ${response.status}`)
   }
-  return data
+  const html = await response.text()
+  const cellPattern =
+    /<td[^>]*data-date="(\d{4}-\d{2}-\d{2})"[^>]*data-level="(\d)"[^>]*><\/td>\s*<tool-tip[^>]*>([^<]*)<\/tool-tip>/g
+  const calendar = new Map<string, GitHubActivityDay>()
+  for (const [, date, level, tooltip] of html.matchAll(cellPattern)) {
+    const count = Number.parseInt(tooltip.replace(/,/g, ''), 10) || 0
+    calendar.set(date, { date, count, level: Number.parseInt(level, 10) })
+  }
+  if (calendar.size === 0) {
+    throw new Error('Could not parse the GitHub contributions page')
+  }
+  const contributions = [...calendar.values()].sort((a, b) => a.date.localeCompare(b.date))
+  const lastYear = contributions.reduce((sum, day) => sum + day.count, 0)
+  return { contributions, total: { lastYear } }
+}
+
+async function fetchData(username: string): Promise<GitHubActivityApiResponse> {
+  try {
+    return await fetchFromGitHub(username)
+  } catch (error) {
+    console.warn(
+      `[GitHubActivityCalendar] GitHub profile fetch failed (${error}), using fallback API`
+    )
+    const apiUrl = 'https://github-contributions-api.jogruber.de/v4/'
+    const response = await fetch(`${apiUrl}${username}?y=last`)
+    const data = (await response.json()) as GitHubActivityApiResponse
+    if (!response.ok) {
+      const message = (data as { error?: string }).error || 'Unknown error'
+      throw Error(`Fetching GitHub contribution data for "${username}" failed: ${message}`)
+    }
+    return data
+  }
 }
 
 function fillHoles(activities: Array<GitHubActivityDay>): Array<GitHubActivityDay> {
@@ -87,7 +117,7 @@ function getMonthLabels(weeks: Array<Array<GitHubActivityDay>>) {
     const firstActivity = week.find((a) => a)
     if (!firstActivity) return labels
     const month = monthNames[getMonth(parseISO(firstActivity.date))]
-    if (weekIndex === 0 || labels.at(-1)?.label !== month) {
+    if (weekIndex === 0 || (labels.at(-1)?.label !== month && weekIndex < weeks.length - 2)) {
       labels.push({ weekIndex, label: month })
     }
     return labels
@@ -99,29 +129,52 @@ const data = await fetchData(username)
 
 const activities = data.contributions
 const totalCount = data.total.lastYear
-const activityYear = getYear(parseISO(activities[0].date))
 
-const blockSize = 12
-const blockMargin = 4
+const blockSize = 10
+const blockMargin = 2
 const blockRadius = 2
-const fontSize = 14
+const fontSize = 10
 const labelMargin = 8
 const labelHeight = fontSize + labelMargin
+const weekdayGutter = 26
 const weeks = groupByWeeks(activities)
-const width = weeks.length * (blockSize + blockMargin) - blockMargin
+const width = weekdayGutter + weeks.length * (blockSize + blockMargin) - blockMargin
 const height = labelHeight + (blockSize + blockMargin) * 7 - blockMargin
 const monthLabels = getMonthLabels(weeks)
+const weekdayLabels = ['Mon', 'Wed', 'Fri']
 ---
 
-<div class="overflow-x-auto w-full" style="max-width: 90vw;">
-  <svg class='block' width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+<div class='w-full overflow-x-auto'>
+  <svg
+    class='block text-muted-foreground'
+    width={width}
+    height={height}
+    viewBox={`0 0 ${width} ${height}`}
+  >
     <g>
       {
         monthLabels.map(({ label, weekIndex }) => (
           <text
-            x={(blockSize + blockMargin) * weekIndex}
+            x={weekdayGutter + (blockSize + blockMargin) * weekIndex}
             y={0}
+            font-size={fontSize}
             dominant-baseline='hanging'
+            fill='currentColor'
+          >
+            {label}
+          </text>
+        ))
+      }
+    </g>
+    <g>
+      {
+        weekdayLabels.map((label, i) => (
+          <text
+            x={weekdayGutter - 4}
+            y={labelHeight + (blockSize + blockMargin) * (i * 2 + 1) + blockSize / 2}
+            font-size={fontSize}
+            text-anchor='end'
+            dominant-baseline='central'
             fill='currentColor'
           >
             {label}
@@ -131,18 +184,11 @@ const monthLabels = getMonthLabels(weeks)
     </g>
     {
       weeks.map((week, wi) => (
-        <g transform={`translate(${(blockSize + blockMargin) * wi}, 0)`}>
+        <g transform={`translate(${weekdayGutter + (blockSize + blockMargin) * wi}, 0)`}>
           {week.map((activity, di) =>
             activity ? (
               <rect
-                class:list={[
-                  'stroke-foreground/10, hover:opacity-80',
-                  activity.level === 0 && 'fill-[#ebedf0] dark:fill-[#161b22]',
-                  activity.level === 1 && 'fill-[#c6e48b] dark:fill-[#0e4429]',
-                  activity.level === 2 && 'fill-[#7bc96f] dark:fill-[#006d32]',
-                  activity.level === 3 && 'fill-[#239a3b] dark:fill-[#26a641]',
-                  activity.level === 4 && 'fill-[#196127] dark:fill-[#39d353]'
-                ]}
+                class:list={['transition-opacity hover:opacity-80', `cg-level-${activity.level}`]}
                 x={0}
                 y={labelHeight + (blockSize + blockMargin) * di}
                 width={blockSize}
@@ -161,8 +207,8 @@ const monthLabels = getMonthLabels(weeks)
     }
   </svg>
 </div>
-<footer class='flex items-center justify-between'>
-  <div>{totalCount} contributions in {activityYear} ~ {activityYear + 1}</div>
+<footer class='flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground'>
+  <div>{totalCount.toLocaleString('en-US')} contributions in the last year</div>
   <div class='flex items-center gap-1'>
     <span>Less</span>
     {
@@ -173,13 +219,7 @@ const monthLabels = getMonthLabels(weeks)
             height={blockSize}
             rx={blockRadius}
             ry={blockRadius}
-            class:list={[
-              level === 0 && 'fill-[#ebedf0] dark:fill-[#161b22]',
-              level === 1 && 'fill-[#c6e48b] dark:fill-[#0e4429]',
-              level === 2 && 'fill-[#7bc96f] dark:fill-[#006d32]',
-              level === 3 && 'fill-[#239a3b] dark:fill-[#26a641]',
-              level === 4 && 'fill-[#196127] dark:fill-[#39d353]'
-            ]}
+            class={`cg-level-${level}`}
           />
         </svg>
       ))
@@ -187,3 +227,37 @@ const monthLabels = getMonthLabels(weeks)
     <span>More</span>
   </div>
 </footer>
+
+<style>
+  /* GitHub contribution calendar palette (light / dark) */
+  .cg-level-0 {
+    fill: #ebedf0;
+  }
+  .cg-level-1 {
+    fill: #9be9a8;
+  }
+  .cg-level-2 {
+    fill: #40c463;
+  }
+  .cg-level-3 {
+    fill: #30a14e;
+  }
+  .cg-level-4 {
+    fill: #216e39;
+  }
+  :global(.dark) .cg-level-0 {
+    fill: #161b22;
+  }
+  :global(.dark) .cg-level-1 {
+    fill: #0e4429;
+  }
+  :global(.dark) .cg-level-2 {
+    fill: #006d32;
+  }
+  :global(.dark) .cg-level-3 {
+    fill: #26a641;
+  }
+  :global(.dark) .cg-level-4 {
+    fill: #39d353;
+  }
+</style>

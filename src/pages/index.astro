@@ -1,22 +1,20 @@
 ---
 import { Image } from 'astro:assets'
+import { getBlogCollection, sortMDByDate } from '@/server'
 
+import PageLayout from '@/layouts/BaseLayout.astro'
 import BlogStats from '@/components/home/BlogStats.astro'
+import GitHubActivityCalendar from '@/components/home/GitHubActivityCalendar.astro'
 import Section from '@/components/home/Section.astro'
 import { PostPreview } from '@/components/pages'
 import { Button, Icon, Label } from '@/components/user'
-import PageLayout from '@/layouts/BaseLayout.astro'
-import { getBlogCollection, sortMDByDate } from '@/server'
-import config from '@/site-config'
 import avatar from '@/assets/avatar.png'
+import config from '@/site-config'
 
 const recentPosts = sortMDByDate(await getBlogCollection()).slice(0, 5)
 ---
 
-<PageLayout
-  meta={{ title: 'Home', description: config.description }}
-  highlightColor='#789ac466'
->
+<PageLayout meta={{ title: 'Home', description: config.description }} highlightColor='#789ac466'>
   <main class='flex w-full flex-col items-center'>
     <section class='animate mb-10 flex flex-col items-center gap-y-7' id='content-header'>
       <div class='flex flex-row items-center gap-x-6'>
@@ -65,9 +63,9 @@ const recentPosts = sortMDByDate(await getBlogCollection()).slice(0, 5)
     <div id='content' class='animate flex w-full flex-col gap-y-12 md:w-5/6'>
       <Section title='About'>
         <p class='text-muted-foreground'>
-          I am interested in machine learning, natural language processing, large language
-          models, theoretical computer science, and mathematics. This site is my personal
-          archive of notes, experiments, projects, and thoughts.
+          I am interested in machine learning, natural language processing, large language models,
+          theoretical computer science, and mathematics. This site is my personal archive of notes,
+          experiments, projects, and thoughts.
         </p>
         <Button title='More about me' class='w-fit self-end' href='/about' style='ahead' />
       </Section>
@@ -84,13 +82,13 @@ const recentPosts = sortMDByDate(await getBlogCollection()).slice(0, 5)
         />
       </Section>
 
-      <Section title='Explore'>
-        <div class='flex flex-wrap gap-2'>
-          <Button title='Archives' href='/archives' style='pill' />
-          <Button title='Tags' href='/tags' style='pill' />
-          <Button title='About' href='/about' style='pill' />
-        </div>
-      </Section>
+      {
+        config.personal?.githubUsername && (
+          <Section title='Contributions'>
+            <GitHubActivityCalendar username={config.personal.githubUsername} />
+          </Section>
+        )
+      }
 
       <Section title='Statistics'>
         <BlogStats
