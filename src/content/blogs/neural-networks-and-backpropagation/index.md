@@ -1,7 +1,7 @@
 ---
 title: "CS224N | Neural Networks and Backpropagation"
 publishDate: 2026-08-10
-category: machine-learning
+category: learning
 tags: [NLP, CS224N]
 language: en
 description: "CS224n lec3,neural networks, backpropagation, regularization, activation functions, and data preprocessing."

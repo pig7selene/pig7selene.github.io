@@ -2,6 +2,7 @@
 title: About
 layout: ../../layouts/IndividualPage.astro
 description: "Student, learner, and builder interested in machine learning, theoretical computer science, and mathematics."
+showDescription: false
 language: en
 back: /
 ---

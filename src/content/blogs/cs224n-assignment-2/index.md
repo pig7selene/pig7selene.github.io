@@ -1,7 +1,7 @@
 ---
 title: "CS224N | Assignment 2"
 publishDate: 2026-08-25
-category: machine-learning
+category: learning
 tags: [NLP, CS224N]
 language: en
 description: "personal solution to CS224N assignment 2"

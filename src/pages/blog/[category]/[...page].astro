@@ -3,7 +3,7 @@ import type { GetStaticPaths, Page } from 'astro'
 import type { CollectionEntry } from 'astro:content'
 
 import { Paginator, PostPreview } from '@/components/pages'
-import { getBlogCollection, getUniqueCategories, getCollectionsByCategory, getUniqueTags, sortMDByDate } from '@/server'
+import { getBlogCollection, getCollectionsByCategory, getUniqueTags, sortMDByDate } from '@/server'
 import { Button, Icon } from '@/components/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import config from '@/site-config'
@@ -12,18 +12,16 @@ export const prerender = true
 
 export const getStaticPaths = (async ({ paginate }) => {
   const categoryMap: Record<string, string> = {
-    'machine-learning': 'Machine Learning',
-    'mathematics': 'Mathematics',
-    'competitive-programming': 'Competitive Programming',
-    'projects': 'Projects'
+    research: 'Research',
+    daily: 'Daily',
+    technical: 'Technical',
+    learning: 'Learning'
   }
   
-  const categoryOrder = ['machine-learning', 'mathematics', 'competitive-programming', 'projects']
+  const categoryOrder = ['research', 'daily', 'technical', 'learning']
   
   const allCollections = await getBlogCollection()
-  const allUniqueCategories = getUniqueCategories(allCollections)
-  
-  const uniqueCategories = categoryOrder.filter(cat => allUniqueCategories.includes(cat))
+  const uniqueCategories = categoryOrder
   
   return uniqueCategories.flatMap((category, index) => {
     const collections = sortMDByDate(getCollectionsByCategory(allCollections, category))

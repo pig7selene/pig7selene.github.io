@@ -12,13 +12,14 @@ type Props = MarkdownLayoutProps<{
   description: string
   heroImage?: { src: string }
   language?: string
+  showDescription?: boolean
   back?: string
 }> & {
   headings: MarkdownHeading[]
 }
 
 const { frontmatter, headings } = Astro.props
-const { title, description, heroImage, language, back } = frontmatter
+const { title, description, heroImage, language, showDescription = true, back } = frontmatter
 const socialImage =
   heroImage?.src ?? '/assets/img/posts/foundation-model-handbook/handbook-card-cover-pink.png'
 ---
@@ -52,7 +53,7 @@ const socialImage =
           }
           {
             // Description
-            description && (
+            description && showDescription && (
               <blockquote class='text-sm italic text-muted-foreground'>
                 <q>{description}</q>
               </blockquote>

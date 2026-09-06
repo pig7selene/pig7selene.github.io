@@ -1,7 +1,7 @@
 ---
 title: "Building The Foundation Model Handbook"
 publishDate: 2026-09-06
-category: projects
+category: technical
 tags: [Foundation Models Handbook, LLM, Project]
 language: en
 description: "Introducing The Foundation Model Handbook, a long-term set of structured notes for learning modern foundation models."

@@ -1,7 +1,7 @@
 ---
 title: "CS224N | Transformer"
 publishDate: 2026-08-21
-category: machine-learning
+category: learning
 tags: [NLP, CS224N, Transformer]
 language: en
 description: "CS224n lec5,A note on self-attention, positional representations, Transformer components, and encoder-decoder architectures."

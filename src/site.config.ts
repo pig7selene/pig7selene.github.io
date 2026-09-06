@@ -44,7 +44,7 @@ export const theme: ThemeUserConfig = {
   /** Configure the header of your site. */
   header: {
     menu: [
-      { title: 'Blog', link: '/blog/machine-learning' },
+      { title: 'Blog', link: '/blog/learning' },
       { title: 'Archives', link: '/archives' },
       { title: 'Tags', link: '/tags' },
       { title: 'About', link: '/about' }

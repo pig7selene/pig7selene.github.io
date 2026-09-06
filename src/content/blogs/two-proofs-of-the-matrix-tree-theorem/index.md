@@ -1,7 +1,7 @@
 ---
 title: "Two Proofs of the Matrix-Tree Theorem"
 publishDate: 2026-06-25
-category: mathematics
+category: learning
 tags: [graph-theory]
 language: en
 description: "Two proofs of the Matrix-Tree Theorem—by induction and Cauchy-Binet—showing how determinants count graph spanning trees."

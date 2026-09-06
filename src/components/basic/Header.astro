@@ -2,26 +2,21 @@
 import config from '@/site-config'
 import { Icon } from '@/components/user'
 import { getRelativeLocaleUrl } from 'astro:i18n'
-import { getBlogCollection, getUniqueCategories } from '@/server'
-
-// Get all categories for the dropdown menu
-const allCollections = await getBlogCollection()
-const allCategories = getUniqueCategories(allCollections)
 
 // Define category display names and filter allowed categories
 const categoryMap: Record<string, string> = {
-  'machine-learning': 'Machine Learning',
-  'mathematics': 'Mathematics',
-  'competitive-programming': 'Competitive Programming',
-  'projects': 'Projects'
+  research: 'Research',
+  daily: 'Daily',
+  technical: 'Technical',
+  learning: 'Learning'
 }
 
-const categoryOrder = ['machine-learning', 'mathematics', 'competitive-programming', 'projects']
+const categoryOrder = ['research', 'daily', 'technical', 'learning']
 
-// Filter and map categories with custom order
-const categories = categoryOrder
-  .filter(cat => allCategories.includes(cat))
-  .map(cat => ({ slug: cat, name: categoryMap[cat] }))
+const categories = categoryOrder.map((category) => ({
+  slug: category,
+  name: categoryMap[category]
+}))
 
 // 处理 trailingSlash: 'never' 配置的辅助函数
 function getLocalizedUrl(locale: string | undefined, path: string) {

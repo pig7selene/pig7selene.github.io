@@ -1,7 +1,7 @@
 ---
 title: "CS224N | GloVe Model"
 publishDate: 2026-08-06
-category: machine-learning
+category: learning
 tags: [NLP, CS224N]
 language: en
 description: "CS224n lec2,the GloVe model, co-occurrence matrices, least-squares objectives, and the evaluation of word vectors."

@@ -29,7 +29,6 @@ const recentPosts = sortMDByDate(await getBlogCollection()).slice(0, 5)
         <div class='flex flex-col gap-y-4'>
           <div>
             <h1 class='text-3xl font-bold'>{config.author}</h1>
-            <p class='mt-1 text-muted-foreground'>Student. Learner. Builder.</p>
           </div>
           <div class='flex flex-wrap gap-1'>
             {
@@ -80,7 +79,7 @@ const recentPosts = sortMDByDate(await getBlogCollection()).slice(0, 5)
         <Button
           title='Browse all posts'
           class='w-fit self-end'
-          href='/blog/machine-learning'
+          href='/blog/learning'
           style='ahead'
         />
       </Section>

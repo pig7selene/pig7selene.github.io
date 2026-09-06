@@ -1,7 +1,7 @@
 ---
 title: "CS224N | Word2Vec Model"
 publishDate: 2026-08-03
-category: machine-learning
+category: learning
 tags: [NLP, CS224N]
 language: en
 description: "CS224n lec1,word representation, distributional semantics, and the Skip-gram Word2Vec model"

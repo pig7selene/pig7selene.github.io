@@ -1,7 +1,7 @@
 ---
 title: "HDU Summer League (8)"
 publishDate: 2026-08-15
-category: competitive-programming
+category: daily
 tags: [xcpc, hdu-summer-league-2026]
 language: en
 description: "Solutions and notes for HDU Summer League(8)."

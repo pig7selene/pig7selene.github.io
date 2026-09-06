@@ -1,7 +1,7 @@
 ---
 title: "CS224N | Language Models and Recurrent Neural Networks"
 publishDate: 2026-08-20
-category: machine-learning
+category: learning
 tags: [NLP, CS224N]
 language: en
 description: "CS224n lec4,A note on n-gram and neural language models, recurrent neural networks, bidirectional RNNs, GRUs, and LSTMs."
