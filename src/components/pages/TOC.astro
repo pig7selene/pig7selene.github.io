@@ -2,6 +2,7 @@
 import type { MarkdownHeading } from 'astro'
 
 import { generateToc } from '@/plugins/toc'
+
 import TOCHeading from './TOCHeading.astro'
 
 interface Props {
@@ -33,6 +34,11 @@ const toc = generateToc(headings)
     slug: string
   }
 
+  interface TOCBranch {
+    element: HTMLElement
+    parentSlug: string
+  }
+
   interface HeadingProgress {
     inView: boolean
     progress: number
@@ -41,12 +47,13 @@ const toc = generateToc(headings)
   class TOC extends HTMLElement {
     headings: HTMLElement[] = []
     tocLinks: TOCLink[] = []
+    tocBranches: TOCBranch[] = []
     headingProgress: Record<string, HeadingProgress> = {}
+    parentBySlug = new Map<string, string>()
+    animationFrame = 0
+    contentResizeObserver?: ResizeObserver
 
-    constructor() {
-      super()
-
-      // Initialize the headings and tocLinks
+    initialize = () => {
       this.headings = Array.from(
         document.querySelectorAll('article h2, article h3, article h4, article h5, article h6')
       )
@@ -55,21 +62,98 @@ const toc = generateToc(headings)
         progressBar: link.previousElementSibling as HTMLElement,
         slug: (link.getAttribute('href') || '').substring(1)
       }))
+
+      this.tocBranches = Array.from(this.querySelectorAll<HTMLElement>('[data-toc-children]')).map(
+        (element) => ({
+          element,
+          parentSlug: element.dataset.parentSlug || ''
+        })
+      )
+
+      this.parentBySlug.clear()
+      const headingStack: HTMLElement[] = []
+
+      this.headings.forEach((heading) => {
+        const depth = Number.parseInt(heading.tagName.substring(1), 10)
+
+        while (
+          headingStack.length &&
+          Number.parseInt(headingStack[headingStack.length - 1].tagName.substring(1), 10) >= depth
+        ) {
+          headingStack.pop()
+        }
+
+        const parent = headingStack[headingStack.length - 1]
+        if (parent) this.parentBySlug.set(heading.id, parent.id)
+        headingStack.push(heading)
+      })
+    }
+
+    getActiveHeading = (contentTop: number, contentBottom: number) => {
+      const readingOffset = Math.min(180, Math.max(96, window.innerHeight * 0.2))
+      const readingPosition = window.scrollY + readingOffset
+
+      if (readingPosition < contentTop || readingPosition > contentBottom) return undefined
+
+      let activeHeading: HTMLElement | undefined
+      for (const heading of this.headings) {
+        const headingTop = heading.getBoundingClientRect().top + window.scrollY
+        if (headingTop > readingPosition) break
+        activeHeading = heading
+      }
+
+      if (!activeHeading) {
+        const firstHeading = this.headings[0]
+        const firstHeadingTop = firstHeading?.getBoundingClientRect().top + window.scrollY
+
+        if (firstHeading && firstHeadingTop < window.scrollY + window.innerHeight * 0.6) {
+          activeHeading = firstHeading
+        }
+      }
+
+      return activeHeading
+    }
+
+    updateExpandedBranches = (activeHeading?: HTMLElement) => {
+      const activeTrail = new Set<string>()
+      let slug = activeHeading?.id
+
+      while (slug) {
+        activeTrail.add(slug)
+        slug = this.parentBySlug.get(slug)
+      }
+
+      this.tocBranches.forEach(({ element, parentSlug }) => {
+        const expanded = activeTrail.has(parentSlug)
+        const nextState = expanded ? 'true' : 'false'
+
+        if (element.dataset.expanded !== nextState) {
+          element.dataset.expanded = nextState
+          element.setAttribute('aria-hidden', expanded ? 'false' : 'true')
+
+          const parentLink = this.tocLinks.find((link) => link.slug === parentSlug)?.element
+          parentLink?.setAttribute('aria-expanded', nextState)
+        }
+      })
     }
 
     updatePositionAndStyle = () => {
       const windowHeight = window.innerHeight
       const contentEl = document.querySelector('#content') as HTMLElement
       const contentTop = contentEl?.getBoundingClientRect().top + window.scrollY || 0
-      const postOffset = (contentEl?.offsetHeight || 0) + contentTop
+      const contentBottom = (contentEl?.offsetHeight || 0) + contentTop
+
+      this.updateExpandedBranches(this.getActiveHeading(contentTop, contentBottom))
 
       this.headings.forEach((el, index) => {
         const elTop = el.getBoundingClientRect().top + window.scrollY
         const nextHeadingTop = this.headings[index + 1]
           ? this.headings[index + 1].getBoundingClientRect().top + window.scrollY
-          : postOffset
+          : contentBottom
         const range = [elTop - window.scrollY, nextHeadingTop - window.scrollY - el.offsetHeight]
-        const progress = (windowHeight - range[0]) / (range[1] - range[0])
+        const progressRange = range[1] - range[0]
+        const progress =
+          progressRange > 0 ? (windowHeight - range[0]) / progressRange : range[1] <= 0 ? 1 : 0
 
         this.headingProgress[el.id] = {
           inView: range[0] < windowHeight && range[1] > 0,
@@ -78,19 +162,20 @@ const toc = generateToc(headings)
       })
 
       this.tocLinks.forEach(({ element: el, progressBar: bar, slug }, i) => {
-        const { inView, progress } = this.headingProgress[slug]
-        if (this.headingProgress[slug]) {
+        const headingProgress = this.headingProgress[slug]
+        if (headingProgress) {
+          const { inView, progress } = headingProgress
           el.classList.toggle('highlight', inView)
           el.classList.toggle('highlight-bg-translucent', inView)
           el.classList.toggle(
             'rounded-t-2xl',
-            inView && (i == 0 || !this.headingProgress[this.tocLinks[i - 1]?.slug].inView)
+            inView && (i == 0 || !this.headingProgress[this.tocLinks[i - 1]?.slug]?.inView)
           )
           el.classList.toggle(
             'rounded-b-2xl',
             inView &&
               (i == this.tocLinks.length - 1 ||
-                !this.headingProgress[this.tocLinks[i + 1]?.slug].inView)
+                !this.headingProgress[this.tocLinks[i + 1]?.slug]?.inView)
           )
           bar.classList.toggle('readed', !inView && progress == 1)
           bar.classList.toggle('highlight-bg', inView)
@@ -99,32 +184,59 @@ const toc = generateToc(headings)
       })
     }
 
-    connectedCallback() {
-      // Smooth scroll
-      this.tocLinks.forEach((link) => {
-        link.element.addEventListener('click', (e) => {
-          e.preventDefault()
-          // Push the history to add the hash at the end of the URL
-          const directHeading = this.headings.find((heading) => heading.id === link.slug)
-          if (directHeading) {
-            // Push the history to add the hash at the end of the URL
-            history.pushState(
-              null,
-              directHeading.textContent || '',
-              link.element.getAttribute('href')
-            )
-            directHeading.scrollIntoView({ behavior: 'smooth' })
-          } else {
-            console.warn(`No heading found for slug: ${link.slug}`)
-          }
-        })
-      })
+    scheduleUpdate = () => {
+      if (this.animationFrame) return
 
-      // Initial first and listen to scroll event
-      setInterval(this.updatePositionAndStyle, 100)
-      window.addEventListener('scroll', this.updatePositionAndStyle)
+      this.animationFrame = window.requestAnimationFrame(() => {
+        this.animationFrame = 0
+        this.updatePositionAndStyle()
+      })
+    }
+
+    handleLinkClick = (event: Event) => {
+      const target = event.target as Element | null
+      const anchor = target?.closest<HTMLAnchorElement>('a[href^="#"]')
+      if (!anchor || !this.contains(anchor)) return
+
+      const slug = (anchor.getAttribute('href') || '').substring(1)
+      const directHeading = this.headings.find((heading) => heading.id === slug)
+
+      if (directHeading) {
+        event.preventDefault()
+        history.pushState(null, directHeading.textContent || '', anchor.getAttribute('href'))
+        directHeading.scrollIntoView({
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            ? 'auto'
+            : 'smooth'
+        })
+      } else {
+        console.warn(`No heading found for slug: ${slug}`)
+      }
+    }
+
+    connectedCallback() {
+      this.initialize()
+      this.addEventListener('click', this.handleLinkClick)
+      window.addEventListener('scroll', this.scheduleUpdate, { passive: true })
+      window.addEventListener('resize', this.scheduleUpdate)
+
+      const contentEl = document.querySelector('#content')
+      if (contentEl) {
+        this.contentResizeObserver = new ResizeObserver(this.scheduleUpdate)
+        this.contentResizeObserver.observe(contentEl)
+      }
+
+      this.scheduleUpdate()
+    }
+
+    disconnectedCallback() {
+      this.removeEventListener('click', this.handleLinkClick)
+      window.removeEventListener('scroll', this.scheduleUpdate)
+      window.removeEventListener('resize', this.scheduleUpdate)
+      this.contentResizeObserver?.disconnect()
+      if (this.animationFrame) window.cancelAnimationFrame(this.animationFrame)
     }
   }
 
-  customElements.define('toc-heading', TOC)
+  if (!customElements.get('toc-heading')) customElements.define('toc-heading', TOC)
 </script>
