@@ -16,8 +16,6 @@ This is my living journal for Chelsea's 2026/27 season — first half only. When
 > This post grows over time. Last updated: 2026-09-07.
 
 ## September
-
-_Match notes will be added here after each game._
 <!--
 Example match note — copy a block like this under any month and reshape it freely.
 Long write-ups and two-line bullet notes are both fine; matches don't need to
@@ -50,7 +48,7 @@ date / competition
 - reaction in one line
 - one thing I liked, one thing I didn't
 -->
-Arsenal 2–1 Chelsea
+**Arsenal 2–1 Chelsea**
 
 2026.09.06 / Premier League
 
