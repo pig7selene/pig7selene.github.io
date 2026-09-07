@@ -48,7 +48,7 @@ date / competition
 - reaction in one line
 - one thing I liked, one thing I didn't
 -->
-**Arsenal 2–1 Chelsea**
+### Arsenal 2–1 Chelsea
 
 2026.09.06 / Premier League
 
