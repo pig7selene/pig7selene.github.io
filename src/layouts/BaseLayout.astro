@@ -1,8 +1,10 @@
 ---
 import BaseHead from '@/components/BaseHead.astro'
 import config from '@/site-config'
+import type { TransitionDirectionalAnimations } from 'astro'
 
 import { Footer, Header, ThemeProvider } from '@/components/basic'
+import HomeHero from '@/components/home/HomeHero.astro'
 import type { SiteMeta } from '@/types'
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseLayout /> component.
@@ -11,23 +13,67 @@ import '@/assets/styles/app.css'
 interface Props {
   meta: SiteMeta
   highlightColor?: string
+  homeHero?: boolean
 }
 
 const {
   meta: { articleDate, description = config.description, ogImage, title },
-  highlightColor
+  highlightColor,
+  homeHero = false
 } = Astro.props
 
 const langAttr = config.locale.lang
+const pathname = Astro.url.pathname.replace(/\/+$/, '') || '/'
+const categoryPagePattern = /^\/blog\/(research|daily|technical|learning)(?:\/\d+)?$/
+const hasInnerPageHero =
+  ['/about', '/archives', '/projects', '/search', '/tags'].includes(pathname) ||
+  pathname.startsWith('/tags/') ||
+  categoryPagePattern.test(pathname)
+const hasSiteHero = homeHero || hasInnerPageHero
+const contentAnimation: TransitionDirectionalAnimations = {
+  forwards: {
+    old: {
+      name: 'page-content-out',
+      duration: 'var(--page-content-out-duration, 220ms)',
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      fillMode: 'both'
+    },
+    new: {
+      name: 'page-content-in',
+      delay: 'var(--page-content-in-delay, 110ms)',
+      duration: 'var(--page-content-in-duration, 340ms)',
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      fillMode: 'both'
+    }
+  },
+  backwards: {
+    old: {
+      name: 'page-content-out',
+      duration: 'var(--page-content-out-duration, 220ms)',
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      fillMode: 'both'
+    },
+    new: {
+      name: 'page-content-in',
+      delay: 'var(--page-content-in-delay, 110ms)',
+      duration: 'var(--page-content-in-duration, 340ms)',
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      fillMode: 'both'
+    }
+  }
+}
 ---
 
-<html lang={langAttr}>
+<html lang={langAttr} data-page-kind={homeHero ? 'home' : hasInnerPageHero ? 'inner' : 'plain'}>
   <head>
     <BaseHead {articleDate} {description} {ogImage} {title} />
     <ThemeProvider />
   </head>
 
-  <body class='flex justify-center bg-background'>
+  <body
+    transition:animate='none'
+    class:list={['flex justify-center bg-background', { 'site-hero-page': hasSiteHero }]}
+  >
     <!-- <div
       id='gradient-background'
       class='pointer-events-none fixed h-screen w-screen blur-2xl transition-opacity duration-1000'
@@ -76,8 +122,11 @@ const langAttr = config.locale.lang
       )
     }
     <div class='w-full max-w-[70rem] px-4 sm:px-7 lg:px-10'>
-      <Header />
-      <slot />
+      <Header transition:persist='site-header' />
+      {hasSiteHero && <HomeHero variant={homeHero ? 'home' : 'page'} />}
+      <div transition:name='page-content' transition:animate={contentAnimation}>
+        <slot />
+      </div>
       <Footer />
     </div>
 
@@ -394,6 +443,110 @@ const langAttr = config.locale.lang
         }
       }
     </style>
+
+    <style is:global>
+      :root[data-route-transition='home-inner'] {
+        --page-content-out-duration: 200ms;
+        --page-content-in-delay: 220ms;
+        --page-content-in-duration: 300ms;
+      }
+
+      :root[data-route-transition='inner-home'] {
+        --page-content-out-duration: 180ms;
+        --page-content-out-offset: 40px;
+        --page-content-in-delay: 180ms;
+        --page-content-in-duration: 360ms;
+        --page-content-in-offset: 96px;
+      }
+
+      :root[data-route-transition='inner-inner'] {
+        --page-content-out-duration: 160ms;
+        --page-content-in-delay: 70ms;
+        --page-content-in-duration: 300ms;
+      }
+
+      @keyframes page-content-out {
+        from {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(var(--page-content-out-offset, -6px));
+        }
+      }
+
+      @keyframes page-content-in {
+        from {
+          opacity: 0;
+          transform: translateY(var(--page-content-in-offset, 8px));
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        @keyframes page-content-out {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+          }
+        }
+
+        @keyframes page-content-in {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+      }
+    </style>
+
+    <script>
+      const getPageKind = (pathname: string) => {
+        const normalizedPath = pathname.replace(/\/+$/, '') || '/'
+        const categoryPagePattern =
+          /^\/blog\/(research|daily|technical|learning)(?:\/\d+)?$/
+        const isInnerPage =
+          ['/about', '/archives', '/projects', '/search', '/tags'].includes(
+            normalizedPath
+          ) ||
+          normalizedPath.startsWith('/tags/') ||
+          categoryPagePattern.test(normalizedPath)
+
+        if (normalizedPath === '/') return 'home'
+        return isInnerPage ? 'inner' : 'plain'
+      }
+
+      document.addEventListener('astro:before-preparation', (event) => {
+        const fromKind = getPageKind(event.from.pathname)
+        const toKind = getPageKind(event.to.pathname)
+        const transitionKind =
+          fromKind === 'home' && toKind === 'inner'
+            ? 'home-inner'
+            : fromKind === 'inner' && toKind === 'home'
+              ? 'inner-home'
+              : fromKind === 'inner' && toKind === 'inner'
+                ? 'inner-inner'
+                : 'default'
+
+        document.documentElement.dataset.routeTransition = transitionKind
+      })
+
+      document.addEventListener('astro:before-swap', (event) => {
+        const transitionKind = document.documentElement.dataset.routeTransition
+
+        if (transitionKind) {
+          event.newDocument.documentElement.dataset.routeTransition = transitionKind
+        }
+      })
+    </script>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {

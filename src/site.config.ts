@@ -1,5 +1,21 @@
 import type { CardListData, Config, IntegrationUserConfig, ThemeUserConfig } from './types'
 
+export const homeHero = {
+  src: '/assets/img/home/home-hero.jpg',
+  homePosition: 'center 50%',
+  pagePosition: 'center 46%',
+  homeHeight: {
+    desktop: '64vh',
+    tablet: '52vh',
+    mobile: '42vh'
+  },
+  pageHeight: {
+    desktop: '34vh',
+    tablet: '28vh',
+    mobile: '26vh'
+  }
+}
+
 export const theme: ThemeUserConfig = {
   // === Basic configuration ===
   /** Title for your website. Will be used in metadata and as browser tab title. */
@@ -47,6 +63,7 @@ export const theme: ThemeUserConfig = {
       { title: 'Blog', link: '/blog/learning' },
       { title: 'Archives', link: '/archives' },
       { title: 'Tags', link: '/tags' },
+      { title: 'Projects', link: '/projects' },
       { title: 'About', link: '/about' }
     ]
   },

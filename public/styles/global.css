@@ -1,6 +1,8 @@
 html {
   font-family: 'Century Gothic', 'Satoshi', sans-serif;
   scroll-behavior: smooth;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 
 html.dark {

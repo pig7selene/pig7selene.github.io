@@ -9,6 +9,7 @@ interface Props {
   class?: string
   project: {
     image?: string
+    imagePosition?: string
     name: string
     description: string
     links: {
@@ -58,6 +59,7 @@ const projectIconSet: Record<string, iconsType> = {
                   src={images[imagePath]()}
                   alt={project.name}
                   loading='lazy'
+                  style={project.imagePosition ? `object-position: ${project.imagePosition}` : undefined}
                 />
               </div>
             )}
@@ -83,6 +85,7 @@ const projectIconSet: Record<string, iconsType> = {
                         src={images[imagePath]()}
                         alt={project.name}
                         loading='lazy'
+                        style={project.imagePosition ? `object-position: ${project.imagePosition}` : undefined}
                       />
                     </div>
                   )}

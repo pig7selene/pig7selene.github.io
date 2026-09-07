@@ -1,0 +1,163 @@
+---
+import { homeHero } from '@/site-config'
+
+interface Props {
+  variant?: 'home' | 'page'
+}
+
+const { variant = 'home' } = Astro.props
+const heights = variant === 'home' ? homeHero.homeHeight : homeHero.pageHeight
+const position = variant === 'home' ? homeHero.homePosition : homeHero.pagePosition
+---
+
+<section
+  transition:persist='site-banner'
+  class:list={[
+    'site-hero pointer-events-none relative left-1/2 -mt-24 w-screen -translate-x-1/2 overflow-hidden bg-muted',
+    { 'home-hero': variant === 'home', 'page-hero': variant === 'page' }
+  ]}
+  style={`--hero-height-desktop: ${heights.desktop}; --hero-height-tablet: ${heights.tablet}; --hero-height-mobile: ${heights.mobile};`}
+  data-site-hero
+  data-variant={variant}
+  aria-label={variant === 'home' ? 'Homepage banner' : 'Page banner'}
+>
+  <img
+    src={homeHero.src}
+    alt='An illustrated figure and a dog looking across the water toward a blue city skyline'
+    class='hero-image absolute inset-0 h-full w-full object-cover'
+    style={`--hero-scale: ${variant === 'home' ? 1 : 1.025}; object-position: ${position};`}
+    width='1200'
+    height='800'
+    loading='eager'
+    fetchpriority='high'
+  />
+  <div class='hero-shade absolute inset-0'></div>
+</section>
+
+<style>
+  .site-hero {
+    height: var(--hero-height-mobile);
+    transition: height 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: height;
+  }
+
+  .hero-image {
+    transform: scale(var(--hero-scale));
+    transition:
+      transform 500ms cubic-bezier(0.4, 0, 0.2, 1),
+      object-position 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+
+  .hero-shade {
+    background:
+      linear-gradient(to bottom, rgb(4 12 28 / 0.34), transparent 38%),
+      linear-gradient(to bottom, transparent 62%, hsl(var(--background) / 0.42));
+  }
+
+  :global(.dark .hero-shade) {
+    background:
+      linear-gradient(to bottom, rgb(2 6 18 / 0.42), transparent 42%),
+      linear-gradient(to bottom, transparent 58%, hsl(var(--background) / 0.62));
+  }
+
+  :global(.site-hero-page) {
+    overflow-x: clip;
+  }
+
+  :global(.site-hero-page header-component:not(.not-top)) {
+    color: white;
+    background: linear-gradient(to bottom, rgb(3 9 24 / 0.38), rgb(3 9 24 / 0.08));
+    border-color: rgb(255 255 255 / 0.14);
+    padding-inline: 0.75rem;
+    text-shadow: 0 1px 10px rgb(0 0 0 / 0.45);
+    backdrop-filter: blur(8px);
+  }
+
+  :global(.site-hero-page header-component:not(.not-top) #toggleDarkMode),
+  :global(.site-hero-page header-component:not(.not-top) #toggleMenu) {
+    border-color: rgb(255 255 255 / 0.32);
+    background-color: rgb(3 9 24 / 0.16);
+  }
+
+  @media (min-width: 768px) {
+    .site-hero {
+      height: var(--hero-height-tablet);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site-hero {
+      height: var(--hero-height-desktop);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-hero,
+    .hero-image {
+      transition-duration: 1ms;
+    }
+
+    :global(.site-hero-page header-component) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  let pendingHeroState:
+    | {
+        ariaLabel: string | null
+        className: string
+        imageStyle: string | null
+        style: string
+        variant: string | undefined
+      }
+    | undefined
+
+  document.addEventListener('astro:before-swap', (event) => {
+    const currentHero = document.querySelector<HTMLElement>('[data-site-hero]')
+    const nextHero = event.newDocument.querySelector<HTMLElement>('[data-site-hero]')
+
+    pendingHeroState = undefined
+
+    if (!currentHero || !nextHero) return
+
+    if (currentHero.dataset.variant === 'page' && nextHero.dataset.variant === 'page') return
+
+    const nextImage = nextHero.querySelector<HTMLImageElement>('.hero-image')
+
+    pendingHeroState = {
+      ariaLabel: nextHero.getAttribute('aria-label'),
+      className: nextHero.className,
+      imageStyle: nextImage?.style.cssText ?? null,
+      style: nextHero.style.cssText,
+      variant: nextHero.dataset.variant
+    }
+  })
+
+  document.addEventListener('astro:after-swap', () => {
+    if (!pendingHeroState) return
+
+    const currentHero = document.querySelector<HTMLElement>('[data-site-hero]')
+    const targetState = pendingHeroState
+    pendingHeroState = undefined
+
+    if (!currentHero) return
+
+    requestAnimationFrame(() => {
+      currentHero.className = targetState.className
+      currentHero.style.cssText = targetState.style
+      currentHero.dataset.variant = targetState.variant
+
+      if (targetState.ariaLabel) {
+        currentHero.setAttribute('aria-label', targetState.ariaLabel)
+      }
+
+      const currentImage = currentHero.querySelector<HTMLImageElement>('.hero-image')
+      if (currentImage && targetState.imageStyle !== null) {
+        currentImage.style.cssText = targetState.imageStyle
+      }
+    })
+  })
+</script>

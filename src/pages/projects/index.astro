@@ -1,0 +1,35 @@
+---
+import PageLayout from '@/layouts/CommonPage.astro'
+import ProjectSection from '@/components/projects/ProjectSection.astro'
+
+const headings = [{ depth: 2, slug: 'projects', text: 'Projects' }]
+---
+
+<PageLayout title='Projects' {headings}>
+  <p class='mb-10 max-w-2xl text-muted-foreground'>
+    Projects that turn what I am learning into structured, reusable work.
+  </p>
+
+  <h2 id='projects' class='mb-8 text-2xl font-semibold'>Projects</h2>
+  <ProjectSection
+    project={[
+      {
+        name: 'The Foundation Model Handbook',
+        description:
+          'A structured and continuously evolving handbook covering foundation model fundamentals, Transformer architecture, pre-training, post-training, and inference systems.',
+        image: 'foundation-model-handbook.png',
+        imagePosition: '78% center',
+        links: [
+          {
+            type: 'github',
+            href: 'https://github.com/pig7selene/the-foundation-model-handbook'
+          },
+          {
+            type: 'doc',
+            href: '/blog/building-the-foundation-model-handbook'
+          }
+        ]
+      }
+    ]}
+  />
+</PageLayout>
