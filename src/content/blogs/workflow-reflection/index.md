@@ -1,5 +1,4 @@
 ---
-
 title: '工作流反思'
 publishDate: 2026-09-09
 category: daily
@@ -7,12 +6,10 @@ tags: [workflow, reflection]
 language: zh
 description: '对暑假期间的学习、运动、娱乐与科研日常进行阶段性复盘，并在现有工作流基础上尝试进一步优化自己的时间安排与生活节奏。'
 heroImage:
-src: /assets/img/posts/workflow-reflection/cover.webp
-alt: 'Workflow reflection'
-color: '#294b82'
-----------------
-
-
+  src: /assets/img/posts/workflow-reflection/cover.webp
+  alt: 'Workflow reflection'
+  color: '#294b82'
+---
 
 大二的暑假也是过去了，马上大三了，时间越来越少了，反思一下现在的工作流，希望后面能更高效
 
