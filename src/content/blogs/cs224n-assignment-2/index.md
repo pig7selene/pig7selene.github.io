@@ -183,8 +183,7 @@ $$
 Since $\mathbb{E}[d_i]=1-p_{\text{drop}}$,
 
 $$
-\mathbb{E}[(h_{\text{drop}})_i]
-=
+\mathbb{E}[(h_{\text{drop}})_i]=
 \gamma h_i(1-p_{\text{drop}}).
 $$
 
@@ -193,6 +192,7 @@ Requiring $\mathbb{E}[(h_{\text{drop}})_i]=h_i$ gives
 $$
 \gamma=\frac{1}{1-p_{\text{drop}}}.
 $$
+
 **(ii)**
 
 Dropout is applied during training as a regularization method, since randomly dropping hidden units prevents the model from relying too heavily on specific neurons and reduces overfitting. During evaluation, dropout is disabled so that the full network is used and predictions remain stable and deterministic.
