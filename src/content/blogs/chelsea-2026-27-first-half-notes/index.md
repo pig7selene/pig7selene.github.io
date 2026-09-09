@@ -3,7 +3,7 @@ title: 'Chelsea 2026/27 — First-Half Notes'
 publishDate: 2026-09-07
 category: daily
 tags: [Chelsea, Football]
-language: en
+language: zh
 description: 'A living Chelsea fan journal for the 2026/27 first half — match reactions, tactical notes and player thoughts, updated after every matchday.'
 heroImage:
   src: /assets/img/posts/chelsea-2026-27-first-half-notes/chelsea-2026-27-card-cover.webp
