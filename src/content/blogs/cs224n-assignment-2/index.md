@@ -11,7 +11,7 @@ heroImage:
   color: "#5273a3"
 ---
 
-You can download the [LaTeX](/output/pdf/cs224n-assignment-2.tex) and [PDF](/output/pdf/cs224n-assignment-2.pdf).
+You can download the [LaTeX](/output/pdf/cs224n-assignment-2.tex) and [PDF](/output/pdf/cs224n-assignment-2.pdf),and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/RlQo8o4QP) here.
 
 ## Problem 1
 
