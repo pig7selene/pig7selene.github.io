@@ -196,3 +196,126 @@ $$
 **(ii)**
 
 Dropout is applied during training as a regularization method, since randomly dropping hidden units prevents the model from relying too heavily on specific neurons and reduces overfitting. During evaluation, dropout is disabled so that the full network is used and predictions remain stable and deterministic.
+
+
+
+## Problem 3
+
+### (a)
+
+The required sequence of transitions is:
+
+| Stack                                         | Buffer                                                   | New dependency           | Transition            |
+| --------------------------------------------- | -------------------------------------------------------- | ------------------------ | --------------------- |
+| `[ROOT]`                                      | `[I, presented, my, findings, at, the, NLP, conference]` |                          | Initial Configuration |
+| `[ROOT, I]`                                   | `[presented, my, findings, at, the, NLP, conference]`    |                          | SHIFT                 |
+| `[ROOT, I, presented]`                        | `[my, findings, at, the, NLP, conference]`               |                          | SHIFT                 |
+| `[ROOT, presented]`                           | `[my, findings, at, the, NLP, conference]`               | `presented → I`          | LEFT-ARC              |
+| `[ROOT, presented, my]`                       | `[findings, at, the, NLP, conference]`                   |                          | SHIFT                 |
+| `[ROOT, presented, my, findings]`             | `[at, the, NLP, conference]`                             |                          | SHIFT                 |
+| `[ROOT, presented, findings]`                 | `[at, the, NLP, conference]`                             | `findings → my`          | LEFT-ARC              |
+| `[ROOT, presented]`                           | `[at, the, NLP, conference]`                             | `presented → findings`   | RIGHT-ARC             |
+| `[ROOT, presented, at]`                       | `[the, NLP, conference]`                                 |                          | SHIFT                 |
+| `[ROOT, presented, at, the]`                  | `[NLP, conference]`                                      |                          | SHIFT                 |
+| `[ROOT, presented, at, the, NLP]`             | `[conference]`                                           |                          | SHIFT                 |
+| `[ROOT, presented, at, the, NLP, conference]` | `[]`                                                     |                          | SHIFT                 |
+| `[ROOT, presented, at, the, conference]`      | `[]`                                                     | `conference → NLP`       | LEFT-ARC              |
+| `[ROOT, presented, at, conference]`           | `[]`                                                     | `conference → the`       | LEFT-ARC              |
+| `[ROOT, presented, conference]`               | `[]`                                                     | `conference → at`        | LEFT-ARC              |
+| `[ROOT, presented]`                           | `[]`                                                     | `presented → conference` | RIGHT-ARC             |
+| `[ROOT]`                                      | `[]`                                                     | `ROOT → presented`       | RIGHT-ARC             |
+
+### (b)
+
+A sentence containing n words requires 2n transitions to parse. Each word is shifted onto the stack exactly once and is removed from the stack exactly once by either a LEFT-ARC or RIGHT-ARC transition.
+
+### (c)
+
+<img src="/assets/img/posts/cs224n-assignment-2/code2.png" alt="code2" style="zoom:50%;" />
+
+![code](/assets/img/posts/cs224n-assignment-2/code.png)
+
+### (d)
+
+`minibatch_parse` creates one `PartialParse` object for each input sentence and keeps their original order. During each iteration, it selects up to `batch_size` unfinished parses, asks the model to predict one transition for each parse, and applies those transitions. A parse is removed from the unfinished list only when its buffer is empty and its stack contains only `ROOT`. Finally, dependencies are collected from the original list of partial parses, which preserves the input sentence order.
+
+![](/assets/img/posts/cs224n-assignment-2/code3.png)
+
+### (e)
+
+**(i)**
+
+Let
+
+[
+\mathbf{z} = \mathbf{xW} + \mathbf{b}_1,
+\qquad
+\mathbf{h} = \operatorname{ReLU}(\mathbf{z}).
+]
+
+For an individual hidden unit (h_i),
+
+[
+h_i = \max(z_i, 0)
+= \max\left(\sum_k x_k W_{ki} + b_{1,i}, 0\right).
+]
+
+Therefore, for an input feature (x_j),
+
+\begin{cases}
+W_{ji}, & z_i > 0,\\
+0, & z_i < 0.
+\end{cases}
+]
+
+The derivative is undefined at (z_i=0), which the question allows us to ignore.
+
+**(ii)**
+
+Let the logits be (\mathbf{l}), and let
+
+[
+\hat{y}_j = \frac{e^{l_j}}{\sum_k e^{l_k}}
+]
+
+be the softmax probability for class (j). The cross-entropy loss is
+
+-\sum_j y_j \log \hat{y}_j.
+]
+
+For a one-hot target vector whose correct class is (c), the derivative with respect to logit (l_i) is
+
+\hat{y}_i - y_i.
+]
+
+Equivalently,
+
+\begin{cases}
+\hat{y}_i - 1, & i=c,\\
+\hat{y}_i, & i\neq c.
+\end{cases}
+]
+
+This gradient increases the logit of the correct transition and decreases the relative preference for incorrect transitions during training.
+
+**(iii) UAS**
+
+![](/assets/img/posts/cs224n-assignment-2/screenshot-2026-09-14-19-40-52.png)
+
+![](/assets/img/posts/cs224n-assignment-2/screenshot-2026-09-14-19-39-50.png)
+
+The best development-set UAS achieved by the model was **88.85**. The final model, restored using the best development-set checkpoint, achieved a test-set UAS of **89.23**.
+
+UAS  measures the percentage of words whose predicted syntactic heads are correct, regardless of dependency-relation labels.
+
+**my code**
+
+![__init__](/assets/img/posts/cs224n-assignment-2/code4.png)
+
+![](/assets/img/posts/cs224n-assignment-2/code5.png)
+
+![](/assets/img/posts/cs224n-assignment-2/code6.png)
+
+**test**
+
+![](/assets/img/posts/cs224n-assignment-2/screenshot-2026-09-14-19-21-52.png)
