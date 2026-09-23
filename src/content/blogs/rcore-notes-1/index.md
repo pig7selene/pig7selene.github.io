@@ -4,7 +4,7 @@ publishDate: 2026-09-23
 category: learning
 tags: [rCore, Operating Systems]
 language: zh
-description: 'Introduces the fundamentals behind executing the first instruction in the kernel, covering memory layout, linking, and the QEMU boot process, then implements and verifies the kernel entry point with assembly, a linker script, and GDB.'
+description: 'Explains memory layout, linking, and the QEMU boot process, then builds and debugs a RISC-V kernel entry point with assembly and GDB.'
 ---
 
 ## 计算机组成基础
