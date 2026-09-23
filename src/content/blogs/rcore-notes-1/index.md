@@ -52,7 +52,11 @@ qemu-system-riscv64 \
 
 源代码被编译成可执行文件后，文件中的内容通常可以分为代码和数据两部分。代码部分由 CPU 可以解码并执行的指令组成，数据部分则是在程序运行过程中被 CPU 读写的内存内容。为了方便管理，编译器和链接器会进一步把这些内容划分成不同的段（Section），并将它们放置到不同的内存区域中，从而形成程序的内存布局（Memory Layout）。典型的程序内存布局从低地址到高地址大致如下：
 
-![程序内存布局示意图](/assets/img/posts/rcore-notes-1/program-memory-layout.jpg)
+<img
+  src='/assets/img/posts/rcore-notes-1/program-memory-layout.jpg'
+  alt='程序内存布局示意图'
+  style='display: block; width: min(100%, 680px); height: auto; margin-inline: auto;'
+/>
 
 其中，代码部分主要位于 `.text` 段，用来保存程序编译后生成的机器指令。
 
