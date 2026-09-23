@@ -16,6 +16,17 @@ const typographyConfig = ({ theme }) => ({
       '--tw-prose-pre-code': fgMuted,
       '--tw-prose-pre-bg': bgMuted,
 
+      code: {
+        color: fg,
+        backgroundColor: bgMuted,
+        borderRadius: theme('borderRadius.sm'),
+        padding: '0.125rem 0.35rem',
+        fontWeight: '500',
+        '&::before, &::after': {
+          content: 'none'
+        }
+      },
+
       'p a, li a, blockquote a, td a': {
         color: fg,
         textDecoration: 'underline',
