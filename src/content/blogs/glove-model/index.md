@@ -6,9 +6,9 @@ tags: [NLP, CS224N]
 language: en
 description: "CS224n lec2,the GloVe model, co-occurrence matrices, least-squares objectives, and the evaluation of word vectors."
 heroImage:
-  src: /assets/img/posts/glove-model/glove-card-cover-v2.png
-  alt: "White-haired figure with blue flowers against a pale-blue sky"
-  color: "#78b8e5"
+  src: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
+  alt: "Sunset cityscape with a figure looking over the skyline"
+  color: "#9a7093"
 ---
 
 > You can download the [LaTeX](/output/pdf/glove-model.tex) and [PDF](/output/pdf/glove-model.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/SW1CcdBqW) here.

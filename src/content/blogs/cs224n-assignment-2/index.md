@@ -6,9 +6,9 @@ tags: [NLP, CS224N]
 language: en
 description: "personal solution to CS224N assignment 2"
 heroImage:
-  src: /assets/img/posts/cs224n-assignment-2/assignment-2-card-cover.png
-  alt: "Moonlit cityscape with a silver-haired figure"
-  color: "#5273a3"
+  src: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
+  alt: "Sunset cityscape with a figure looking over the skyline"
+  color: "#9a7093"
 ---
 
 You can download the [LaTeX](/output/pdf/cs224n-assignment-2.tex) and [PDF](/output/pdf/cs224n-assignment-2.pdf),and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/RlQo8o4QP) here.

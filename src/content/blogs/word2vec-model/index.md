@@ -6,9 +6,9 @@ tags: [NLP, CS224N]
 language: en
 description: "CS224n lec1,word representation, distributional semantics, and the Skip-gram Word2Vec model"
 heroImage:
-  src: /assets/img/posts/word2vec-model/word2vec-card-cover-v2.png
-  alt: "Two anime characters in a colorful kawaii collage"
-  color: "#a960ac"
+  src: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
+  alt: "Sunset cityscape with a figure looking over the skyline"
+  color: "#9a7093"
 ---
 
 > You can download the [LaTeX](/output/pdf/word2vec-model.tex) and [PDF](/output/pdf/word2vec-model.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/9d4Zemo0c) here.

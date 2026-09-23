@@ -6,9 +6,9 @@ tags: [NLP, CS224N]
 language: en
 description: "CS224n lec4,A note on n-gram and neural language models, recurrent neural networks, bidirectional RNNs, GRUs, and LSTMs."
 heroImage:
-  src: /assets/img/posts/language-models-and-rnns/language-models-card-cover.png
-  alt: "Moonlit shrine with a pink-haired figure and cherry blossoms"
-  color: "#be6976"
+  src: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
+  alt: "Sunset cityscape with a figure looking over the skyline"
+  color: "#9a7093"
 ---
 
 >人间 瞬间 天地之间 下次我 又是谁  

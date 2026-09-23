@@ -5,6 +5,10 @@ category: learning
 tags: [rCore, Operating Systems]
 language: zh
 description: 'Explains memory layout, linking, and the QEMU boot process, then builds and debugs a RISC-V kernel entry point with assembly and GDB.'
+heroImage:
+  src: /assets/img/posts/glove-model/glove-card-cover-v2.png
+  alt: "White-haired figure with blue flowers against a pale-blue sky"
+  color: "#78b8e5"
 ---
 
 ## 计算机组成基础

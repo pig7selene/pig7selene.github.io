@@ -6,9 +6,9 @@ tags: [NLP, CS224N]
 language: en
 description: "CS224n lec3,neural networks, backpropagation, regularization, activation functions, and data preprocessing."
 heroImage:
-  src: /assets/img/posts/neural-networks-and-backpropagation/backpropagation-card-cover-v2.png
-  alt: "Moonlit lake and pavilion with a figure in blue on the right"
-  color: "#365f92"
+  src: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
+  alt: "Sunset cityscape with a figure looking over the skyline"
+  color: "#9a7093"
 ---
 
 > 寻找太阳的梦 自不量力说 自己也变成太阳的念头  
