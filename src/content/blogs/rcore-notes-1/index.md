@@ -1,10 +1,10 @@
 ---
-title: 'rCore Notes 1：计算机组成、QEMU 与程序内存布局'
+title: 'rCore Notes 1'
 publishDate: 2026-09-23
 category: learning
-tags: [rCore, Operating Systems, Computer Architecture, RISC-V]
+tags: [rCore, Operating Systems]
 language: zh
-description: '从计算机硬件与端序出发，梳理 QEMU 和 RustSBI 的启动流程，以及程序内存布局、编译、链接与重定位。'
+description: 'Introduces the fundamentals behind executing the first instruction in the kernel, covering memory layout, linking, and the QEMU boot process, then implements and verifies the kernel entry point with assembly, a linker script, and GDB.'
 ---
 
 ## 计算机组成基础
