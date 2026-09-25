@@ -278,9 +278,9 @@ Size: 4                Blocks: 8          IO Block: 4096   regular file
 | `jal rd, imm[20:1]` | `rd ← pc + 4`<br>`pc ← pc + imm` |
 | `jalr rd, (imm[11:0])rs` | `rd ← pc + 4`<br>`pc ← rs + imm` |
 
-<div style="margin: 1.5rem 0; padding: 1rem 1.25rem; border: 1px solid hsl(var(--border)); border-radius: 0.75rem; background: hsl(var(--muted)); color: hsl(var(--foreground));">
-  <strong>Note.</strong><br><br>
-  <strong>RISC-V 指令各部分含义</strong><br><br>
-  在大多数只与通用寄存器打交道的指令中，<code>rs</code> 表示 <strong>源寄存器（Source Register）</strong>，<code>imm</code> 表示 <strong>立即数（Immediate）</strong>，是一个常数，二者通常构成指令的输入部分；<code>rd</code> 表示 <strong>目标寄存器（Destination Register）</strong>，是指令的输出部分。<br><br>
-  <code>rs</code> 和 <code>rd</code> 可以从 32 个通用寄存器 <code>x0~x31</code> 中选取，但这些部分并不是所有指令都必须具备；有些指令只有输入部分，也有些指令没有输出部分。
+<div class="note-box">
+  <p><strong>Note.</strong></p>
+  <p><strong>RISC-V 指令各部分含义</strong></p>
+  <p>在大多数只与通用寄存器打交道的指令中，<code>rs</code> 表示 <strong>源寄存器（Source Register）</strong>，<code>imm</code> 表示 <strong>立即数（Immediate）</strong>，是一个常数，二者通常构成指令的输入部分；<code>rd</code> 表示 <strong>目标寄存器（Destination Register）</strong>，是指令的输出部分。</p>
+  <p><code>rs</code> 和 <code>rd</code> 可以从 32 个通用寄存器 <code>x0~x31</code> 中选取，但这些部分并不是所有指令都必须具备；有些指令只有输入部分，也有些指令没有输出部分。</p>
 </div>

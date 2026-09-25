@@ -96,3 +96,30 @@
     @apply transition-colors hover:text-primary;
   }
 }
+
+@layer components {
+  .note-box {
+    margin: 1.5rem 0;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid #93c5fd;
+    border-left-width: 4px;
+    border-left-color: #3b82f6;
+    border-radius: 0.75rem;
+    background: #eff6ff;
+    color: hsl(var(--foreground));
+  }
+
+  .note-box p {
+    margin: 0;
+  }
+
+  .note-box p + p {
+    margin-top: 1rem;
+  }
+
+  .dark .note-box {
+    border-color: #3b82f6;
+    border-left-color: #60a5fa;
+    background: #172554;
+  }
+}
