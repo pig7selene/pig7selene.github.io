@@ -93,3 +93,194 @@ qemu-system-riscv64 \
 外部符号的最终地址要到链接（Linking）阶段才能确定。链接器把多个目标文件合并后，各个 Section 在最终内存布局中的位置才会确定，此时不同模块之间引用的外部符号就可以被解析为具体地址。
 
 链接过程中，各目标文件中的 Section 还会被重新排列和合并，因此即使是原本已经确定位置的内部符号，其最终地址也可能发生变化。链接器需要根据最终内存布局修正机器码中相关的地址，这个过程称为重定位（Relocation）。例如，模块 1 调用了模块 2 中定义的函数，在模块 1 单独生成目标文件时，只知道函数的符号名，并不知道函数最终会位于哪个地址。链接器将两个目标文件合并后，确定模块 2 中该函数的最终位置，再把模块 1 中对应的函数调用地址修正为正确值。
+
+## 编写内核第一条指令
+
+为了验证内核镜像是否能够正确接入 QEMU，首先编写进入内核后执行的第一条指令。在 `os/src/entry.asm` 中加入：
+
+```asm
+.section .text.entry
+.globl _start
+
+_start:
+    li x1, 100
+```
+
+其中，`li x1, 100` 表示将立即数 `100` 加载到寄存器 `x1` 中。`li` 是 Load Immediate 的缩写。
+
+`_start` 是一个符号，它指向紧跟在其后的指令，因此 `_start` 的地址就是 `li x1, 100` 这条指令所在的地址。`.globl _start` 将 `_start` 声明为全局符号，使其他目标文件在链接时也可以引用它。
+
+`.section .text.entry` 表示将后续代码放入名为 `.text.entry` 的 Section。通常程序代码会放在 `.text` 段中，这里单独使用 `.text.entry`，是为了在后续链接时能够把它放在其他代码段之前，从而保证 `_start` 作为内核入口最先被执行。
+
+为了让 Rust 编译器将这段汇编代码一起编译到内核中，需要在 `os/src/main.rs` 中嵌入 `entry.asm`：
+
+```rust
+#![no_std]
+#![no_main]
+
+mod lang_items;
+
+use core::arch::global_asm;
+
+global_asm!(include_str!("entry.asm"));
+```
+
+其中，`include_str!("entry.asm")` 会读取同目录下的 `entry.asm` 并将其转换为字符串，`global_asm!` 则将这段汇编代码作为全局汇编嵌入当前 Rust 程序中。
+
+## 调整内核的内存布局
+
+默认链接器生成的内存布局不能满足内核与 QEMU 对接的要求，因此需要通过链接脚本（Linker Script）自定义最终可执行文件中各个 Section 的位置。这里要求内核第一条指令位于物理地址 `0x80200000`。首先在 Cargo 配置中指定目标平台，并通过 `rustflags` 让链接器使用自定义的 `src/linker.ld`：
+
+```toml
+# os/.cargo/config
+[build]
+target = "riscv64gc-unknown-none-elf"
+
+[target.riscv64gc-unknown-none-elf]
+rustflags = [
+    "-Clink-arg=-Tsrc/linker.ld",
+    "-Cforce-frame-pointers=yes"
+]
+```
+
+链接脚本 `os/src/linker.ld` 如下：
+
+```ld
+OUTPUT_ARCH(riscv)
+ENTRY(_start)
+BASE_ADDRESS = 0x80200000;
+
+SECTIONS
+{
+    . = BASE_ADDRESS;
+    skernel = .;
+
+    stext = .;
+    .text : {
+        *(.text.entry)
+        *(.text .text.*)
+    }
+
+    . = ALIGN(4K);
+    etext = .;
+    srodata = .;
+    .rodata : {
+        *(.rodata .rodata.*)
+        *(.srodata .srodata.*)
+    }
+
+    . = ALIGN(4K);
+    erodata = .;
+    sdata = .;
+    .data : {
+        *(.data .data.*)
+        *(.sdata .sdata.*)
+    }
+
+    . = ALIGN(4K);
+    edata = .;
+    .bss : {
+        *(.bss.stack)
+        sbss = .;
+        *(.bss .bss.*)
+        *(.sbss .sbss.*)
+    }
+
+    . = ALIGN(4K);
+    ebss = .;
+    ekernel = .;
+
+    /DISCARD/ : {
+        *(.eh_frame)
+    }
+}
+```
+
+`OUTPUT_ARCH(riscv)` 指定最终可执行文件的目标架构为 RISC-V，`ENTRY(_start)` 将之前定义的全局符号 `_start` 设置为程序入口。
+
+`BASE_ADDRESS = 0x80200000` 定义内核的起始地址，并通过 `. = BASE_ADDRESS;` 将链接器的当前位置 `.` 设置为 `0x80200000`。链接器之后会从该位置开始依次放置各个 Section。链接脚本中可以通过给 `.` 赋值来调整后续 Section 的位置，也可以将当前地址记录到全局符号中，例如 `stext = .;` 表示使用 `stext` 记录此时的地址。
+
+Section 的基本写法为：
+
+```ld
+.rodata : {
+    *(.rodata)
+}
+```
+
+冒号前面的 `.rodata` 是最终可执行文件中的 Section 名称，花括号内部描述哪些输入目标文件中的 Section 会被放入其中。通配符 `*` 表示所有输入目标文件，因此 `*(.text .text.*)` 表示将所有目标文件中的 `.text` 以及 `.text.*` Section 合并到最终的 `.text` 中。
+
+最终的内存布局按照 `.text`、`.rodata`、`.data`、`.bss` 的顺序从低地址向高地址排列，并通过 `stext`、`etext`、`srodata`、`erodata`、`sdata`、`edata`、`sbss`、`ebss` 等符号记录各个区域的起始或结束地址。
+
+不同 Section 之间使用 `. = ALIGN(4K);` 将当前位置按照 4 KiB 对齐。`.text` 中首先放置 `*(.text.entry)`，然后才放置其他 `.text` Section：`*(.text .text.*)`。
+
+由于整个内核从 `BASE_ADDRESS` 即 `0x80200000` 开始布局，因此 `.text.entry` 会位于整个代码段的最前面，从而保证 `_start` 对应的内核第一条指令位于 `0x80200000`，与 RustSBI 跳转到内核的地址正确对应。`.bss` 中首先放置 `.bss.stack`，之后再放置普通的 `.bss` 和 `.sbss` 数据。`/DISCARD/` 则用于丢弃不需要进入最终内核镜像的 Section，例如 `.eh_frame`。完成链接脚本配置后，可以重新编译内核：
+
+```bash
+cargo build --release
+Finished release [optimized] target(s) in 0.10s
+file target/riscv64gc-unknown-none-elf/release/os
+target/riscv64gc-unknown-none-elf/release/os: ELF 64-bit LSB executable, UCB RISC-V, version 1 (SYSV), statically linked, not stripped
+```
+
+我们以 `release` 模式生成了内核可执行文件，它的位置在 `os/target/riscv64gc.../release/os`。接着通过 `file` 工具查看它的属性，生成的 `os` 是面向 64 位 RISC-V 架构的可执行文件，并采用静态链接。
+
+## 手动加载内核可执行文件
+
+前面生成的内核可执行文件虽然已经满足内存布局要求，但还不能直接交给 QEMU 加载。原因是可执行文件中除了真正需要运行的代码段和数据段之外，还包含一些额外的元数据。这些元数据主要用于描述可执行文件本身的结构和信息，QEMU 在直接加载内核镜像时并不需要它们。如果把整个可执行文件原样加载到内存中，这些额外内容会占据空间，并可能导致代码段和数据段被放到错误的物理地址。
+
+<img
+  src='/assets/img/posts/rcore-notes-1/kernel-image-metadata-comparison.jpg'
+  alt='内核可执行文件与裸二进制镜像的元数据比较'
+  style='display: block; width: min(100%, 850px); height: auto; margin-inline: auto;'
+/>
+
+图中红色区域表示内核可执行文件中的元数据，深蓝色区域表示各个段（包括代码段和数据段），浅蓝色区域则表示内核被执行的第一条指令，它位于深蓝色区域的开头。图示上半部分中，我们直接将内核可执行文件 `os` 提交给 QEMU；QEMU 会将整个可执行文件不加处理地加载到内存的 `0x80200000` 处。由于可执行文件开头是一段元数据，QEMU 内存的 `0x80200000` 处无法找到内核第一条指令，RustSBI 也就无法正常将计算机控制权转交给内核。相反，图示下半部分中，将元数据丢弃得到的内核镜像 `os.bin` 被加载到 QEMU 后，可以在 `0x80200000` 处正确找到内核第一条指令。
+
+前面得到的内核可执行文件中除了实际需要加载的代码和数据之外，还包含符号表、重定位信息等元数据。由于 QEMU 的加载功能比较简单，需要先去除这些元数据，将内核可执行文件转换为裸二进制形式的内核镜像。使用以下命令生成内核镜像 `os.bin`：
+
+```bash
+rust-objcopy --strip-all target/riscv64gc-unknown-none-elf/release/os -O binary target/riscv64gc-unknown-none-elf/release/os.bin
+```
+
+可以使用 `stat` 工具比较内核可执行文件和内核镜像的大小：
+
+```bash
+$ stat target/riscv64gc-unknown-none-elf/release/os
+File: target/riscv64gc-unknown-none-elf/release/os
+Size: 1016             Blocks: 8          IO Block: 4096   regular file
+...
+
+$ stat target/riscv64gc-unknown-none-elf/release/os.bin
+File: target/riscv64gc-unknown-none-elf/release/os.bin
+Size: 4                Blocks: 8          IO Block: 4096   regular file
+...
+```
+
+可以看到，生成的内核镜像 `os.bin` 只有 4 字节，这是因为当前内核中只有 `entry.asm` 中编写的一条指令，而一般情况下 RISC-V 架构的一条指令长度就是 4 字节。相比之下，内核可执行文件 `os` 大小为 1016 字节，因为其中还包含大量用于描述和加载可执行文件的元数据。这些元数据可以帮助系统在加载可执行文件时完成重定位、动态链接等工作，但 QEMU 无法直接利用这些信息，因此这里将它们去除，只保留真正需要加载到内存中的代码和数据。从某种意义上说，这相当于我们手动完成了一部分可执行文件的加载工作。
+
+## 函数调用与栈
+
+从汇编指令的角度看，如果 CPU 按顺序执行定长指令，设当前指令地址为 $a_n$，每条指令长度为 $L$ 字节，那么下一条指令地址通常满足：$a_{n+1}=a_n+L$。但程序并不总是顺序执行。遇到跳转指令时，CPU 会修改 `pc` 寄存器，使其跳转到指定地址，从而实现程序中的控制流（Control Flow），例如 `if/switch` 分支以及 `for/while` 循环。
+
+函数调用（Function Call）是一种更特殊的控制流。调用函数时，需要先跳转到被调用函数的入口执行；函数执行结束后，还需要返回到调用指令的下一条指令继续执行。与普通分支不同，函数返回地址并不是编译期固定的。同一个函数可能在程序中的多个位置被调用，因此每次调用对应的返回地址都可能不同。这个返回地址只能在函数调用实际发生时确定。因此，实现函数调用不仅需要完成到被调用函数的跳转，还需要在调用时保存当前的返回地址，以便函数执行结束后能够恢复并跳回正确的位置。
+
+<img
+  src='/assets/img/posts/rcore-notes-1/library-function-call-stack-flow.jpg'
+  alt='函数调用、返回地址与栈帧流转示意图'
+  style='display: block; width: min(100%, 620px); height: auto; margin-inline: auto;'
+/>
+
+普通跳转只需要修改 `pc`，而函数调用还需要额外保存**返回地址**，这样函数执行结束后才能回到调用位置继续执行。RISC-V 中有两条常用于函数调用的跳转指令：
+
+| 指令 | 指令功能 |
+| --- | --- |
+| `jal rd, imm[20:1]` | `rd ← pc + 4`<br>`pc ← pc + imm` |
+| `jalr rd, (imm[11:0])rs` | `rd ← pc + 4`<br>`pc ← rs + imm` |
+
+<div style="margin: 1.5rem 0; padding: 1rem 1.25rem; border: 1px solid hsl(var(--border)); border-radius: 0.75rem; background: hsl(var(--muted)); color: hsl(var(--foreground));">
+  <strong>Note.</strong><br><br>
+  <strong>RISC-V 指令各部分含义</strong><br><br>
+  在大多数只与通用寄存器打交道的指令中，<code>rs</code> 表示 <strong>源寄存器（Source Register）</strong>，<code>imm</code> 表示 <strong>立即数（Immediate）</strong>，是一个常数，二者通常构成指令的输入部分；<code>rd</code> 表示 <strong>目标寄存器（Destination Register）</strong>，是指令的输出部分。<br><br>
+  <code>rs</code> 和 <code>rd</code> 可以从 32 个通用寄存器 <code>x0~x31</code> 中选取，但这些部分并不是所有指令都必须具备；有些指令只有输入部分，也有些指令没有输出部分。
+</div>
