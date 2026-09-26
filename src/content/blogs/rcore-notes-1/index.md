@@ -197,14 +197,14 @@ riscv64-elf-gdb \
 
 GDB 连接 QEMU 后，可以看到当前 `PC = 0x1000`，说明 CPU 会先执行 QEMU 的启动固件。通过 `x/10i $pc` 可以查看这段 Boot ROM 的指令，随后它会把 RustSBI 的入口地址 `0x80000000` 加载到寄存器中，并通过 `jr t0` 跳转过去。
 
-<img src='/assets/img/posts/rcore-notes-1/qemu-boot-rom.png' alt='GDB 中 QEMU Boot ROM 的启动指令' style='display: block; width: min(100%, 720px); height: auto; margin: 1.5rem auto;' />
+<img src='/assets/img/posts/rcore-notes-1/qemu-boot-rom.png' alt='GDB 中 QEMU Boot ROM 的启动指令' style='display: block; width: min(100%, 400px); height: auto; margin: 1.5rem auto;' />
 
 我们通过单步调试来复盘一下。
 
-<img src='/assets/img/posts/rcore-notes-1/qemu-single-step.png' alt='GDB 单步调试 QEMU 启动过程' style='display: block; width: min(100%, 680px); height: auto; margin: 1.5rem auto;' />
+<img src='/assets/img/posts/rcore-notes-1/qemu-single-step.png' alt='GDB 单步调试 QEMU 启动过程' style='display: block; width: min(100%, 360px); height: auto; margin: 1.5rem auto;' />
 
 当执行完 `0x1010` 处的 `ld t0,24(t0)` 后，寄存器 `t0` 被加载为 `0x80000000`；随后再执行 `jr t0`，PC 跳转到 `0x80000000`，说明控制权已经从 QEMU Boot ROM 转交给 RustSBI。
 
-<img src='/assets/img/posts/rcore-notes-1/kernel-entry-breakpoint.png' alt='GDB 在内核入口 _start 处命中断点' style='display: block; width: min(100%, 760px); height: auto; margin: 1.5rem auto;' />
+<img src='/assets/img/posts/rcore-notes-1/kernel-entry-breakpoint.png' alt='GDB 在内核入口 _start 处命中断点' style='display: block; width: min(100%, 400px); height: auto; margin: 1.5rem auto;' />
 
 在内核入口 `0x80200000` 处设置断点并继续执行后，程序成功停在 `_start`。反汇编可以看到第一条指令是 `li x1, 100`；单步执行后 `x1 = 100`，说明内核已经正确加载并执行。同时此时 `sp = 0`，说明内核栈尚未初始化。
