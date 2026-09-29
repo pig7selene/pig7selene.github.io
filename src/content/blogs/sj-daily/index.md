@@ -1,6 +1,6 @@
 ---
 title: "算法竞赛每日一题"
-publishDate: 2026-090-29
+publishDate: 2026-09-29
 category: daily
 tags: [xcpc]
 language: zh
