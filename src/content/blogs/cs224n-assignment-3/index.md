@@ -11,7 +11,7 @@ heroImage:
   color: "#9a7093"
 ---
 
-You can download the [**LaTeX**](/output/pdf/cs224n-assignment-3.tex) and [**PDF**](/output/pdf/cs224n-assignment-3.pdf), and you can also read the [**Chinese version ↗**](https://notes.sjtu.edu.cn/fENstMYZT7W6Lzhufmly_w) here.
+You can download the [**LaTeX**](/output/pdf/cs224n-assignment-3.tex) and [**PDF**](/output/pdf/cs224n-assignment-3.pdf), and you can also read the [**Chinese version **](https://notes.sjtu.edu.cn/s/BLqwDFtjd) here.
 
 ## Problem 1
 
