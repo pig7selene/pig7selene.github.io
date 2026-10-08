@@ -157,7 +157,7 @@ $$
 
 Append that token to the input and repeat. If the sequence exceeds the context length, keep only the most recent `context_length` tokens for the forward pass.
 
-### (b) Training the Transformer
+### (b)
 
 `get_loss_on_batch` uses next-token prediction. Given an input sequence
 
@@ -181,7 +181,7 @@ After 100 batches, the loss decreases overall from about $10.83$ to about $10.77
 
 ![Training loss and gradient norm over 100 batches](/assets/img/posts/cs224n-assignment-3/losses-and-grad-norms.png)
 
-### (c) Bonus: Faster Training
+### (c) Bonus
 
 With the number of training steps fixed at 100, the goal is to obtain a lower final loss than the baseline under the same budget. I applied three changes in sequence: a higher learning rate, no weight decay, and a learnable bias in the language-model head.
 
