@@ -288,7 +288,7 @@ $$
 For a one-hot target vector whose correct class is $c$, the derivative with respect to logit $l_i$ is
 
 $$
-\hat{y}_i - y_i.
+\hat{y}_i - y_i
 $$
 
 Equivalently,
