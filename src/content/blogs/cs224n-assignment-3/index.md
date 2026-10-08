@@ -3,75 +3,76 @@ title: "CS224N | Assignment 3"
 publishDate: 2026-10-01
 category: learning
 tags: [NLP, CS224N, Transformer]
-language: zh
-description: "CS224N Assignment 3 notes on self-attention, multi-head attention, permutation equivariance, and positional embeddings."
+language: en
+description: "Personal solutions to CS224N Assignment 3: attention, permutation equivariance, positional embeddings, and a decoder-only Transformer."
 heroImage:
   src: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
   alt: "Sunset cityscape with a figure looking over the skyline"
   color: "#9a7093"
 ---
 
+You can download the [**LaTeX**](/output/pdf/cs224n-assignment-3.tex) and [**PDF**](/output/pdf/cs224n-assignment-3.pdf), and you can also read the [**Chinese version ↗**](https://notes.sjtu.edu.cn/fENstMYZT7W6Lzhufmly_w) here.
+
 ## Problem 1
 
 ### (a)
 
-**1.** 让 $k_j^\top q$ 比所有其他 $k_i^\top q$ 大得多即可。
+**1.** Make $k_j^\top q$ much larger than every other $k_i^\top q$.
 
-**2.** 约等于 $v_j$。
+**2.** The output is approximately $v_j$.
 
 ### (b)
 
-设 $q=\lambda(k_a+k_b)$，$\lambda$ 是一个足够大的正数。因为 key 两两正交且都是单位向量，易得
+Let $q=\lambda(k_a+k_b)$, where $\lambda$ is a sufficiently large positive number. Since the keys are pairwise orthogonal unit vectors,
 
 $$
-k_a^\top q = k_b^\top q = \lambda
+k_a^\top q=k_b^\top q=\lambda.
 $$
 
-以及对于 $i\ne a,b$，有 $k_i^\top q=0$。因此 $k_a,k_b$ 的 softmax score 都为 $e^{\lambda}$，其余的都为 $e^0$。当 $\lambda$ 足够大的时候，可以忽略其余 key 的贡献，因此
+For every $i\ne a,b$, we also have $k_i^\top q=0$. Thus the softmax scores of $k_a$ and $k_b$ are both $e^\lambda$, while every other score is $e^0$. When $\lambda$ is large, the contributions of the other keys become negligible, so
 
 $$
-c=\sum_i\alpha_i v_i \approx\frac12(v_a+v_b)
+c=\sum_i\alpha_i v_i\approx\frac{1}{2}(v_a+v_b).
 $$
 
 ### (c)
 
-**1.** 和 (b) 类似，只是把确定的实际采样出来的 $k$ 变成了均值，剩下的思路和 (b) 一样。因为扰动项很少可以忽略，所以均值仍然可以看作 $k_a$ 和 $k_b$。
+**1.** The idea is the same as in (b), except that we use the mean of each key distribution rather than a particular sampled key. The perturbations are small, so the relevant keys remain close to $\mu_a$ and $\mu_b$.
 
-**2.** 这个题专门让 $k_a$ 沿着 $\mu_a$ 方向大幅伸缩，可以看成 $k_a \approx s\mu_a$，其中 $s$ 有很大波动。因此我们可以得到 $k_a^\top q\approx\lambda s$，而 $k_b$ 模长比较稳定，因此 $k_b^\top q\approx\lambda$。这导致输出 $c$ 会在 $v_a$ 和 $v_b$ 之间摇摆；第一题中 $c$ 的方差很小，比较稳定，而第二题中 $c$ 的方差较大。
+**2.** Here $k_a$ varies substantially in length along the direction of $\mu_a$. Write $k_a\approx s\mu_a$, where $s$ fluctuates considerably. Then $k_a^\top q\approx\lambda s$, whereas the length of $k_b$ is relatively stable and $k_b^\top q\approx\lambda$. Consequently, the attention output $c$ shifts between $v_a$ and $v_b$. In the first case its variance is small and the output is stable; in this case its variance is larger.
 
 ### (d)
 
-**1.** 这题区别于 (c)：上题是让单头用一个 query 同时关注 $a$ 和 $b$，这题是让两个 head 分工。因为各 $\mu_i$ 两两正交，且 key 只有极小扰动，$q_1$ 只会与 $k_a$ 有较大点积，因此 $c_1\approx v_a$；同理 $c_2\approx v_b$，故
+**1.** Unlike (c), where one head uses a single query to attend to both $a$ and $b$, the two heads now divide the work. The means $\mu_i$ are pairwise orthogonal and the key perturbations are small, so $q_1$ has a large dot product only with $k_a$, giving $c_1\approx v_a$. Similarly, $c_2\approx v_b$. Therefore,
 
 $$
-c=\frac12(c_1+c_2) \approx\frac12(v_a+v_b)
+c=\frac{1}{2}(c_1+c_2)\approx\frac{1}{2}(v_a+v_b).
 $$
 
-**2.** 类似于 (c)(ii) 的多头版本。$k_a$ 的模长波动会使 $k_a^\top q_1$ 波动，因此 $c_1$ 的方差较大；$k_a$ 较长时 $c_1\approx v_a$，较短时对 $v_a$ 的关注减弱。但 $q_2\perp\mu_a$，故 $k_a$ 沿 $\mu_a$ 方向的模长波动几乎不影响第二个 head，仍有 $c_2\approx v_b$ 且 $c_2$ 方差很小。因此：
+**2.** This is the multi-head counterpart of (c)(ii). Changes in the length of $k_a$ make $k_a^\top q_1$ fluctuate, so $c_1$ has relatively high variance: when $k_a$ is long, $c_1\approx v_a$, and when it is short, the attention paid to $v_a$ weakens. But $q_2\perp\mu_a$, so variation in $k_a$ along $\mu_a$ has almost no effect on the second head. We still have $c_2\approx v_b$ with low variance. Hence
 
 $$
-c=\frac12(c_1+c_2)
+c=\frac{1}{2}(c_1+c_2).
 $$
 
-只有第一个 head 的输出波动，第二个 head 保持稳定。相比 (c)(ii) 的单头 Attention 中 $v_a,v_b$ 的权重会同时波动，多头 Attention 的最终输出 $c$ 方差更小。
+Only the first head's output fluctuates; the second remains stable. In the single-head attention of (c)(ii), the weights on both $v_a$ and $v_b$ fluctuate together. Averaging the two heads therefore gives an output with lower variance.
 
 ### (e)
 
-多头 Attention 将原本由单个 head 同时关注 $v_a,v_b$ 的任务拆分开：一个 head 关注 $v_a$，另一个 head 关注 $v_b$。因此某个 key 的模长波动只会影响对应 head 的输出，其他 head 仍保持稳定，最终再对各 head 输出求平均，能降低输出方差，使 Attention 更鲁棒。
+Multi-head attention splits a task that one head would otherwise perform alone: one head attends to $v_a$, and another attends to $v_b$. A fluctuation in the length of one key mainly affects its corresponding head, while the other head remains stable. Averaging the head outputs reduces the variance of the final result and makes attention more robust.
 
 ## Problem 2
 
 ### (a)
 
-**1.** 由 $X_{\mathrm{perm}}=PX$ 可得 $Q_{\mathrm{perm}}=PQ,K_{\mathrm{perm}}=PK,V_{\mathrm{perm}}=PV$，因此：
+**1.** From $X_{\mathrm{perm}}=PX$, we obtain $Q_{\mathrm{perm}}=PQ$, $K_{\mathrm{perm}}=PK$, and $V_{\mathrm{perm}}=PV$. Therefore,
 
 $$
 \frac{Q_{\mathrm{perm}}K_{\mathrm{perm}}^\top}{\sqrt d}
-=
-P\frac{QK^\top}{\sqrt d}P^\top
+=P\frac{QK^\top}{\sqrt d}P^\top.
 $$
 
-由题设 Softmax 性质及 $P^\top P=I$：
+Using the stated property of row-wise softmax and $P^\top P=I$,
 
 $$
 \begin{aligned}
@@ -82,26 +83,113 @@ P\frac{QK^\top}{\sqrt d}P^\top
 &=P\operatorname{softmax}\left(
 \frac{QK^\top}{\sqrt d}
 \right)P^\top PV \\
-&=PH
+&=PH.
 \end{aligned}
 $$
 
-又因为 $P\mathbf1=\mathbf1$，故：
+Since $P\mathbf{1}=\mathbf{1}$, it follows that
 
 $$
 \begin{aligned}
 Z_{\mathrm{perm}}
-&=\operatorname{ReLU}(PHW_1+\mathbf1b_1)W_2+\mathbf1b_2 \\
-&=\operatorname{ReLU}\left(P(HW_1+\mathbf1b_1)\right)W_2+P\mathbf1b_2 \\
-&=P\operatorname{ReLU}(HW_1+\mathbf1b_1)W_2+P\mathbf1b_2 \\
-&=PZ
+&=\operatorname{ReLU}(PHW_1+\mathbf{1}b_1)W_2+\mathbf{1}b_2 \\
+&=\operatorname{ReLU}\left(P(HW_1+\mathbf{1}b_1)\right)W_2+P\mathbf{1}b_2 \\
+&=P\operatorname{ReLU}(HW_1+\mathbf{1}b_1)W_2+P\mathbf{1}b_2 \\
+&=PZ.
 \end{aligned}
 $$
 
-**2.** Transformer 不加入 Position Embedding 时满足置换等变性 $Z_{\mathrm{perm}}=PZ$，模型无法感知 token 原本所在的位置。但文本语义依赖词序，因此该性质会使 Transformer 无法区分不同词序的文本，需要加入 Position Embedding 来提供位置信息。
+**2.** Without positional embeddings, the Transformer is permutation-equivariant: $Z_{\mathrm{perm}}=PZ$. It cannot tell where a token originally appeared. Because the meaning of text depends on word order, positional embeddings are needed to supply position information.
 
 ### (b)
 
-**1.** 能解决。加入 Position Embedding 后 $X_{\mathrm{pos}}=X+\Phi$，若只置换 token 而位置不变，输入变为 $X_{\mathrm{perm,pos}}=PX+\Phi$，而原输入整体置换为 $P(X+\Phi)=PX+P\Phi$，因此不同词序会产生不同的输入表示。每个位置具有不同的 Position Embedding，Transformer 可以据此感知 token 的位置和顺序。
+**1.** Yes. With positional embeddings, $X_{\mathrm{pos}}=X+\Phi$. If the tokens are permuted while their positions stay fixed, the new input is $X_{\mathrm{perm,pos}}=PX+\Phi$. Permuting the original full input instead would give $P(X+\Phi)=PX+P\Phi$. These expressions generally differ, so different word orders produce different input representations. The Transformer can use the position assigned to each token to recover order information.
 
-**2.** 不会。若两个不同位置 $t\ne s$ 的 Position Embedding 相同，则其前两维必须满足 $\sin t=\sin s,\cos t=\cos s$，因此 $t=s+2\pi k$，其中 $k$ 为整数。由于 $t,s$ 均为整数，而 $2\pi k$ 仅在 $k=0$ 时为整数，故只能有 $t=s$。
+**2.** No, for the sinusoidal embeddings in the question. If distinct integer positions $t\ne s$ had identical embeddings, their first two coordinates would require $\sin t=\sin s$ and $\cos t=\cos s$. This implies $t=s+2\pi k$ for some integer $k$. Since $t-s$ is an integer and $2\pi k$ can be an integer only when $k=0$, we must have $t=s$, a contradiction.
+
+## Problem 3
+
+### (a)
+
+This problem implements a decoder-only, GPT-2-style Transformer.
+
+**MLP.** The MLP independently applies two linear transformations to each token, with GELU between them:
+
+$$
+\operatorname{MLP}(x)=W_2\operatorname{GELU}(W_1x+b_1)+b_2.
+$$
+
+The first layer expands the hidden dimension from $d_{\text{model}}$ to $4d_{\text{model}}$; the second projects it back to $d_{\text{model}}$.
+
+**CausalAttention.** First obtain $Q$, $K$, and $V$ from the input, then compute scaled dot-product attention:
+
+$$
+\operatorname{Attention}(Q,K,V)=
+\operatorname{softmax}\left(\frac{QK^\top}{\sqrt{d_h}}+M\right)V.
+$$
+
+Here $M$ is a causal mask that permits the lower triangular part of the score matrix. Position $t$ can attend only to positions $0,\ldots,t$. Setting the scores for future positions to $-\infty$ makes their softmax weights zero. For multi-head attention, reshape $[B,T,d_{\text{model}}]$ into $[B,h,T,d_h]$, compute attention separately for each head, and concatenate the results.
+
+**DecoderBlock.** This implementation uses Pre-LN: apply layer normalization before attention and the MLP, then add each sublayer's residual connection:
+
+$$
+\begin{aligned}
+H &= X+\operatorname{CausalAttention}(\operatorname{LN}_1(X)),\\
+Y &= H+\operatorname{MLP}(\operatorname{LN}_2(H)).
+\end{aligned}
+$$
+
+**Transformer.** Add token and position embeddings, pass the result through the decoder blocks, then apply a final layer normalization and the language-model head to obtain logits:
+
+$$
+H^{(0)}=E_{\text{token}}(x)+E_{\text{position}}(0,\ldots,T-1),
+$$
+
+$$
+\operatorname{logits}=H^{(L)}W_{\text{lm}}^\top.
+$$
+
+At each generation step, take the token with the largest logit at the final position:
+
+$$
+x_{\text{next}}=\arg\max_v\operatorname{logits}_{-1,v}.
+$$
+
+Append that token to the input and repeat. If the sequence exceeds the context length, keep only the most recent `context_length` tokens for the forward pass.
+
+### (b) Training the Transformer
+
+`get_loss_on_batch` uses next-token prediction. Given an input sequence
+
+$$
+(x_0,x_1,\ldots,x_{T-1}),
+$$
+
+the logits at position $t$ predict $x_{t+1}$. Thus we remove the final logit position and the first label token:
+
+$$
+\operatorname{loss}=
+\operatorname{CrossEntropy}\left(
+\operatorname{logits}_{[:,0:T-1,:]},
+x_{[:,1:T]}
+\right).
+$$
+
+In the implementation, flatten the batch and sequence dimensions before passing them to `F.cross_entropy`. The final position has no next token, so it does not contribute to the loss.
+
+After 100 batches, the loss decreases overall from about $10.83$ to about $10.77$, showing that the model has begun to learn from the data. The gradient norm stays within a modest range, with no obvious gradient explosion.
+
+![Training loss and gradient norm over 100 batches](/assets/img/posts/cs224n-assignment-3/losses-and-grad-norms.png)
+
+### (c) Bonus: Faster Training
+
+With the number of training steps fixed at 100, the goal is to obtain a lower final loss than the baseline under the same budget. I applied three changes in sequence: a higher learning rate, no weight decay, and a learnable bias in the language-model head.
+
+| Setting | Final loss after 100 steps |
+| --- | ---: |
+| Baseline | $\approx 10.77$ |
+| Learning rate: $10^{-3}$ | $6.449274$ |
+| + No weight decay | $6.446831$ |
+| + LM head bias | **$6.427308$** |
+
+Increasing the learning rate produces the largest improvement in convergence over the fixed number of steps. Removing weight decay slightly improves the training loss under this budget; the LM-head bias can directly learn an overall frequency offset for each token and reduces the final loss further.
