@@ -11,7 +11,9 @@ heroImage:
   color: '#bd7d77'
 ---
 
-> You can download the [LaTeX](/output/pdf/multi-armed-bandits.tex) and [PDF](/output/pdf/multi-armed-bandits.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/NeAXHWf9V) here.
+<aside class="download-callout" role="note">
+  <p>You can download the <a href="/output/pdf/multi-armed-bandits.tex">LaTeX</a> and <a href="/output/pdf/multi-armed-bandits.pdf">PDF</a>, and you can also read the <a href="https://notes.sjtu.edu.cn/s/NeAXHWf9V">Chinese version</a> here.</p>
+</aside>
 
 ## Multi-Armed Bandits
 

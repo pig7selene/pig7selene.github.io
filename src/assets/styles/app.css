@@ -122,4 +122,67 @@
     border-left-color: #60a5fa;
     background: #172554;
   }
+
+  #content .download-callout {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid #b8d8f0;
+    border-radius: 1rem;
+    background: #eaf5ff;
+    color: #254363;
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  #content .download-callout::before {
+    content: 'i';
+    display: grid;
+    flex: 0 0 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    place-items: center;
+    border-radius: 50%;
+    background: #1385d5;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  #content .download-callout p {
+    margin: 0;
+    color: inherit;
+  }
+
+  #content .download-callout a {
+    color: #075b9d;
+    text-decoration: underline;
+    text-decoration-color: #6ca9d7;
+    text-underline-offset: 0.2em;
+  }
+
+  #content .download-callout a:hover {
+    color: #034475;
+    text-decoration-color: currentColor;
+  }
+
+  .dark #content .download-callout {
+    border-color: #2c5b82;
+    background: #103759;
+    color: #e4edf7;
+  }
+
+  .dark #content .download-callout a {
+    color: #f1f7ff;
+    text-decoration-color: #8bb7df;
+  }
+
+  .dark #content .download-callout a:hover {
+    color: #fff;
+  }
 }
