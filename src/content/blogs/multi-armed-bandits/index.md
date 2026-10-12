@@ -1,5 +1,5 @@
 ---
-title: '强化学习 | 多臂老虎机'
+title: 'Reinforcement Learning | Multi-Armed Bandits'
 publishDate: 2026-10-12
 category: learning
 tags: [Reinforcement learning]
