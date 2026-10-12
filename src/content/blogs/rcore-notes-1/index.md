@@ -1,5 +1,5 @@
 ---
-title: 'rCore Notes 1 基本执行环境'
+title: 'rCore | 基本执行环境'
 publishDate: 2026-09-23
 category: learning
 tags: [rCore, Operating Systems]
