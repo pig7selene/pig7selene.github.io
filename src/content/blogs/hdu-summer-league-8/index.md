@@ -1,38 +1,42 @@
 ---
-title: "HDU Summer League (8)"
+title: "HDU 暑期多校（8）"
 publishDate: 2026-08-15
 category: daily
 tags: [xcpc, hdu-summer-league-2026]
-language: en
+language: zh
 description: "Solutions and notes for HDU Summer League(8)."
 heroImage:
   src: /assets/img/posts/foundation-model-handbook/handbook-card-cover.png
-  alt: "Anime-style figure in a hood overlooking a city at sunset"
+  alt: "文章封面"
   color: "#755f82"
 ---
 
-## HDU Summer League(8)
-> You can download the [LaTeX](/output/pdf/hdu-summer-league-8.tex) and [PDF](/output/pdf/hdu-summer-league-8.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/WTuny4iBr) here.
-[Code Implementation for This Contest](https://github.com/pig7selene/xcpc-code/tree/main/summer08)
+<aside class="download-callout" role="note">
+  <p>You can download the <a href="/output/pdf/hdu-summer-league-8.tex">LaTeX</a> and <a href="/output/pdf/hdu-summer-league-8.pdf">PDF</a>.</p>
+</aside>
+
+## HDU 暑期多校（8）
+
+[本场比赛的代码实现](https://github.com/pig7selene/xcpc-code/tree/main/summer08)
 ### 1001
 
-**Problem**: Given a directed graph with $n$ vertices and $m$ edges, you need to travel from vertex $1$ to vertex $n$. There are $q$ operations. The $i$-th operation deletes all outgoing edges of vertex $p_i$. You need to find the maximum number of operations $k$ such that after performing the first $k$ operations, there is still a path from vertex $1$ to vertex $n$.
+**题意**：给定一个有 $n$ 个点、$m$ 条边的有向图，需要从点 $1$ 走到点 $n$。有 $q$ 次操作，第 $i$ 次操作删除点 $p_i$ 的所有出边。求最大的操作次数 $k$，使前 $k$ 次操作完成后，点 $1$ 仍能到达点 $n$。
 
-**Solution**: First assume that all outgoing edges of every $p_i$ have already been deleted. We then add the edges back in reverse order while maintaining two arrays
+**思路**：先假设所有 $p_i$ 的出边都已经删除，再倒序加回这些边，同时维护两个数组：
 
-* $on[u]$: whether the outgoing edges of vertex $u$ currently exist
-* $vis[u]$: whether $u$ can currently reach $n$
+* $on[u]$：点 $u$ 的出边当前是否存在；
+* $vis[u]$：点 $u$ 当前能否到达 $n$。
 
-When restoring vertex $u=p[i]$ in reverse order, set $on[u] = 1$. If there exists an edge $u \to v$ and $vis[v] = 1$, then $vis[u] = 1$. Then perform a bfs starting from $u$ on the reverse graph.
+倒序恢复点 $u=p[i]$ 时，先令 $on[u] = 1$。若存在边 $u \to v$，且 $vis[v] = 1$，则令 $vis[u] = 1$，再从 $u$ 出发沿反图进行 BFS。
 
 ### 1002
 
-**Problem**: Given two sequences $a$ and $b$ of length $n$, there are $m$ days. At the beginning of each day, $a_i = a_i + b_i$ is performed, and there is one query every day
+**题意**：给定长度为 $n$ 的两个序列 $a$ 和 $b$，共有 $m$ 天。每天开始时执行 $a_i = a_i + b_i$，随后进行一次询问：
 
-* `1 l r x`: for all $l \le i \le r$, perform $b_i \leftarrow b_i+x$
-* `2 l r`: calculate $\sum_{i=l}^{r} a_i \bmod 2^{64}$
+* `1 l r x`：对所有 $l \le i \le r$，执行 $b_i \leftarrow b_i+x$；
+* `2 l r`：计算 $\sum_{i=l}^{r} a_i \bmod 2^{64}$。
 
-**Solution**: Maintain prefix sums for both arrays. Since the modulus is $2^{64}$, we can directly use `ull`. For the first operation, use a Fenwick tree to maintain two lazy arrays `lazy1` and `lazy2`. One stores all modifications $x$, while the other stores $day \times x$. On day $t$, the answer for an interval $[l,r]$ is
+**思路**：维护两个数组的前缀和。由于模数为 $2^{64}$，可以直接使用 `ull`。对第一种操作，用树状数组维护两个懒标记数组 `lazy1` 和 `lazy2`，分别记录所有修改量 $x$ 和 $day \times x$。在第 $t$ 天，区间 $[l,r]$ 的答案为
 
 $$
 \sum A_i+t\sum B_i+t\sum lazy1_i-\sum lazy2_i
@@ -40,53 +44,53 @@ $$
 
 ### 1003
 
-**Problem**: Given a permutation, each query gives `x k`. We need to select some positions such that $x$ is not selected and the distance between any two selected positions is at least $k$. Find the number of valid selection schemes.
+**题意**：给定一个排列，每次询问给出 `x k`。选择若干位置，要求不能选择 $x$，且任意两个被选位置之间的距离至少为 $k$，求合法方案数。
 
-**Solution**: We can think about it in reverse and calculate the total number of schemes minus the number of schemes in which $x$ is selected.
+**思路**：反过来考虑，用总方案数减去必须选择 $x$ 的方案数。
 
-Let $f(n,k)$ denote the number of schemes for $n$ positions where the distance between any two selected positions is at least $k$. For a query $(x,k)$, the total number of schemes is $f(n,k)$. For schemes that must contain $x$, consider the valid positions on the left and right of $x$. The valid length on the left is $l=\max(0,x-k)$, and the valid length on the right is $r=\max(0,n-x-k+1)$. Therefore, the answer is
+设 $f(n,k)$ 表示在 $n$ 个位置中选取若干位置、任意两个被选位置距离至少为 $k$ 的方案数。对于询问 $(x,k)$，总方案数为 $f(n,k)$。对于必须包含 $x$ 的方案，分别考虑其左右两侧可以选择的位置，左侧长度为 $l=\max(0,x-k)$，右侧长度为 $r=\max(0,n-x-k+1)$，因此答案为
 
 $$
 f(n,k)-f(l,k)f(r,k)
 $$
 
-There are two ways to calculate $f$:
+有两种方法计算 $f$：
 
-Recurrence:
+递推：
 
 $$
 f(i,k)=f(i-1,k)+f(i-k,k)
 $$
 
-For a fixed $k$, it can be precomputed in $O(n)$.
+对于固定的 $k$，可以在 $O(n)$ 时间内预处理。
 
-Or enumerate the number $c$ of selected positions. Transforming the condition that adjacent selected positions have distance at least $k$ into an ordinary position-selection problem gives
+或者枚举选择的位置数量 $c$，将相邻被选位置间距至少为 $k$ 的限制转化为普通的选位置问题，可得
 
 $$
 f(n,k)=\sum_{c\ge 0}\binom{n-(k-1)(c-1)}{c}
 $$
 
-The complexity is $O(n/k)$.
+复杂度为 $O(n/k)$。
 
-If there are many queries with the same $k$, use the first method; otherwise, calculate it using combinations.
+如果有很多询问使用相同的 $k$，就用第一种方法；否则用组合数直接计算。
 
 ### 1007
 
-**Problem**: Given an $n \times m$ grid with obstacles in some cells, you can move up, down, left, or right from a cell. There are $k$ directed portals in the grid, and a cell may contain multiple portals. You may choose not to use a portal. There are $q$ queries, each asking whether it is possible to reach the destination from the starting point.
+**题意**：给定一个 $n \times m$ 的网格，其中一些格子有障碍。可以从当前格子上下左右移动。网格中还有 $k$ 个有向传送门，一个格子可以有多个传送门，也可以选择不使用。有 $q$ 次询问，每次判断能否从起点到达终点。
 
-**Solution**: First divide all cells into connected components and assign an id to the connected component of each cell. Any two cells inside the same connected component are mutually reachable. Then consider the portals. A portal $(x_1,y_1) \to (x_2,y_2)$ is equivalent to adding an edge between the connected components containing these two cells. We only need to renumber the connected components and build a new graph, then run bfs from each connected component containing a portal to determine whether the connected components containing the starting point and destination are reachable.
+**思路**：先将所有格子划分为连通块，记录每个格子所在连通块的编号。同一个连通块内的任意两个格子都可以互相到达。再考虑传送门：一个 $(x_1,y_1) \to (x_2,y_2)$ 的传送门，相当于在两个格子所在的连通块之间连一条有向边。将相关连通块重新编号并建图，再从包含传送门的各连通块出发进行 BFS，即可判断起点与终点所在的连通块是否可达。
 
 ### 1009
 
-**Problem**: Given an array $P$ of length $2N$, where $P$ is a permutation of $2N$ and some elements are missing and represented by $0$. Define the value of the permutation as
+**题意**：给定长度为 $2N$ 的数组 $P$，它原本是 $2N$ 的排列，但其中一些元素缺失，用 $0$ 表示。定义排列的价值为
 
 $$
 |P_1-P_2|+|P_3-P_4|+\cdots+|P_{2N-1}-P_{2N}|
 $$
 
-Find the number of ways to complete the permutation such that its value is maximized.
+求补全排列、使其价值达到最大的方案数。
 
-**Solution**: Divide the array into $N$ pairs of adjacent positions. If both numbers in a pair are non-zero, its contribution is already fixed, so we can ignore it. We only consider pairs containing at least one $0$. Suppose there are $k$ such pairs. Sort the corresponding $2k$ numbers and divide them into a lower half and an upper half. To maximize the contribution, each pair must contain one large number and one small number. Let $cnt$ be the number of pairs where both numbers are $0$. The answer is
+**思路**：将数组按相邻位置分成 $N$ 对。如果一对中的两个数都非零，它的贡献已经固定，可以忽略。只考虑至少包含一个 $0$ 的数对，设共有 $k$ 对。将对应的 $2k$ 个数排序，分成较小的一半与较大的一半。为了最大化贡献，每一对必须由一个大数和一个小数组成。设两个位置均为 $0$ 的数对共有 $cnt$ 对，则答案为
 
 $$
 l!\times r!\times 2^{cnt}
@@ -94,6 +98,6 @@ $$
 
 ### 1012
 
-**Problem**: Given an undirected graph with $n$ vertices and $m$ edges numbered $1,2,\dots,n$. There may be multiple edges connecting the same pair of vertices. The input graph is guaranteed to be bipartite. A cycle is a connected subgraph in which every vertex has degree $2$. If a cycle contains exactly $k$ vertices, it is called a $k$-cycle. The input guarantees that $k$ is prime. Find the number of different $k$-cycles in the graph.
+**题意**：给定一个有 $n$ 个点、$m$ 条边的无向图，点的编号为 $1,2,\dots,n$，允许重边，且保证图是二分图。环是一个每个点的度数都为 $2$ 的连通子图。如果一个环恰好包含 $k$ 个点，就称为 $k$ 环。输入保证 $k$ 是质数，求不同的 $k$ 环的数量。
 
-**Solution**: Since the graph is bipartite, every cycle must have even length. Since $k$ is also prime, the cycle length can only be $2$. Therefore, we only need to count the number of ways to choose two different parallel edges between the same pair of vertices.
+**思路**：二分图的所有环长度都为偶数，而 $k$ 又是质数，因此环长只能为 $2$。只需要统计每对点之间选择两条不同重边的方案数。

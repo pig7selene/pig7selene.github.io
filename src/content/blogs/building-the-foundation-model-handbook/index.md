@@ -14,7 +14,9 @@ heroImage:
 
 I have completed Version 1.0 of a long-term project called [**The Foundation Model Handbook**](https://github.com/pig7selene/the-foundation-model-handbook). The first complete edition is a 39-chapter technical monograph on modern foundation models and LLM systems. It remains a structured record of what I have learned rather than an attempt to be an authoritative textbook, but the core roadmap is now complete and available as a single assembled book.
 
-> Read the [complete Version 1.0 PDF](https://github.com/pig7selene/the-foundation-model-handbook/raw/refs/heads/main/build/the-foundation-model-handbook-v1.0.pdf), or browse the [source and standalone chapter PDFs on GitHub](https://github.com/pig7selene/the-foundation-model-handbook).
+<aside class="download-callout" role="note">
+  <p>Read the <a href="https://github.com/pig7selene/the-foundation-model-handbook/raw/refs/heads/main/build/the-foundation-model-handbook-v1.0.pdf">complete Version 1.0 PDF</a>, or browse the <a href="https://github.com/pig7selene/the-foundation-model-handbook">source and standalone chapter PDFs on GitHub</a>.</p>
+</aside>
 
 ## Why I Started It
 

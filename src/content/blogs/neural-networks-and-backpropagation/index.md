@@ -1,36 +1,39 @@
 ---
-title: "CS224N | Neural Networks and Backpropagation"
+title: "CS224N | 神经网络与反向传播"
 publishDate: 2026-08-10
 category: learning
 tags: [NLP, CS224N]
-language: en
+language: zh
 description: "CS224n lec3,neural networks, backpropagation, regularization, activation functions, and data preprocessing."
 heroImage:
   src: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
-  alt: "Sunset cityscape with a figure looking over the skyline"
+  alt: "文章封面"
   color: "#9a7093"
 ---
 
-> 寻找太阳的梦 自不量力说 自己也变成太阳的念头  
-> You can download the [LaTeX](/output/pdf/neural-networks-and-backpropagation.tex) and [PDF](/output/pdf/neural-networks-and-backpropagation.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/N-NJOZkhJ) here.
-# Neural Networks and Backpropagation
+<aside class="download-callout" role="note">
+  <p>You can download the <a href="/output/pdf/neural-networks-and-backpropagation.tex">LaTeX</a> and <a href="/output/pdf/neural-networks-and-backpropagation.pdf">PDF</a>.</p>
+</aside>
 
-## Neural Networks
+> 寻找太阳的梦 自不量力说 自己也变成太阳的念头
+# 神经网络与反向传播
 
-### 1.1 A Single Neuron
+## 神经网络
 
-A neuron receives $n$ inputs and produces one output. Different neurons produce different outputs because they have different parameters. A common example is the sigmoid logistic unit. It receives an $n$-dimensional input vector $x$ and produces an activation value $a$. The neuron also has an $n$-dimensional weight vector $w$ and a scalar bias $b$. Its output is
+### 1.1 一个神经元
 
-$$
-a=\frac{1}{1+\exp\left(-\left(w^\top x+b\right)\right)}.
-$$
-
-### 1.2 A Single Layer of Neurons
-
-Now extend this idea to multiple neurons. Suppose their weight vectors are $\{w^{(1)},w^{(2)},\dots,w^{(m)}\}$, their biases are $\{b_1,\dots,b_m\}$, and their corresponding activations are $\{a_1,\dots,a_m\}$:
+神经元接收 $n$ 个输入并产生一个输出。不同的神经元会产生不同的输出因为参数不同，比较常见的神经元是Sigmoid逻辑单元。该单元接收一个 $n$ 维输入向量 $x$，并产生一个输出值 $a$。这一神经元还具有一个 $n$ 维权重向量 $w$ 和一个标量偏置 $b$ 。输出为
 
 $$
-a_1=\frac{1}{1+\exp\left(-\left(w^{(1)\top}x+b_1\right)\right)},
+a=\frac{1}{1+\exp(-(w^\top x+b))}
+$$
+
+### 1.2 单层神经元
+
+扩展到多个神经元的输入，设不同神经元的权重分别为$\{w^{(1)},w^{(2)},\dots,w^{(m)}\}$，偏置分别为$\{b_1,\dots,b_m\}$，对应的激活值为$\{a_1,\dots,a_m\}$
+
+$$
+a_1=\frac{1}{1+\exp(-(w^{(1)T}x+b_1))},
 $$
 
 $$
@@ -38,10 +41,10 @@ $$
 $$
 
 $$
-a_m=\frac{1}{1+\exp\left(-\left(w^{(m)\top}x+b_m\right)\right)}.
+a_m=\frac{1}{1+\exp(-(w^{(m)T}x+b_m))}
 $$
 
-To simplify the notation and make more complex networks easier to describe, define
+为了使记号更简洁，并便于表示更复杂的网络，定义
 
 $$
 \sigma(z)=
@@ -50,7 +53,7 @@ $$
 \vdots\\
 \dfrac{1}{1+\exp(-z_m)}
 \end{bmatrix},
-\qquad
+\quad
 b=
 \begin{bmatrix}
 b_1\\
@@ -60,247 +63,162 @@ b_m
 \in\mathbb{R}^m,
 $$
 
-and
-
 $$
 W=
 \begin{bmatrix}
-w^{(1)\top}\\
+-\,w^{(1)T}-\\
 \vdots\\
-w^{(m)\top}
+-\,w^{(m)T}-
 \end{bmatrix}
 \in\mathbb{R}^{m\times n}.
 $$
 
-The pre-activation vector is therefore
+因此输出可以转化为$z = Wx + b$，Sigmoid函数的激活值可以写成$\begin{bmatrix} a^{(1)}\\ \vdots\\ a^{(m)} \end{bmatrix} =\sigma(z)=\sigma(Wx+b)$
+
+### 1.3 前馈计算
+
+神经网络的前馈计算过程为$a=f(Wx+b)$，其中 $x$ 为输入，$W,b$ 为参数，$f$ 为激活函数，$a$ 为隐藏层激活值。再根据隐藏层得到输出分数$s=U^Ta=U^Tf(Wx+b)$，隐藏层的作用是通过非线性变换提取输入中的组合特征，使模型能够学习更复杂的关系。
+
+### 1.4 最大间隔目标函数
+
+与大多数机器学习模型一样，神经网络也需要一个优化目标，最大间隔目标的思想是确保真实标注数据点的得分高于错误标注数据点的得分，我们将正确标注点的记为 $s$，错误标注点的得分记为 $s_c$，其中
 
 $$
-z=Wx+b,
+s_c=U^Tf(Wx_c+b),\quad s=U^Tf(Wx+b)
 $$
 
-and the vector of sigmoid activations can be written as
+那么目标函数应最大化 $(s-s_c)$，等价于最小化 $(s_c-s)$，我们考虑 $s_c  > s$ 的情况下，目标就变成了 $minimize \space J = max(s_c - s,0)$，但是我们希望真实标注数据点至少比错误标注数据点高出一个正间隔 $\Delta$，所以目标变为
 
 $$
-a=
-\begin{bmatrix}
-a_1\\
-\vdots\\
-a_m
-\end{bmatrix}
-=\sigma(z)=\sigma(Wx+b).
+\operatorname{minimize} J=\max(\Delta+s_c-s,0)
 $$
 
-### 1.3 Feedforward Computation
+### 1.5 反向传播
 
-The feedforward computation of a neural network is
-
-$$
-a=f(Wx+b),
-$$
-
-where $x$ is the input, $W$ and $b$ are parameters, $f$ is an activation function, and $a$ is the hidden-layer activation. The output score is then computed from the hidden layer:
+这一节讨论当代价 $J$ 为正的时候如何训练模型中的各个参数。若代价为0，无需更新任何参数。我们通常使用梯度下降来更新参数，因此需要得到更新公式中任意参数的梯度
 
 $$
-s=U^\top a=U^\top f(Wx+b).
+\theta^{(t+1)}=\theta^{(t)}-\alpha\nabla_{\theta^{(t)}}J
 $$
 
-The hidden layer applies a nonlinear transformation to extract combinations of input features, allowing the model to learn more complex relationships.
+我们可以利用微分链式法则计算前馈过程中任意参数对应损失梯度
 
-### 1.4 Maximum-Margin Objective
+![三层神经网络及其前馈连接](/assets/img/posts/neural-networks-and-backpropagation/network-architecture.png)
 
-Like most machine-learning models, a neural network needs an optimization objective. A maximum-margin objective encourages the score of a correctly labeled example to exceed that of an incorrectly labeled example. Let $s$ denote the score of the correct example and $s_c$ the score of an incorrect example, where
+**记号说明**
 
-$$
-s_c=U^\top f(Wx_c+b),
-\qquad
-s=U^\top f(Wx+b).
-$$
+| 记号             | 含义                                             |
+| ---------------- | ------------------------------------------------ |
+| $x_i$            | 神经网络的第 $i$ 个输入                          |
+| $s$              | 神经网络的输出                                   |
+| $z_j^{(k)}$      | 第 $k$ 层第 $j$ 个神经元接收的标量输入           |
+| $a_j^{(k)}$      | 第 $k$ 层第 $j$ 个神经元产生的激活输出           |
+| $\delta_j^{(k)}$ | 在 $z_j^{(k)}$ 处计算并向后传播的误差            |
+| $W^{(k)}$        | 将第 $k$ 层的输出映射到第 $k+1$ 层输入的权重矩阵 |
 
-The objective should maximize $s-s_c$, or equivalently minimize $s_c-s$. If we only considered the case $s_c>s$, the objective would be $\operatorname{minimize} J=\max(s_c-s,0)$. However, we want the correct example to score at least a positive margin $\Delta$ above the incorrect example. The objective therefore becomes
-
-$$
-\operatorname{minimize}\quad
-J=\max(\Delta+s_c-s,0).
-$$
-
-### 1.5 Backpropagation
-
-This section discusses how to train the model parameters when the cost $J$ is positive. If the cost is zero, no parameter update is needed. We usually update parameters with gradient descent, so we need the gradient of the loss with respect to every parameter:
-
-$$
-\theta^{(t+1)}
-=\theta^{(t)}
--\alpha\nabla_{\theta^{(t)}}J.
-$$
-
-The chain rule allows us to calculate the loss gradient for any parameter used in the feedforward computation.
-
-![A three-layer neural network and its feedforward connections](/assets/img/posts/neural-networks-and-backpropagation/network-architecture.png)
-
-**Notation**
-
-| Symbol | Meaning |
-| --- | --- |
-| $x_i$ | The $i$-th input to the neural network |
-| $s$ | The output of the neural network |
-| $z_j^{(k)}$ | The scalar input received by neuron $j$ in layer $k$ |
-| $a_j^{(k)}$ | The activation output produced by neuron $j$ in layer $k$ |
-| $\delta_j^{(k)}$ | The error computed at $z_j^{(k)}$ and propagated backward |
-| $W^{(k)}$ | The weight matrix mapping the outputs of layer $k$ to the inputs of layer $k+1$ |
-
-The first layer is the input layer, so
+其中，第 $1$ 层表示输入层，因此
 
 $$
 x_j=z_j^{(1)}=a_j^{(1)}.
 $$
 
-Using the notation introduced earlier,
+结合前面的记号，
 
 $$
-W^{(1)}=W,
-\qquad
-W^{(2)}=U.
+W^{(1)}=W,\quad W^{(2)}=U.
 $$
 
-We now begin the derivation. Assume that $J=1+s_c-s>0$, and consider updating the parameter $W_{14}^{(1)}$. This parameter affects only the input $z_1^{(2)}$ of the first hidden-layer neuron, which in turn affects $a_1^{(2)}$. The gradient therefore propagates backward only along paths influenced by this parameter.
+下面开始推导，假设 $J = (1 + s_c - s)$ 为正，我们希望更新参数 $W_{14}^{(1)}$。它只影响隐藏层第一个神经元的输入 $z_1^{(2)}$，进而影响 $a_1^{(2)}$，因此向后传播的梯度只会受到那些由该参数贡献的量的影响
 
-From the maximum-margin loss,
-
-$$
-\frac{\partial J}{\partial s}=-1,
-\qquad
-\frac{\partial J}{\partial s_c}=1.
-$$
-
-Consider the effect of the first-layer weight $W_{ij}^{(1)}$ on the output $s$. By the chain rule,
+假设 $J=1+s_c-s>0$，由最大间隔损失可得 $\frac{\partial J}{\partial s}=-1$，$\frac{\partial J}{\partial s_c}=1$。 下面考虑第 $1$ 层权重 $W_{ij}^{(1)}$ 对输出 $s$ 的影响。根据链式法则，
 
 $$
-\begin{aligned}
-\frac{\partial s}{\partial W_{ij}^{(1)}}
-&=W_i^{(2)}\frac{\partial a_i^{(2)}}{\partial W_{ij}^{(1)}}\\
-&=W_i^{(2)}
-\frac{\partial a_i^{(2)}}{\partial z_i^{(2)}}
-\frac{\partial z_i^{(2)}}{\partial W_{ij}^{(1)}}\\
-&=W_i^{(2)}f'\left(z_i^{(2)}\right)
-\frac{\partial z_i^{(2)}}{\partial W_{ij}^{(1)}}.
-\end{aligned}
+\begin{aligned} \frac{\partial s}{\partial W_{ij}^{(1)}} &=W_i^{(2)}\frac{\partial a_i^{(2)}}{\partial W_{ij}^{(1)}}\\ &=W_i^{(2)} \frac{\partial a_i^{(2)}}{\partial z_i^{(2)}} \frac{\partial z_i^{(2)}}{\partial W_{ij}^{(1)}}\\ &=W_i^{(2)}f'(z_i^{(2)}) \frac{\partial z_i^{(2)}}{\partial W_{ij}^{(1)}} \end{aligned}
 $$
 
-The input to neuron $i$ in the second layer is
+第 $2$ 层第 $i$ 个神经元的输入为 $z_i^{(2)}=b_i^{(1)}+\sum_k a_k^{(1)}W_{ik}^{(1)}$，因此 $\frac{\partial z_i^{(2)}}{\partial W_{ij}^{(1)}}=a_j^{(1)}$ 代入上式，
 
 $$
-z_i^{(2)}
-=b_i^{(1)}+\sum_k a_k^{(1)}W_{ik}^{(1)},
+\frac{\partial s}{\partial W_{ij}^{(1)}} =W_i^{(2)}f'(z_i^{(2)})a_j^{(1)}
 $$
 
-so
+ 定义第 $2$ 层第 $i$ 个神经元的反向传播误差为 $\delta_i^{(2)}=W_i^{(2)}f'(z_i^{(2)})$，于是
 
 $$
-\frac{\partial z_i^{(2)}}{\partial W_{ij}^{(1)}}
-=a_j^{(1)}.
+\frac{\partial s}{\partial W_{ij}^{(1)}}=\delta_i^{(2)}a_j^{(1)}
 $$
 
-Substitution gives
+ 其中，$\delta_i^{(2)}$ 是第 $2$ 层第 $i$ 个神经元的后向误差，$a_j^{(1)}$ 是前一层传入权重 $W_{ij}^{(1)}$ 的激活值。 因此可以概括为：权重梯度 = 后向误差 × 前向输入。
+
+以参数 $W_{14}^{(1)}$ 为例，它只影响隐藏层第 $1$ 个神经元，因此误差沿对应路径反向传播：
+
+1. 从输出 $a_1^{(3)}$ 开始，向后传播大小为 $1$ 的误差信号。
+
+2. 误差经过 $z_1^{(3)}\to a_1^{(3)}$ 时，需要乘以局部梯度。这里局部梯度为 $1$，因此记
 
 $$
-\frac{\partial s}{\partial W_{ij}^{(1)}}
-=W_i^{(2)}f'\left(z_i^{(2)}\right)a_j^{(1)}.
+\delta_1^{(3)}=1.
 $$
 
-Define the backpropagated error of neuron $i$ in the second layer as
+3. 误差继续向前一层传播，通过权重 $W_1^{(2)}$ 分配给 $a_1^{(2)}$，因此此处误差为 $W_1^{(2)}\delta_1^{(3)}=W_1^{(2)}$。
+
+4. 误差经过 $z_1^{(2)}\to a_1^{(2)}$ 时，再乘以激活函数的局部梯度 $f'(z_1^{(2)})$，于是
 
 $$
-\delta_i^{(2)}
-=W_i^{(2)}f'\left(z_i^{(2)}\right).
+\delta_1^{(2)}=f'(z_1^{(2)})W_1^{(2)}.
 $$
 
-Then
+5. 最后，$W_{14}^{(1)}$ 在前向传播中接收的输入为 $a_4^{(1)}$，因此它的梯度为
 
 $$
-\frac{\partial s}{\partial W_{ij}^{(1)}}
-=\delta_i^{(2)}a_j^{(1)}.
-$$
-
-Here, $\delta_i^{(2)}$ is the backward error at neuron $i$ in layer $2$, while $a_j^{(1)}$ is the activation from the previous layer that enters the weight $W_{ij}^{(1)}$. In short:
-
-$$
-\text{weight gradient}
-=\text{backward error}\times\text{forward input}.
-$$
-
-For example, $W_{14}^{(1)}$ affects only the first hidden-layer neuron, so the error propagates backward along the corresponding path:
-
-1. Start at the output $a_1^{(3)}$ and propagate an error signal of magnitude $1$ backward.
-
-2. As the error passes through $z_1^{(3)}\to a_1^{(3)}$, multiply it by the local gradient. The local gradient here is $1$, so
-
-   $$
-   \delta_1^{(3)}=1.
-   $$
-
-3. The error continues to the previous layer. It is distributed to $a_1^{(2)}$ through the weight $W_1^{(2)}$, giving $W_1^{(2)}\delta_1^{(3)}=W_1^{(2)}$.
-
-4. As the error passes through $z_1^{(2)}\to a_1^{(2)}$, multiply it by the local derivative $f'\left(z_1^{(2)}\right)$:
-
-   $$
-   \delta_1^{(2)}
-   =f'\left(z_1^{(2)}\right)W_1^{(2)}.
-   $$
-
-5. Finally, $W_{14}^{(1)}$ receives $a_4^{(1)}$ during the forward pass, so its gradient is
-
-   $$
-   \frac{\partial s}{\partial W_{14}^{(1)}}
+\frac{\partial s}{\partial W_{14}^{(1)}}
    =\delta_1^{(2)}a_4^{(1)}
-   =a_4^{(1)}f'\left(z_1^{(2)}\right)W_1^{(2)}.
-   $$
-
-**Bias Updates**
-
-A bias can be viewed as a special weight whose input is always $1$. Therefore, the bias gradient of neuron $i$ in layer $k$ is its backpropagated error:
-
-$$
-\frac{\partial J}{\partial b_i^{(k)}}
-=\delta_i^{(k)}.
+   =a_4^{(1)}f'(z_1^{(2)})W_1^{(2)}.
 $$
 
-For example, the gradient of $b_1^{(1)}$ is
+**偏置更新**
+
+偏置可以看作输入恒为 $1$ 的特殊权重，因此第 $k$ 层第 $i$ 个神经元的偏置梯度就是其反向传播误差：
 
 $$
-\frac{\partial J}{\partial b_1^{(1)}}
-=\delta_1^{(2)}
-=f'\left(z_1^{(2)}\right)W_1^{(2)}.
+\frac{\partial J}{\partial b_i^{(k)}}=\delta_i^{(k)}
 $$
 
-**General Procedure for Propagating $\delta^{(k)}$ to $\delta^{(k-1)}$**
+ 例如，对于偏置 $b_1^{(1)}$，其梯度为
 
-1. The error $\delta_i^{(k)}$ at neuron $i$ in layer $k$ propagates toward the preceding layer along the weight $W_{ij}^{(k-1)}$.
+$$
+\frac{\partial J}{\partial b_1^{(1)}}=\delta_1^{(2)}=f'(z_1^{(2)})W_1^{(2)}
+$$
 
-   ![An error signal propagating backward through a weighted connection](/assets/img/posts/neural-networks-and-backpropagation/backpropagation-connection.png)
+**将 $\delta^{(k)}$传播到$\delta^{(k - 1)}$的一般步骤**
 
-2. Along one connection to neuron $j$ in layer $k-1$, the path contributes the error $\delta_i^{(k)}W_{ij}^{(k-1)}$.
+1. 第 $k$ 层第 $i$ 个神经元的误差为 $\delta_i^{(k)}$，它会沿权重 $W_{ij}^{(k-1)}$ 向前一层传播。
 
-3. Because neuron $j$ in layer $k-1$ is usually connected to several neurons in the next layer, sum the errors from all paths:
+![误差信号沿加权连接反向传播](/assets/img/posts/neural-networks-and-backpropagation/backpropagation-connection.png)
 
-   $$
-   \sum_i\delta_i^{(k)}W_{ij}^{(k-1)}.
-   $$
+2. 沿一条连接传播到第 $k-1$ 层第 $j$ 个神经元时，该路径贡献的误差为 $\delta_i^{(k)}W_{ij}^{(k-1)}$。
 
-4. After obtaining the total error, multiply it by the local derivative $f'\left(z_j^{(k-1)}\right)$ of that neuron's activation function.
+3. 由于第 $k-1$ 层第 $j$ 个神经元通常连接到下一层多个神经元，因此需要把所有路径的误差相加：
 
-5. The error at neuron $j$ in layer $k-1$ is therefore
+$$
+\sum_i \delta_i^{(k)}W_{ij}^{(k-1)}.
+$$
 
-   $$
-   \delta_j^{(k-1)}
-   =f'\left(z_j^{(k-1)}\right)
-   \sum_i\delta_i^{(k)}W_{ij}^{(k-1)}.
-   $$
+4. 得到总误差后，还需要乘以该神经元激活函数的局部梯度 $f'(z_j^{(k-1)})$。
 
-### 1.6 Training with Backpropagation: Vectorized Form
+5. 因此，第 $k-1$ 层第 $j$ 个神经元的误差为
 
-So far, we have discussed how to compute the gradient of one parameter. We now generalize the method so that an entire weight matrix can be updated at once.
+$$
+\delta_j^{(k-1)}
+=f'(z_j^{(k-1)})
+\sum_i \delta_i^{(k)}W_{ij}^{(k-1)}
+$$
 
-For a parameter $W_{ij}^{(k)}$, the gradient derived above is $\delta_i^{(k+1)}a_j^{(k)}$. Therefore, the gradient of the entire matrix $W^{(k)}$ is
+### 1.6 使用反向传播训练：向量化形式
+
+到目前为止，我们讨论了如何计算模型中某个给定参数的梯度，下面将推广前面的做法，以便一次性更新权重向量
+
+对于给定参数 $W_{ij}^{(k)}$，前面已经得到其误差梯度为 $\delta_i^{(k+1)} a_j^{(k)}$，因此整个矩阵 $W^{(k)}$ 的误差梯度为
 
 $$
 \nabla W^{(k)}=
@@ -309,90 +227,66 @@ $$
 \delta_2^{(k+1)}a_1^{(k)} & \delta_2^{(k+1)}a_2^{(k)} & \cdots\\
 \vdots & \vdots & \ddots
 \end{bmatrix}
-=\delta^{(k+1)}a^{(k)\top}.
+=\delta^{(k+1)}a^{(k)T}
 $$
 
-Thus, the matrix gradient is the outer product of the error vector entering the matrix during backpropagation and the activation vector that passed forward through the matrix. The vectorized error recurrence is
+因此，可以用“传播进入该矩阵的误差向量”和“由该矩阵向前传递 的激活向量”的外积，写出整个矩阵的梯度
 
 $$
-\delta^{(k)}
-=f'\left(z^{(k)}\right)
-\circ\left(W^{(k)\top}\delta^{(k+1)}\right),
+\delta^{(k)}=f'(z^{(k)})\circ\left(W^{(k)T}\delta^{(k+1)}\right)
 $$
 
-where $\circ$ denotes element-wise multiplication.
+## 神经网络的实用技巧
 
-## Practical Techniques for Neural Networks
+### 2.1 正则化
 
-### 2.1 Regularization
+和很多机器学习模型一样，神经网络很容易发生过拟合，一种常见的解决过拟合的方法是加入 $L2$ 正则化惩罚项，我们在
 
-Like many machine-learning models, neural networks can easily overfit. One common remedy is to add an $L_2$ regularization penalty to the loss $J$:
+损失函数 $J$ 后附加一个额外项，这样总损失就变成了
 
 $$
-J_R
-=J+\lambda\sum_{i=1}^{L}
-\left\lVert W^{(i)}\right\rVert_F^2.
+J_R=J+\lambda\sum_{i=1}^{L}\left\|W^{(i)}\right\|_F^2
 $$
 
-Here, $\left\lVert W^{(i)}\right\rVert_F$ is the Frobenius norm of $W^{(i)}$, and $\lambda$ is a hyperparameter controlling the strength of the penalty relative to the original loss. Because the objective minimizes $J_R$, regularization penalizes excessively large weights while optimizing the loss. The quadratic nature of the penalty reduces the model's flexibility and helps alleviate overfitting.
+其中，$\left\|W^{(i)}\right\|_F$ 是矩阵 $W^{(i)}$ 的Frobenius范数，$\lambda$ 是一个超参数，用于控制正则项相对于原始损失函数的权重。由于目标是最小化 $J_R$，正则化本质上会在优化损失函数的同时，惩罚过大的权重。由于Frobenius范数具有二次性质，$L_2$ 正则化会有效降低模型的灵活性，从而缓解过拟合现象。
 
-> The Frobenius norm of a matrix $U$ is $\left\lVert U\right\rVert_F=\sqrt{\sum_i\sum_j U_{ij}^2}$.
+> 矩阵U的Frobenius范数定义为$\|U\|_F=\sqrt{\sum_i\sum_j U_{ij}^2}$
 
-This constraint can also be interpreted as a Bayesian prior stating that the optimal weights should be close to zero. How close they should be depends on $\lambda$, so choosing an appropriate value requires hyperparameter tuning. If $\lambda$ is too large, most weights are forced close to zero and the model cannot learn meaningful information from the training data. It will usually perform poorly on the training, validation, and test sets. If $\lambda$ is too small, the model may overfit again.
-
-Bias terms are not normally regularized because a bias $b$ controls an overall translation of the model and does not substantially increase its complexity, whereas a weight $w$ determines sensitivity to the input and is more likely to contribute to overfitting.
+施加这种约束也可以解释为一种贝叶斯先验信念：最优权重应接近于0；具体多接近取决于 $\lambda$ 的取值，选择合适的 $\lambda$ 非常关键，必须通过超参数调优来确定。若 $\lambda$ 过大，大多数权重都会被压到非常接近 0，模型无法从训练数据中学到有意义的信息，通常会在训练集，验证集和测试集上都取得较差的准确率。若 $\lambda$ 过小，又会重新进入过拟合的状态。必须注意的是，偏置项不被正则化，也不对上述成本项做出贡献。因为偏置项 $b$ 只控制模型整体平移，不会明显增加模型复杂度；而权重 $w$ 决定模型对输入的敏感程度，更容易导致过拟合。
 
 ### 2.2 Dropout
 
-**Dropout** is a powerful regularization technique with a simple idea: during each forward and backward pass in training, independently discard each neuron with probability $1-p$, or equivalently retain it with probability $p$. At test time, use the complete network to compute predictions. Dropout encourages the network to learn more robust representations and can reduce overfitting. It can also be viewed as training an exponential number of smaller subnetworks and approximately averaging their predictions.
+**Dropout** 是一种强有力的正则化技术，其思想简单而有效：训练时，在每次前向/反向传播过程中，以概率 $(1-p)$ 随机丢弃一部分神经元，等价地，每个神经元以概率 $p$ 被保留。测试时，则使用完整网络计算预测结果。这样做通常会使网络从数据中学习到更有意义的信息，更不容易过拟合，并且往往能在当前任务上取得更高的总体性能，Dropout 实际上同时训练了指数数量的较小网络，并对它们的预测结果取平均。
 
-In practice, for each layer output $h$, retain each activation with probability $p$ and otherwise set it to zero. During backpropagation, gradients pass only through neurons retained in the forward pass.
+实践中，引入 Dropout 的方式是：取每一层神经元的输出 $h$，以概率 $p$ 保留每个神经元，否则将其置为 0。在反向传播时，只让梯度通过前向传播中被保留的神经元。测试时，则使用网络中的所有神经元执行前向传播。
 
-A key detail is that the expected scale of the activations should remain approximately the same during training and testing. The most common implementation is **inverted dropout**, which divides retained activations by $p$ during training and requires no scaling at test time. Alternatively, if activations are not scaled during training, multiply them by $p$ at test time.
+要让 Dropout 有效工作，还存在一个关键细节：测试时神经元输出的期望值，应当与训练时大致相同，否则输出的量级可能会发生巨大变化，网络的行为将不再明确。使用传统 Dropout 时，测试阶段将激活值乘以保留概率 $p$；使用倒置 Dropout 时，则在训练阶段把保留的激活值除以 $p$，测试时不再缩放。
 
-### 2.3 Neuron Units
+### 2.3 神经元单元
 
-The neural networks discussed so far use sigmoid neurons to introduce nonlinearity. In many applications, however, other activation functions work better. The following functions and their derivatives are common alternatives.
+我们现在讨论的神经网络都用 Sigmoid 神经元来引入非线性。然而，在许多应用中，采用其他激活函数的效果更好。下面列出一些常见的选择以及其函数与梯度定义；它们可以替代前面讨论的Sigmoid函数
 
-**Sigmoid.** The sigmoid activation is
+**Sigmoid**：Sigmoid我们已经非常熟悉了，激活函数 $\sigma$ 定义为 $\sigma(z) = \frac{1}{1 + exp(-z)}$
 
-$$
-\sigma(z)=\frac{1}{1+\exp(-z)}.
-$$
+其梯度为 $\sigma'(z) = \frac{\exp(-z)}{(1+\exp(-z))^2} = \sigma(z)(1-\sigma(z))$
 
-Its derivative is
+![Sigmoid 激活函数](/assets/img/posts/neural-networks-and-backpropagation/sigmoid.png)
 
-$$
-\sigma'(z)
-=\frac{\exp(-z)}{\left(1+\exp(-z)\right)^2}
-=\sigma(z)\left(1-\sigma(z)\right).
-$$
-
-![The sigmoid activation function](/assets/img/posts/neural-networks-and-backpropagation/sigmoid.png)
-
-**Tanh.** The hyperbolic tangent is an alternative to the sigmoid and often converges faster in practice. Tanh outputs values between $-1$ and $1$, whereas sigmoid outputs values between $0$ and $1$:
+**Tanh**：Tanh函数是Sigmoid函数的一种替代选择，实践中常常收敛得更快。区别是Tanh的输出范围为-1到1，而Sigmoid为0到1
 
 $$
-\tanh(z)
-=\frac{\exp(z)-\exp(-z)}{\exp(z)+\exp(-z)}
-=2\sigma(2z)-1,
-\qquad
-\tanh(z)\in(-1,1).
+tanh(z) = \frac{\exp(z)-\exp(-z)}{\exp(z)+\exp(-z)}=2\sigma(2z) - 1 \quad tanh(z) \in (-1,1)
 $$
 
-Its derivative is
+梯度为
 
 $$
-\tanh'(z)
-=1-\left(
-\frac{\exp(z)-\exp(-z)}{\exp(z)+\exp(-z)}
-\right)^2
-=1-\tanh^2(z).
+\tanh'(z)=1-\left(\frac{\exp(z)-\exp(-z)}{\exp(z)+\exp(-z)}\right)^2=1-\tanh^2(z)
 $$
 
-![The tanh activation function](/assets/img/posts/neural-networks-and-backpropagation/tanh.png)
+![Tanh 激活函数](/assets/img/posts/neural-networks-and-backpropagation/tanh.png)
 
-**Hard Tanh.** Hard Tanh is sometimes used in place of Tanh because it is less expensive to compute, although it saturates when $\lvert z\rvert>1$:
+**Hard Tanh：** 有时会使用 Hard Tanh 代替 Tanh，因为前者计算成本更低。不过，当 $\lvert z\rvert>1$ 时，它会饱和。Hard Tanh 的激活函数为
 
 $$
 \operatorname{hardtanh}(z)=
@@ -403,81 +297,78 @@ z, & -1\le z\le 1,\\
 \end{cases}
 $$
 
-Its derivative is
+其导数也可写成分段函数：
 
 $$
 \operatorname{hardtanh}'(z)=
 \begin{cases}
-1, & -1<z<1,\\
-0, & \text{otherwise}.
+1, & -1\le z\le 1,\\
+0, & \text{其他情况}.
 \end{cases}
 $$
 
-![The Hard Tanh activation function](/assets/img/posts/neural-networks-and-backpropagation/hard-tanh.png)
+![Hard Tanh 激活函数](/assets/img/posts/neural-networks-and-backpropagation/hard-tanh.png)
 
-**Softsign.** Softsign is another nonlinear alternative to Tanh. Its tails approach saturation more gradually than those of Tanh:
-
-$$
-\operatorname{softsign}(z)
-=\frac{z}{1+\lvert z\rvert}.
-$$
-
-Its derivative is
+**Soft Sign：** Soft Sign 是另一种非线性函数，可以作为 Tanh 的替代，因为它不像硬截断函数那样容易饱和：
 
 $$
-\operatorname{softsign}'(z)
-=\frac{1}{\left(1+\lvert z\rvert\right)^2}.
+\operatorname{softsign}(z)=\frac{z}{1+\lvert z\rvert}.
 $$
 
-![The Softsign activation function](/assets/img/posts/neural-networks-and-backpropagation/softsign.png)
-
-**ReLU.** The rectified linear unit is a widely used activation function. It does not saturate for large positive values of $z$ and has achieved strong results in computer-vision applications:
+其导数表示为
 
 $$
-\operatorname{ReLU}(z)=\max(z,0).
+\operatorname{softsign}'(z)=\frac{1}{(1+\lvert z\rvert)^2},
 $$
 
-Its derivative is the piecewise function
+![Softsign 激活函数](/assets/img/posts/neural-networks-and-backpropagation/softsign.png)
+
+**ReLU：** ReLU是一种常见的激活函数。即使 $z$ 取较大的值，它也不会饱和，并且已经在计算机视觉应用中取得了很大成功：
 
 $$
-\operatorname{ReLU}'(z)=
+\operatorname{rect}(z)=\max(z,0).
+$$
+
+其导数是分段函数
+
+$$
+\operatorname{rect}'(z)=
 \begin{cases}
 1, & z>0,\\
-0, & z<0.
+0, & \text{其他情况}.
 \end{cases}
 $$
 
-At $z=0$, a subgradient such as $0$ is chosen by convention.
+![ReLU 激活函数](/assets/img/posts/neural-networks-and-backpropagation/relu.png)
 
-![The ReLU activation function](/assets/img/posts/neural-networks-and-backpropagation/relu.png)
-
-**Leaky ReLU.** A conventional ReLU does not propagate an error signal when $z<0$. Leaky ReLU modifies it so that a small gradient can still propagate when $z$ is negative:
+**Leaky ReLU：** 传统 ReLU 单元在 $z\le 0$ 时不会传播任何误差。Leaky ReLU 对此进行了修改，使得即使 $z$ 为负，仍允许少量误差向后传播：
 
 $$
-\operatorname{LeakyReLU}(z)
-=\max(z,kz),
-\qquad
-0<k<1.
+\operatorname{leaky}(z)=\max(z,kz),\qquad 0<k<1.
 $$
 
-Its derivative is
+因此，其导数可写为
 
 $$
-\operatorname{LeakyReLU}'(z)=
+\operatorname{leaky}'(z)=
 \begin{cases}
 1, & z>0,\\
-k, & z<0.
+k, & \text{其他情况}.
 \end{cases}
 $$
 
-![The Leaky ReLU activation function](/assets/img/posts/neural-networks-and-backpropagation/leaky-relu.png)
+![Leaky ReLU 激活函数](/assets/img/posts/neural-networks-and-backpropagation/leaky-relu.png)
 
-### 2.4 Data Preprocessing
+### 2.4 数据预处理
 
-As with other machine-learning models, basic data preprocessing is essential for obtaining reasonable performance on the target task.
+和一般的机器学习模型一样，要确保模型在目标任务上取得合理性能，一个关键步骤是对数据进行基本预处理
 
-**Mean subtraction.** Given an input dataset $X$, subtract the mean feature vector from every example so that the data is centered at zero. In practice, compute the mean using only the training set, then subtract that same mean from the training, validation, and test sets.
+**均值减法**
 
-**Normalization.** Another common technique, though sometimes used less often than mean subtraction, is to scale every input feature dimension to a similar range. This is useful because input features are often measured in different units, while initially we usually want to treat all features as equally important. Compute each feature's standard deviation on the training set, then divide that feature by the corresponding value across the training, validation, and test sets.
+给定输入数据集合 $X$，通常会从 $X$ 中减去 $X$ 的平均特征向量，使数据以零为中心。一个重要细节是：实践中只使用训练集计算均值，然后从训练集、验证集和测试集中都减去该均值。
 
-**Whitening.** Whitening is less common than mean subtraction followed by normalization. It transforms the data so that its covariance matrix is the identity: the features become uncorrelated and each has variance $1$. First subtract the mean from the data to obtain $X'$. Next, compute the singular value decomposition of $X'$, obtaining $U$, $S$, and $V$. Project $X'$ into the basis defined by the columns of $U$, then divide each resulting dimension by its corresponding singular value in $S$. If a singular value is zero, divide by a small positive value instead for numerical stability.
+**归一化**
+另一种常用技术——尽管可能不如均值减法常用——是把每个输入特征维度缩放到相近的数量级范围。这很有用，因为输入特征通常使用不同的“单位”进行度量，但我们往往希望在初始阶段把所有特征视为同等重要。实现方式很简单：用每个特征在训练集上计算得到的标准差，分别除以对应特征。
+
+**白化**
+白化不像“均值减法 + 归一化”那样常用。它本质上将数据转换为具有单位协方差矩阵的形式，即各特征彼此不相关，并且方差为 $1$。首先像往常一样对数据进行均值减法，得到 $X'$。然后对 $X'$ 作奇异值分解（SVD），得到矩阵 $U,S,V$。接着计算 $UX'$，将 $X'$ 投影到由 $U$ 的列定义的基中。最后，用 $S$ 中相应的奇异值除以结果的每个维度，从而适当地缩放数据；若某个奇异值为零，则可以改为除以一个很小的数。

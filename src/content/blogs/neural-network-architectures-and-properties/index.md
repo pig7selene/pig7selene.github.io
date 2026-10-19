@@ -3,492 +3,409 @@ title: "CS224N | Transformer"
 publishDate: 2026-08-21
 category: learning
 tags: [NLP, CS224N, Transformer]
-language: en
+language: zh
 description: "CS224n lec5,A note on self-attention, positional representations, Transformer components, and encoder-decoder architectures."
 heroImage:
   src: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
-  alt: "Sunset cityscape with a figure looking over the skyline"
+  alt: "文章封面"
   color: "#9a7093"
 ---
 
->天雨粟 鬼夜哭 思念漫太古  
-> You can download the [LaTeX](/output/pdf/neural-network-architectures-and-properties.tex) and [PDF](/output/pdf/neural-network-architectures-and-properties.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/WdOsAAXpd) here.
-## Foundations
+<aside class="download-callout" role="note">
+  <p>You can download the <a href="/output/pdf/neural-network-architectures-and-properties.tex">LaTeX</a> and <a href="/output/pdf/neural-network-architectures-and-properties.pdf">PDF</a>.</p>
+</aside>
 
-Let $w_{1:n}$ denote a sequence of $n$ words, where $w_i\in V$ and $V$ is a finite vocabulary. The entire sequence can also be represented as a matrix of one-hot vectors:
+> 天雨粟 鬼夜哭 思念漫太古
 
-$$
-w_{1:n}\in\mathbb{R}^{n\times\lvert V\rvert}.
-$$
+## 基础
 
-A language model predicts the current word from the preceding words:
+设 $w_{1:n}$ 表示长度为 $n$ 的词序列，其中 $w_i\in V$，$V$ 为有限词表。也可以将整个序列表示为 one-hot 向量组成的矩阵 $w_{1:n}\in\mathbb R^{n\times\lvert V\rvert}$。
 
-$$
-w_t\sim\operatorname{softmax}\left(f(w_{1:t-1})\right),
-$$
-
-where
+语言模型根据前面的词预测当前词：
 
 $$
-f(w_{1:t-1})\in\mathbb{R}^{\lvert V\rvert}.
+w_t\sim\operatorname{softmax}\left(f(w_{1:t-1})\right)
 $$
 
-The softmax converts the model output into a probability distribution over the vocabulary.
+其中 $f(w_{1:t-1})\in\mathbb R^{\lvert V\rvert}$，softmax 将模型输出转换为词表上的概率分布。
 
-For $A\in\mathbb{R}^{\ell\times d}$, softmax is usually computed along the last dimension:
-
-$$
-\operatorname{softmax}(A)_{i,j}
-=\frac{\exp(A_{i,j})}
-{\sum_{j'=1}^{d}\exp(A_{i,j'})}.
-$$
-
-The same rule applies to higher-dimensional tensors. For example, if $B\in\mathbb{R}^{m\times\ell\times d}$, softmax is still computed along the last dimension.
-
-**Word embeddings**
-
-Let $E\in\mathbb{R}^{d\times\lvert V\rvert}$ be an embedding matrix. It maps a one-hot vector $w$ to a $d$-dimensional word vector:
+对于 $A\in\mathbb R^{\ell\times d}$，softmax 通常沿最后一个维度计算：
 
 $$
-x=Ew\in\mathbb{R}^{d}.
+\operatorname{softmax}(A)_{i,j}=
+\frac{\exp A_{i,j}}{\sum_{j'=1}^{d}\exp A_{i,j'}}
 $$
 
-For an entire sequence,
+对于更高维张量同理，例如 $B\in\mathbb R^{m\times\ell\times d}$，仍然沿最后一个维度计算 softmax。
+**词嵌入**
+
+设嵌入矩阵 $E\in\mathbb R^{d\times\lvert V\rvert}$，它将 one-hot 向量 $w$ 映射为 $d$ 维词向量 $x=Ew\in\mathbb R^d$。
+
+对于整个序列，有 $x_{1:n}=w_{1:n}E^T\in\mathbb R^{n\times d}$。
+
+**上下文化表示**
+
+词嵌入 $Ew_i$ 是**非上下文化表示**，只由词 $w_i$ 本身决定，因此同一个词在不同上下文中的表示相同。
+
+上下文化表示 $h_i$ 则同时取决于词本身和上下文，可写为 $h_i=f(x_{1:n})$；在语言模型中通常只使用前缀信息，即 $h_i=f(x_{1:i})$。
+
+- **非上下文化表示**：只取决于词本身；
+- **上下文化表示**：取决于词本身以及所在的上下文。
+
+## 一种最简自注意力架构
+广义而言，注意力是一种方法：给定一个query，通过挑选与查询最相似的键所对应的值，在键值 存储中进行软查找。这里所说的“挑选”和“最相似”，是指对所有值求平均，并为那些对应键更像查询的值赋予更高权重。在自注意力中，我们使用同一组元素来帮助定义查询、 键和值
+### 键—查询—值自注意力机制
+我们这里讨论的是一种最流行的自注意力机制，键-查询-值自注意力机制
+对于序列 $x_{1:n}$ 中的词元 $x_i$，分别通过三个权重矩阵 $Q,K,V\in\mathbb R^{d\times d}$ 得到查询、键和值：
 
 $$
-x_{1:n}=w_{1:n}E^\top\in\mathbb{R}^{n\times d}.
+q_i=Qx_i, k_j=Kx_j, v_j=Vx_j
 $$
 
-**Contextualized representations**
+其中：
 
-The word embedding $Ew_i$ is a **non-contextualized representation**: it depends only on the word $w_i$, so the same word has the same representation in every context.
+- $q_i$（Query）：表示当前词元想要寻找什么信息；
+- $k_j$（Key）：表示词元 $x_j$ 能提供什么信息；
+- $v_j$（Value）：表示词元 $x_j$ 实际提供的信息。
 
-A contextualized representation $h_i$, by contrast, depends on both the word and its context. It can be written as $h_i=f(x_{1:n})$. A language model usually uses only prefix information, giving $h_i=f(x_{1:i})$.
-
-- A **non-contextualized representation** depends only on the word itself.
-- A **contextualized representation** depends on both the word and its surrounding context.
-
-## A Minimal Self-Attention Architecture
-
-Broadly speaking, attention is a soft lookup mechanism over a key-value store. Given a query, it retrieves the values associated with the most similar keys. Here, “retrieve” and “most similar” mean taking a weighted average over all values, assigning greater weight to values whose keys more closely resemble the query. In self-attention, the same set of elements is used to construct the queries, keys, and values.
-
-### Key-Query-Value Self-Attention
-
-We begin with one of the most widely used attention mechanisms: key-query-value self-attention.
-
-For token $x_i$ in the sequence $x_{1:n}$, three projection matrices $W_Q,W_K,W_V\in\mathbb{R}^{d\times d}$ produce its query, key, and value:
+首先用 $q_i$ 和 $k_j$ 的点积衡量词元 $x_i$ 与 $x_j$ 的相关程度，再通过 softmax 得到注意力权重：
 
 $$
-q_i=W_Qx_i,
-\qquad
-k_j=W_Kx_j,
-\qquad
-v_j=W_Vx_j.
+\alpha_{ij}=
+\frac{\exp(q_i^Tk_j)}
+{\sum_{j'=1}^{n}\exp(q_i^Tk_{j'})}
 $$
 
-Their roles are as follows:
+其中 $\alpha_{ij}$ 表示在计算 $x_i$ 的表示时，应该关注 $x_j$ 的程度。
 
-- The **query** $q_i$ represents the information that the current token is looking for.
-- The **key** $k_j$ represents the information that token $x_j$ can offer.
-- The **value** $v_j$ represents the information that token $x_j$ actually provides.
-
-First, the dot product of $q_i$ and $k_j$ measures the relevance between $x_i$ and $x_j$. A softmax then converts these scores into attention weights:
+最后对所有 Value 加权求和，得到 $x_i$ 的上下文化表示：
 
 $$
-\alpha_{ij}
-=\frac{\exp(q_i^\top k_j)}
-{\sum_{j'=1}^{n}\exp(q_i^\top k_{j'})}.
+h_i=\sum_{j=1}^{n}\alpha_{ij}v_j
 $$
 
-The weight $\alpha_{ij}$ indicates how much token $x_i$ should attend to token $x_j$. Finally, a weighted sum over all values produces the contextualized representation of $x_i$:
+因此，Self-Attention 的核心过程可以概括为：
+计算 Q、K、V → Query 与 Key 计算相关性 → softmax 得到权重 → 对 Value 加权求和。
+
+![键—查询—值自注意力机制](/assets/img/posts/neural-network-architectures/self-attention.png)
+
+### 位置表示
+Self-Attention 本身没有内置的序列顺序概念。若只改变输入词元的排列，注意力计算中的相似度和加权求和也只是相应地重新排列，因此模型无法仅靠 Self-Attention 区分词元所在的位置。
+
+也就是说，普通词嵌入 $x_i=Ew_i$ 只取决于词元本身，而不依赖它在序列中的位置。
+
+**位置嵌入**
+
+一种常见方法是为每个位置学习一个位置向量。设位置嵌入矩阵 $P\in\mathbb R^{N\times d}$，其中 $N$ 是模型支持的最大序列长度。
+
+对于位置 $i$ 的词元，将位置向量 $P_i$ 加到词嵌入 $x_i$ 上：
 
 $$
-h_i=\sum_{j=1}^{n}\alpha_{ij}v_j.
+\tilde{x}_i=x_i+P_i
 $$
 
-The core self-attention process can therefore be summarized as follows:
+随后使用 $\tilde{x}_i$ 进行 Self-Attention。这样同一个词出现在不同位置时会得到不同的输入表示，使模型能够感知序列顺序。
 
-**Compute Q, K, and V → compare each Query with the Keys → apply softmax to obtain weights → take a weighted sum of the Values.**
+**在 Attention 中加入位置偏置**
 
-![The key-query-value self-attention mechanism](/assets/img/posts/neural-network-architectures/self-attention.png)
+除了修改输入表示，也可以直接修改注意力分数，使注意力本身具有位置概念。
 
-### Positional Representations
-
-Self-attention has no built-in notion of sequence order. If we only rearrange the input tokens, the similarities and weighted sums in the attention computation are rearranged in the same way. Self-attention alone therefore cannot determine where a token occurs in the sequence.
-
-In other words, an ordinary word embedding $x_i=Ew_i$ depends only on the token itself and not on its position.
-
-**Positional embeddings**
-
-One common approach is to learn a vector for each position. Let $P\in\mathbb{R}^{N\times d}$ be a positional embedding matrix, where $N$ is the maximum sequence length supported by the model.
-
-For the token at position $i$, add its positional vector $P_i$ to the word embedding $x_i$:
+一种方法是在原始注意力分数中加入与相对距离有关的偏置：
 
 $$
-\widetilde{x}_i=x_i+P_i.
+\alpha_i=\operatorname{softmax}\left(K^Tq_i+b_i\right)
 $$
 
-Self-attention then operates on $\widetilde{x}_i$. The same word receives a different input representation at different positions, allowing the model to perceive sequence order.
+其中 $b_i$ 根据词元之间的相对位置确定。通常距离当前位置越近的词元偏置越大，从而使模型更倾向于关注附近的信息。
 
-**Adding a positional bias to attention**
+### 逐元素非线性
 
-Instead of modifying the input representation, we can modify the attention score directly so that attention itself incorporates positional information.
+如果只不断堆叠 Self-Attention 层，虽然每一层都会重新计算注意力权重，但从 Value 的聚合形式来看，多层结果仍可以整理成对输入表示的加权线性组合，因此仅靠堆叠注意力层不足以提供深度网络中丰富的非线性变换。
 
-One approach adds a relative-position bias to the original attention scores:
-
-$$
-\alpha_i=\operatorname{softmax}\left(K^\top q_i+b_i\right).
-$$
-
-Here, $b_i$ is determined by the relative positions of the tokens. Tokens closer to the current position often receive a larger bias, encouraging the model to focus more strongly on nearby information.
-
-### Element-wise Nonlinearity
-
-If we only stack self-attention layers, every layer recomputes its attention weights. However, if we focus on the value-aggregation step while treating those weights as fixed, the result can still be expressed as a weighted linear combination of the input representations. Attention alone does not provide all the rich nonlinear transformations expected from a deep network.
-
-For example, the output of a second self-attention layer can be written schematically as
+以两层 Self-Attention 为例，第二层输出可以写成
 
 $$
-\begin{aligned}
-o_i
-&=\sum_{j=1}^{n}\alpha_{ij}V^{(2)}
-\left(\sum_{k=1}^{n}\alpha_{jk}V^{(1)}x_k\right)\\
-&=\sum_{k=1}^{n}\alpha_{ik}^{*}V^{*}x_k,
-\end{aligned}
+o_i=\sum_{j=1}^{n}\alpha_{ij}V^{(2)}\left(\sum_{k=1}^{n}\alpha_{jk}V^{(1)}x_k\right)
+=\sum_{k=1}^{n}\alpha_{ik}^{*}V^{*}x_k
 $$
 
-where $V^{*}=V^{(2)}V^{(1)}$, and $\alpha_{ik}^{*}$ represents the combined effect of the attention weights in the two layers. Its form still resembles a single self-attention layer: linearly transform the inputs and then take a weighted sum.
+其中 $V^{*}=V^{(2)}V^{(1)}$，$\alpha_{ik}^{*}$ 表示两层注意力权重组合后的结果。可以看到，其形式仍与单层 Self-Attention 类似：对输入经过线性变换后再进行加权求和。
 
-For this reason, self-attention is usually followed by an **element-wise feed-forward network (FFN)** that introduces additional nonlinearity:
-
-$$
-h_{\mathrm{FF}}
-=W_2\operatorname{ReLU}\left(
-W_1h_{\mathrm{self\text{-}attention}}+b_1
-\right)+b_2.
-$$
-
-The FFN independently applies the same transformation to every token in the sequence. Different positions share parameters, but their computations do not interact within the FFN.
-
-An FFN typically expands the hidden dimension $d$ to a larger intermediate dimension and then projects it back to $d$. For example,
+因此，在 Self-Attention 之后通常加入**逐元素前馈网络（Feed-Forward Network, FFN）**，为模型引入非线性：
 
 $$
-W_1\in\mathbb{R}^{5d\times d},
-\qquad
-W_2\in\mathbb{R}^{d\times5d}.
+h_{\mathrm{FF}}=W_2\operatorname{ReLU}(W_1h_{\mathrm{self-attention}}+b_1)+b_2
 $$
 
-### Causal Masking
+FFN 会对序列中的每个词元独立地执行相同的变换，即不同位置共享参数，但计算互不影响。
 
-In an autoregressive language model, the model predicts the next word from all words before the current position:
+通常 FFN 先把隐藏维度 $d$ 扩展到更大的中间维度，再投影回 $d$ 维。例如 $W_1\in\mathbb R^{5d\times d}$，$W_2\in\mathbb R^{d\times5d}$。
 
-$$
-w_t\sim\operatorname{softmax}\left(f(w_{1:t-1})\right).
-$$
+### 因果掩码
 
-The key constraint is that the model cannot use information from future positions when predicting position $t$. Otherwise, it would see the answer during training.
-
-An RNN satisfies this constraint naturally because its hidden states are computed sequentially:
+在自回归语言模型中，模型根据当前位置之前的所有词预测下一个词：
 
 $$
-h_{t-1}=\sigma\left(Wh_{t-2}+Ux_{t-1}\right),
-\qquad
-w_t\sim\operatorname{softmax}(h_{t-1}E).
+w_t\sim\operatorname{softmax}\left(f(w_{1:t-1})\right)
 $$
 
-The state $h_{t-1}$ contains information only from time steps $1,\ldots,t-1$ and cannot see the future.
+其中 $f$ 根据前缀 $w_{1:t-1}$ 计算下一个词的概率分布。关键要求是：预测位置 $t$ 时不能使用未来位置的信息，否则模型在训练时就会提前看到答案。
 
-Self-attention, however, allows every position to attend to the entire sequence by default. An autoregressive model therefore needs a **causal mask**, which restricts position $i$ to positions satisfying $j\le i$.
+RNN 天然满足这一要求，因为隐藏状态按时间顺序递推：
 
-The mask can be added directly to the attention score:
+$$
+h_{t-1}=\sigma(Wh_{t-2}+Ux_{t-1}),\
+w_t\sim\operatorname{softmax}(h_{t-1}E)
+$$
+
+因此 $h_{t-1}$ 只包含 $1,\ldots,t-1$ 时刻的信息，不会看到未来。
+
+而 Self-Attention 默认允许每个位置关注整个序列，因此需要加入**未来掩码（causal mask）**，限制位置 $i$ 只能关注满足 $j\le i$ 的位置。
+
+可以直接在 attention score 上加入 mask：
 
 $$
 s_{ij}^{\mathrm{masked}}=
 \begin{cases}
-s_{ij}, & j\le i,\\
--\infty, & j>i.
+s_{ij}, & j\le i\\
+-\infty, & j>i
 \end{cases}
 $$
 
-Applying softmax gives
+再经过 softmax：
 
 $$
-\alpha_{ij}
-=\operatorname{softmax}\left(s_i^{\mathrm{masked}}\right)_j.
+\alpha_{ij}=\operatorname{softmax}(s_i^{\mathrm{masked}})_j
 $$
 
-Because $\exp(-\infty)=0$, we have $\alpha_{ij}=0$ whenever $j>i$. Future tokens cannot contribute to the current position.
+由于 $\exp(-\infty)=0$，因此当 $j>i$ 时有 $\alpha_{ij}=0$，未来词元不会参与当前位置的计算。
 
-A causal mask therefore makes Transformer self-attention satisfy the autoregressive constraint: every position can use only itself and the positions before it.
+因此，未来掩码使 Transformer 的 Self-Attention 满足自回归约束：每个位置只能使用自己以及之前的信息，不能查看未来。
 
-![A causal attention mask](/assets/img/posts/neural-network-architectures/causal-mask.png)
+![因果注意力掩码](/assets/img/posts/neural-network-architectures/causal-mask.png)
 
-### Summary of the Minimal Self-Attention Architecture
+### 最简自注意力架构小结
 
-A basic self-attention model consists of the following components:
+一个最基本的 Self-Attention 模型可以概括为以下几个部分：
 
-1. **Input representation:** Map tokens to word vectors and add positional representations so that the model can perceive token order.
-2. **Self-attention:** Compute Queries, Keys, and Values from the inputs, then aggregate information from across the sequence to obtain contextualized representations.
-3. **Element-wise nonlinearity:** Apply an FFN independently to every token after self-attention to increase the model's representational capacity.
-4. **Causal mask:** In an autoregressive language model, restrict position $i$ to tokens at positions $j\le i$, preventing it from using future information.
+1. **输入表示**：将词元映射为词向量，并加入位置表示，使模型能够感知词元顺序。
+2. **Self-Attention**：由输入计算 Query、Key 和 Value，通过注意力权重聚合整个序列的信息，得到上下文化表示。
+3. **逐元素非线性**：在 Self-Attention 后加入 FFN，对每个词元独立进行非线性变换，提高模型的表示能力。
+4. **未来掩码**：在自回归语言模型中加入 causal mask，使位置 $i$ 只能关注位置 $j\le i$ 的词元，避免使用未来信息。
 
-The simplest self-attention architecture can thus be written as
+因此，一个最简的自注意力架构可以表示为：
 
-**word embeddings + positional representations → self-attention → FFN → output.**
+**词嵌入 + 位置表示 → Self-Attention → FFN → 输出**
 
-For autoregressive language modeling, a causal mask is additionally applied inside self-attention.
+若用于自回归语言模型，则在 Self-Attention 中额外加入**未来掩码**。
 
 ## Transformer
+Transformer是一种基于自注意力的架构，由多个堆叠的块组成，每个块都包含自注意力层和前馈层，以及我们还将讨论的其他几个组件。下图给出了Transformer架构示意图。
 
-A Transformer is an architecture based on self-attention. It consists of multiple stacked blocks, each containing a self-attention layer, a feed-forward layer, and several other components discussed below. The following diagram shows a decoder-only Transformer architecture.
+![仅含解码器的 Transformer 架构](/assets/img/posts/neural-network-architectures/transformer-decoder.png)
 
-![A decoder-only Transformer architecture](/assets/img/posts/neural-network-architectures/transformer-decoder.png)
+### 多头自注意力
 
-### Multi-Head Self-Attention
+单头 Self-Attention 本质上是对所有 Value 进行一次加权平均。为了让模型能够同时从不同角度关注序列中的信息，可以并行执行多次 Self-Attention，这就是多头自注意力（Multi-Head Self-Attention）。
 
-Single-head self-attention takes one weighted average over all Values. To let a model attend to the sequence from multiple perspectives at the same time, we can run several self-attention operations in parallel. This is called **multi-head self-attention**.
-
-Suppose there are $k$ attention heads and let $d_h=d/k$. Each head has independent projection matrices
-
-$$
-W_Q^{(\ell)},W_K^{(\ell)},W_V^{(\ell)}
-\in\mathbb{R}^{d_h\times d}.
-$$
-
-Head $\ell$ first computes its own Queries, Keys, and Values, then performs attention independently:
+设共有 $k$ 个注意力头，每个头都有独立的参数矩阵 $Q^{(l)},K^{(l)},V^{(l)}\in\mathbb R^{d\times d/k}$。第 $l$ 个头首先计算自己的 Query、Key 和 Value，然后独立执行注意力：
 
 $$
-\alpha_{ij}^{(\ell)}
-=\frac{\exp\left((q_i^{(\ell)})^\top k_j^{(\ell)}\right)}
-{\sum_{j'=1}^{n}
-\exp\left((q_i^{(\ell)})^\top k_{j'}^{(\ell)}\right)},
+\alpha_{ij}^{(l)}=\frac{\exp\left((q_i^{(l)})^Tk_j^{(l)}\right)}{\sum_{j'=1}^{n}\exp\left((q_i^{(l)})^Tk_{j'}^{(l)}\right)}
 $$
 
 $$
-h_i^{(\ell)}
-=\sum_{j=1}^{n}\alpha_{ij}^{(\ell)}v_j^{(\ell)}.
+h_i^{(l)}=\sum_{j=1}^{n}\alpha_{ij}^{(l)}v_j^{(l)}
 $$
 
-Each head produces a $d_h$-dimensional output. The outputs of all heads are concatenated and passed through an output projection $W_O\in\mathbb{R}^{d\times d}$:
+每个头的输出维度为 $d/k$。最后将所有头的结果拼接，再通过线性变换 $O\in\mathbb R^{d\times d}$ 得到最终表示：
 
 $$
-h_i=W_O
-\left[h_i^{(1)};\ldots;h_i^{(k)}\right].
+h_i=O[h_i^{(1)};\ldots;h_i^{(k)}]
 $$
 
-**Matrix form of self-attention**
+**Self-Attention 的矩阵形式**
 
-Let the input sequence be represented by $X\in\mathbb{R}^{n\times d}$. All Queries, Keys, and Values can be computed at once:
-
-$$
-Q_X=XW_Q^\top,
-\qquad
-K_X=XW_K^\top,
-\qquad
-V_X=XW_V^\top.
-$$
-
-The attention scores between every pair of tokens can then be computed simultaneously:
+设整个输入序列表示为 $X\in\mathbb R^{n\times d}$，则可以一次性计算所有词元的 Query、Key 和 Value：
 
 $$
-A=\operatorname{softmax}\left(Q_XK_X^\top\right)
-\in\mathbb{R}^{n\times n}.
+Q_X=XQ,\ K_X=XK,\ V_X=XV
 $$
 
-The entry $A_{ij}$ is the attention weight from position $i$ to position $j$. The final weighted sum over the Values is
+所有词元之间的注意力分数可以通过矩阵乘法同时得到：
 
 $$
-H=AV_X
-=\operatorname{softmax}\left(Q_XK_X^\top\right)V_X
-\in\mathbb{R}^{n\times d}.
+A=\operatorname{softmax}(Q_XK_X^T)\in\mathbb R^{n\times n}
 $$
 
-The following diagram illustrates these matrix operations.
-
-![The matrix form of self-attention](/assets/img/posts/neural-network-architectures/attention-matrix.png)
-
-Multi-head self-attention can also be computed in parallel through tensor reshaping. First compute $XW_Q,XW_K,XW_V\in\mathbb{R}^{n\times d}$. For $k$ heads, split the dimension $d$ into $k\times d_h$ and rearrange the tensors into shape $k\times n\times d_h$. The $k$ heads can then compute their attention matrices and outputs simultaneously:
+其中 $A_{ij}$ 表示位置 $i$ 对位置 $j$ 的注意力权重。最终对 Value 进行加权求和：
 
 $$
-A=\operatorname{softmax}\left(QK^\top\right),
-\qquad
-H=AV.
+H=AV_X=\operatorname{softmax}(Q_XK_X^T)V_X\in\mathbb R^{n\times d}
 $$
 
-Finally, concatenate the head outputs back into a $d$-dimensional representation and apply one more linear transformation. Multi-head attention therefore splits one $d$-dimensional attention operation into $k$ parallel $d_h$-dimensional operations, with a computational cost comparable to that of single-head attention at the full dimension.
+下图展示了这些矩阵操作
 
-![Parallel matrix computation for multi-head attention](/assets/img/posts/neural-network-architectures/multi-head-attention-matrix.png)
+![自注意力的矩阵形式](/assets/img/posts/neural-network-architectures/attention-matrix.png)
 
-### Layer Normalization
+多头 Self-Attention 可以通过矩阵变形并行计算。先得到$XQ,XK,XV\in\mathbb R^{n\times d}$，设共有 $k$ 个头，将维度 $d$ 拆成 $k\times d/k$，并调整维度顺序：$Q,K,V\in\mathbb R^{k\times n\times d/k}$，于是 $k$ 个注意力头可以同时计算：$A=\operatorname{softmax}(QK^T),\ H=AV$，最后将各个头的输出重新拼接成 $d$ 维表示，再进行一次线性变换。
+因此，多头注意力本质上是把一个 $d$ 维注意力拆成 $k$ 个 $d/k$ 维注意力并行计算，主要计算量与单头注意力相近
 
-Transformers commonly use layer normalization to stabilize the activations of each layer and improve gradient propagation during training.
+![多头注意力的并行矩阵计算](/assets/img/posts/neural-network-architectures/multi-head-attention-matrix.png)
 
-For the hidden state $h_i\in\mathbb{R}^{d}$ at sequence position $i$, LayerNorm computes statistics only across that token's own $d$ hidden dimensions. It does not mix information from other positions.
+### 层归一化
 
-First compute the mean and standard deviation:
+Transformer 中常使用层归一化来稳定每一层的激活，并改善训练时的梯度传播。
 
-$$
-\widehat{\mu}_i
-=\frac{1}{d}\sum_{j=1}^{d}h_{i,j},
-\qquad
-\widehat{\sigma}_i
-=\sqrt{
-\frac{1}{d}\sum_{j=1}^{d}
-\left(h_{i,j}-\widehat{\mu}_i\right)^2
-}.
-$$
+对于序列中位置 $i$ 的隐藏状态 $h_i\in\mathbb R^d$，LayerNorm 只在该词元自己的 $d$ 个隐藏维度上计算统计量，不会与其他位置混合。
 
-Then normalize the representation:
+首先计算均值和标准差：
 
 $$
-\operatorname{LN}(h_i)
-=\frac{h_i-\widehat{\mu}_i}{\widehat{\sigma}_i}.
+\hat{\mu}_i=\frac{1}{d}\sum_{j=1}^{d}h_{i,j},\ \hat{\sigma}_i=\sqrt{\frac{1}{d}\sum_{j=1}^{d}(h_{i,j}-\hat{\mu}_i)^2}
 $$
 
-In practice, an implementation also includes a small numerical-stability term as well as learnable scale and bias parameters, allowing the model to readjust the normalized representation.
-
-The main difference from BatchNorm is that LayerNorm does not depend on other examples in the batch. This makes it particularly suitable for Transformers and other sequence models.
-
-### Residual Connections
-
-A residual connection adds the input of a layer directly to its output:
+然后进行归一化：
 
 $$
-h'=f(h)+h.
+\operatorname{LN}(h_i)=\frac{h_i-\hat{\mu}_i}{\hat{\sigma}_i}
 $$
 
-This provides a more direct path for gradients and makes deep networks easier to train.
+实际使用时通常还会加入可学习的缩放和偏置参数，使模型能够重新调整归一化后的表示。
 
-In a Transformer, residual connections are usually combined with LayerNorm in an Add & Norm operation. Two common arrangements are:
+它与 BatchNorm 的主要区别是：LayerNorm 不依赖 batch 中其他样本，因此很适合 Transformer 和序列模型。
 
-- **Pre-Norm:** Normalize first, pass the result through the sublayer, and then add the residual connection.
+### 残差连接
 
-  $$
-  h_{\mathrm{pre\text{-}norm}}
-  =f\left(\operatorname{LN}(h)\right)+h.
-  $$
-
-- **Post-Norm:** Pass the input through the sublayer, add the residual connection, and then normalize.
-
-  $$
-  h_{\mathrm{post\text{-}norm}}
-  =\operatorname{LN}\left(f(h)+h\right).
-  $$
-
-Here, $f$ may be either self-attention or an FFN. In practice, Pre-Norm usually provides more stable gradient propagation.
-
-### Attention Logit Scaling
-
-Attention uses the dot product of a Query and Key to measure their relevance. As the dimension $d$ increases, the magnitude of the dot product tends to grow, which can make the softmax distribution excessively sharp and hinder gradient propagation.
-
-Scaled dot-product attention divides the score by $\sqrt{d}$:
+残差连接（Residual Connection）把某一层的输入直接加到该层输出上：
 
 $$
-A=\operatorname{softmax}\left(\frac{QK^\top}{\sqrt{d}}\right).
+h'=f(h)+h
 $$
 
-The result then weights the Values:
+这样可以为梯度提供更直接的传播路径，使深层网络更容易训练。
+
+在 Transformer 中，残差连接通常与 LayerNorm 一起使用，即 Add & Norm。常见有两种形式：
+
+- **Pre-Norm**：先归一化，再经过子层并加入残差；
 
 $$
-H=AV
-=\operatorname{softmax}\left(\frac{QK^\top}{\sqrt{d}}\right)V.
+h_{\text{pre-norm}}=f(\operatorname{LN}(h))+h
 $$
 
-In multi-head attention, each head usually has dimension $d_h=d/k$, so the actual scaling factor is $\sqrt{d_h}$.
-
-### Transformer Encoder
-
-A Transformer Encoder receives the complete input sequence and therefore does not require a causal mask.
-
-First, convert the tokens to embeddings and add positional representations:
+- **Post-Norm**：先经过子层并加入残差，再归一化；
 
 $$
-H^{(0)}=X+P.
+h_{\text{post-norm}}=\operatorname{LN}(f(h)+h)
 $$
 
-Then stack several Encoder Blocks. Each Encoder Block contains two main sublayers:
+其中 $f$ 可以是 Self-Attention，也可以是 FFN。实际中 Pre-Norm 通常具有更稳定的梯度传播。
 
-1. **Multi-head self-attention:** Allows information to move between different positions.
-2. **FFN:** Applies an independent nonlinear transformation at every position.
+### 注意力 logit 缩放
 
-Both sublayers are combined with residual connections and LayerNorm. Using Pre-Norm as an example,
+注意力使用 Query 和 Key 的点积衡量相关性。当维度 $d$ 增大时，点积的大小通常也会随之增大，使 softmax 的分布过于尖锐，影响梯度传播。
+
+因此使用缩放点积注意力（Scaled Dot-Product Attention），将注意力分数除以 $\sqrt d$：
 
 $$
-H'=H+\operatorname{MHA}\left(\operatorname{LN}(H)\right),
+A=\operatorname{softmax}\left(\frac{QK^T}{\sqrt d}\right)
+$$
+
+再对 Value 加权：
+
+$$
+H=AV=\operatorname{softmax}\left(\frac{QK^T}{\sqrt d}\right)V
+$$
+
+对于多头注意力，每个头的维度通常为 $d_k=d/k$，因此实际缩放因子为 $\sqrt{d_k}$。
+
+### Transformer 编码器
+
+Transformer Encoder 接收完整输入序列，因此不需要未来掩码。
+
+首先将词元转换为词嵌入，并加入位置表示：
+
+$$
+H^{(0)}=X+P
+$$
+
+随后堆叠多个 Encoder Block。每个 Encoder Block 主要包含两个子层：
+
+1. **Multi-Head Self-Attention**：让不同位置之间交换信息；
+2. **FFN**：对每个位置独立进行非线性变换。
+
+两个子层都配合残差连接和 LayerNorm。以 Pre-Norm 为例：
+
+$$
+H'=H+\operatorname{MHA}(\operatorname{LN}(H))
 $$
 
 $$
-H_{\mathrm{out}}
-=H'+\operatorname{FFN}\left(\operatorname{LN}(H')\right).
+H_{\text{out}}=H'+\operatorname{FFN}(\operatorname{LN}(H'))
 $$
 
-After several Encoder Blocks are stacked, the model produces a contextualized representation for every token.
+多个 Encoder Block 依次堆叠后，最终得到每个词元的上下文化表示。
 
-![A Transformer Encoder architecture](/assets/img/posts/neural-network-architectures/transformer-encoder.png)
+![Transformer 编码器架构](/assets/img/posts/neural-network-architectures/transformer-encoder.png)
 
-A Transformer Encoder has no causal mask, so every position can attend to the entire input sequence. It is well suited to tasks that require a contextualized representation of the complete sequence.
+Transformer Encoder 中没有未来掩码，因此每个位置都可以看到整个输入序列，适合需要获得完整序列上下文化表示的任务。
 
-Its main properties are:
+它的特点是：
 
-- Every token can attend to every position in the sequence.
-- Each output representation incorporates both the current token and its surrounding context.
-- It is more naturally suited to sequence understanding than to autoregressive text generation.
+- 每个词元都可以关注序列中的所有位置；
+- 输出表示同时包含当前词元及其前后文信息；
+- 更适合序列理解，而不是自回归文本生成。
 
-### Transformer Decoder
+### Transformer 解码器
 
-A Transformer Decoder is primarily used for autoregressive language modeling. Its main difference from an Encoder is that Decoder self-attention uses a causal mask, so position $i$ can see only itself and earlier positions.
+Transformer Decoder 主要用于自回归语言建模。与 Encoder 的主要区别是：Decoder 中的 Self-Attention 使用未来掩码，使位置 $i$ 只能看到当前位置及之前的信息。
 
-When generating the $t$-th word, the model can therefore condition only on $w_{1:t-1}$:
-
-$$
-w_t\sim\operatorname{softmax}\left(f(w_{1:t-1})\right).
-$$
-
-Stacking multiple Decoder Blocks produces an autoregressive Transformer.
-
-### Transformer Encoder-Decoder
-
-An Encoder-Decoder Transformer operates on two sequences. The input sequence first passes through the Encoder to obtain contextualized representations:
+因此在生成第 $t$ 个词时，只能根据 $w_{1:t-1}$ 进行预测：
 
 $$
-H^{(x)}
-=\operatorname{TransformerEncoder}(x_{1:n}).
+w_t\sim\operatorname{softmax}(f(w_{1:t-1}))
 $$
 
-The Decoder applies causally masked self-attention to the target sequence and uses **cross-attention** to read the Encoder output.
+通过堆叠多个 Decoder Block，就可以构成自回归 Transformer。
 
-Cross-attention has the same computational form as self-attention, but its Queries, Keys, and Values come from different sequences:
+### Transformer 编码器—解码器
 
-$$
-q_i=W_Qh_i^{(y)},
-\qquad
-k_j=W_Kh_j^{(x)},
-\qquad
-v_j=W_Vh_j^{(x)}.
-$$
-
-The Queries come from the Decoder, while the Keys and Values come from the Encoder. The attention weights are
+Encoder-Decoder Transformer 同时接收两个序列。输入序列首先经过 Encoder，得到上下文化表示：
 
 $$
-\alpha_{ij}
-=\frac{\exp(q_i^\top k_j)}
-{\sum_{j'=1}^{n}\exp(q_i^\top k_{j'})}.
+H^{(x)}=\operatorname{TransformerEncoder}(x_{1:n})
 $$
 
-The Decoder then takes a weighted sum over the Encoder Values:
+Decoder 一方面对目标序列进行带未来掩码的 Self-Attention，另一方面通过交叉注意力（Cross-Attention）读取 Encoder 的输出。
+
+Cross-Attention 与 Self-Attention 的计算形式相同，区别在于 Query、Key 和 Value 来自不同序列：
 
 $$
-h_i=\sum_{j=1}^{n}\alpha_{ij}v_j.
+q_i=Qh_i^{(y)},\ k_j=Kh_j^{(x)},\ v_j=Vh_j^{(x)}
 $$
 
-![A Transformer Encoder-Decoder architecture](/assets/img/posts/neural-network-architectures/transformer-encoder-decoder.png)
+其中 Query 来自 Decoder，Key 和 Value 来自 Encoder。注意力权重为
 
-An Encoder-Decoder architecture is useful when a task requires both bidirectional understanding of an input and autoregressive generation of an output.
+$$
+\alpha_{ij}=\frac{\exp(q_i^Tk_j)}{\sum_{j'=1}^{n}\exp(q_i^Tk_{j'})}
+$$
 
-- The Encoder allows every input token to attend to the entire input sequence, producing complete contextualized representations.
-- The Decoder predicts the output one step at a time from the content already generated.
-- Cross-attention lets the Decoder read the Encoder representations during generation.
+再对 Encoder 的 Value 加权求和：
 
-Encoder-Decoder Transformers are well suited to sequence-to-sequence tasks such as summarization and translation.
+$$
+h_i=\sum_{j=1}^{n}\alpha_{ij}v_j
+$$
 
-However, this architecture must divide model parameters between the Encoder and Decoder. As models grow larger, a Decoder-only architecture is often simpler, which is why many large language models use Decoder-only Transformers.
+![Transformer 编码器—解码器架构](/assets/img/posts/neural-network-architectures/transformer-encoder-decoder.png)
+
+当任务既需要双向上下文理解，又需要自回归生成输出时，可以使用 Encoder-Decoder 架构。
+
+其中：
+
+- Encoder 可以让每个输入词元关注整个输入序列，从而获得完整的上下文化表示；
+- Decoder 根据已经生成的内容逐步预测后续输出；
+- Cross-Attention 使 Decoder 在生成过程中能够读取 Encoder 的表示。
+
+Encoder-Decoder 很适合输入序列到输出序列的任务，例如摘要、翻译等。
+
+不过这种架构需要在 Encoder 和 Decoder 之间分配模型参数。随着模型规模增大，仅使用 Decoder 的架构通常更加简单，因此许多大规模语言模型采用 Decoder-only Transformer。

@@ -1,26 +1,29 @@
 ---
-title: "CS224N | Word2Vec Model"
+title: "CS224N | Word2Vec 模型"
 publishDate: 2026-08-03
 category: learning
 tags: [NLP, CS224N]
-language: en
+language: zh
 description: "CS224n lec1,word representation, distributional semantics, and the Skip-gram Word2Vec model"
 heroImage:
   src: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
-  alt: "Sunset cityscape with a figure looking over the skyline"
+  alt: "文章封面"
   color: "#9a7093"
 ---
 
-> You can download the [LaTeX](/output/pdf/word2vec-model.tex) and [PDF](/output/pdf/word2vec-model.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/9d4Zemo0c) here.
-## Word Representation
+<aside class="download-callout" role="note">
+  <p>You can download the <a href="/output/pdf/word2vec-model.tex">LaTeX</a> and <a href="/output/pdf/word2vec-model.pdf">PDF</a>.</p>
+</aside>
 
-### 1.1 Signifier and Signified
+## 词表示
 
-A word is a signifier. It represents a signified object in the real or imagined world. A signifier, or the corresponding signified object, can refer to something very broad, such as uncle and drink, but it can also refer to something much more specific, such as uncle Zuko and coffee. Therefore, word meaning is extremely important, and even a small change may have a large influence.
+### 1.1 能指与所指
 
-### 1.2 Independent Words and Vectors
+词语是能指，代表现实或想象世界中的某个所指对象。能指及其所指可以非常宽泛，例如“叔叔”和“饮料”，也可以更加具体，例如“祖寇叔叔”和“咖啡”。因此，词义十分重要，即使很小的变化也可能带来很大影响。
 
-The simplest way to represent words is to treat them as mutually independent and unrelated entities. Mutually independent components are usually represented by one-hot vectors, that is, standard basis vectors. For example,
+### 1.2 独立的词与向量
+
+表示词语最简单的方法，是将它们视为相互独立、互不相关的实体。相互独立的分量通常用 one-hot 向量，也就是标准基向量表示。例如，
 
 $$
 v_{\mathrm{tea}}=[0,0,1,0,\ldots,0]^T,
@@ -28,46 +31,46 @@ v_{\mathrm{tea}}=[0,0,1,0,\ldots,0]^T,
 v_{\mathrm{coffee}}=[0,0,0,0,\ldots,1,\ldots,0]^T.
 $$
 
-However, the problem with one-hot representations is that they cannot encode any similarity relation. The dot product of any two different vectors is $0$. In reality, however, words in a sentence are related to each other. Therefore, we introduce the next approach.
+但 one-hot 表示无法编码词语之间的相似关系：任意两个不同词向量的点积都为 $0$。而实际句子中的词语彼此有关，因此需要引入下面的方法。
 
-### 1.3 Vectors from Manually Annotated Discrete Attributes
+### 1.3 用人工标注的离散属性构造向量
 
-This approach manually constructs a feature vector whose entries describe the attributes of a word. Clearly, this is not a good solution.
+这种方法手工构造特征向量，用各个分量描述词语的属性。显然，这并不是一个理想的解决方案。
 
-## Distributional Semantics and Word2Vec
+## 分布语义学与 Word2Vec
 
-### 2.1 Distributional Hypothesis
+### 2.1 分布假设
 
-The distributional hypothesis states that the meaning of a word can be inferred from the distribution of contexts in which it appears. This is one of the most influential ideas in NLP.
+分布假设认为，可以从一个词出现的上下文分布中推断其含义。这是 NLP 中最有影响力的思想之一。
 
-### 2.2 Co-occurrence Matrix and Document Context
+### 2.2 共现矩阵与文档上下文
 
-To implement the idea of the distributional hypothesis, we can construct a co-occurrence matrix, denoted by $X$. The size of this matrix is $\lvert V\rvert\times\lvert V\rvert$, where $X_{ij}$ denotes the number of times word $i$ and word $j$ appear in the same context.
+为实现分布假设的思想，可以构造一个共现矩阵，记为 $X$。矩阵大小为 $\lvert V\rvert\times\lvert V\rvert$，其中 $X_{ij}$ 表示词 $i$ 与词 $j$ 出现在相同上下文中的次数。
 
-In a sentence, we can mark multiple windows of different sizes. Short windows tend to encode syntactic properties, while long windows tend to encode semantic properties or even topic-level properties.
+在一个句子中，可以划定不同大小的窗口。较短的窗口倾向于编码句法性质，较长的窗口则倾向于编码语义性质，甚至是主题层面的性质。
 
-The problem with this approach is that high-dimensional vectors are difficult to handle in modern neural systems, and high-frequency words receive too much weight.
+这种方法的问题在于，高维向量不便于现代神经网络系统处理，而且高频词会获得过大的权重。
 
-### 2.3 Word2Vec Model and Objective Function
+### 2.3 Word2Vec 模型与目标函数
 
-Word2Vec represents each word in a fixed vocabulary as a low-dimensional vector whose dimension is much smaller than the vocabulary size. It learns the values of word vectors so that they can be used to predict the distribution of context words through a simple function. The model introduced here is **Skip-gram Word2Vec**.
+Word2Vec 将固定词表中的每个词表示为一个低维向量，维度远小于词表大小。它学习词向量的数值，使模型能够通过一个简单函数预测上下文词的分布。这里介绍的是 **Skip-gram Word2Vec**。
 
 **Skip-gram Word2Vec**
 
-Let $C,O$ be a pair of unknown random variables, where $C \in V$ denotes the center word, and $O \in V$ denotes an outside word appearing in the context of the center word. We use $c,o$ to denote their concrete values.
+设 $C,O$ 是一对随机变量，$C \in V$ 表示中心词，$O \in V$ 表示出现在中心词上下文中的外部词，用 $c,o$ 表示它们的具体取值。
 
-Suppose the vocabulary is $V$. Each word has two $d$-dimensional vector representations:
+设词表为 $V$。每个词有两种 $d$ 维向量表示：
 
-- $u_w$: the vector of word $w$ when it is used as a context word;
-- $v_w$: the vector of word $w$ when it is used as a center word.
+- $u_w$：词 $w$ 作为上下文词时的向量；
+- $v_w$：词 $w$ 作为中心词时的向量。
 
-We arrange all word vectors into matrices
+将所有词向量排列成矩阵
 
 $$
 U,V\in\mathbb{R}^{\lvert V\rvert\times d}.
 $$
 
-Given center word $c$, the probability that the context word is $o$ is defined as
+给定中心词 $c$，上下文词为 $o$ 的概率定义为
 
 $$
 p_{U,V}(o\mid c)=
@@ -75,17 +78,17 @@ p_{U,V}(o\mid c)=
 {\sum_{w\in V}\exp(u_w^\top v_c)}.
 $$
 
-Here, $u_o^\top v_c$ represents the similarity between two word vectors. The larger the dot product is, the more likely the model believes that word $o$ appears in the context of word $c$.
+这里，$u_o^\top v_c$ 表示两个词向量的相似度。点积越大，模型就越认为词 $o$ 容易出现在词 $c$ 的上下文中。
 
-Softmax converts the dot-product scores of all words into a probability distribution:
+Softmax 将所有词的点积得分转换为概率分布：
 
 $$
 p_{U,V}(\cdot\mid c)\in\mathbb R^{\lvert V\rvert}.
 $$
 
-The goal of training Word2Vec is to make the predicted probability distribution close to the true distribution of context words for word $c$ in the corpus, namely the row of the word co-occurrence matrix corresponding to $c$.
+训练 Word2Vec 的目标，是让预测概率分布接近语料中词 $c$ 的真实上下文词分布，也就是共现矩阵中 $c$ 对应的那一行。
 
-So far, we have only defined the model. We still need to determine the parameters $U,V$ through training. Word2Vec uses the cross-entropy loss to make the predicted conditional distribution close to the true context distribution:
+到目前为止，我们只定义了模型，还需要通过训练确定参数 $U,V$。Word2Vec 使用交叉熵损失，让预测的条件分布接近真实上下文分布：
 
 $$
 \min_{U,V}
@@ -95,27 +98,27 @@ $$
 \right].
 $$
 
-Here, $(o,c)$ denotes a context word and center word pair sampled from the corpus. For each sample, the model computes the negative log probability of the true context word $o$ given the center word $c$:
+这里，$(o,c)$ 表示从语料中采样的一对上下文词和中心词。对每个样本，模型计算给定中心词 $c$ 时，真实上下文词 $o$ 的负对数概率：
 
 $$
 -\log p_{U,V}(o\mid c).
 $$
 
-If the model assigns a larger probability to the true context word, the loss becomes smaller. Therefore, the training process continuously adjusts $U,V$ to increase the predicted probability of real word pairs.
+模型赋予真实上下文词的概率越大，损失越小。因此训练会持续调整 $U,V$，提高真实词对的预测概率。
 
-### 2.4 Estimating Word2Vec from a Corpus
+### 2.4 从语料中估计 Word2Vec
 
-**Empirical Loss of Word2Vec**
+**Word2Vec 的经验损失**
 
-Let $D$ be a collection of documents $\{d\}$. Each document is a word sequence $w_1^{(d)},\dots,w_m^{(d)}$, where $w^{(d)} \in V$. Let $k \in \mathbb N_{++}$ be a positive integer window size. We now connect the random variables $C,O$ with this concrete dataset.
+设 $D$ 是由文档 $\{d\}$ 组成的集合。每篇文档是词序列 $w_1^{(d)},\dots,w_m^{(d)}$，其中 $w^{(d)} \in V$。设 $k \in \mathbb N_{++}$ 为正整数窗口大小，现在将随机变量 $C,O$ 与这个具体数据集联系起来。
 
-The center word $C$ takes each word $w_i$ in the document in turn. For each such $w_i$, the outside words are
+中心词 $C$ 依次取文档中的每个词 $w_i$。对每个 $w_i$，其上下文词为
 
 $$
 \{w_{i-k},\dots,w_{i-1},w_{i+1},\dots,w_{i+k}\}.
 $$
 
-Therefore, the objective function becomes
+因此，目标函数变为
 
 $$
 L(U,V)=
@@ -130,21 +133,21 @@ w_i^{(d)}
 \right).
 $$
 
-Here, we sum over all documents, all words in each document, and all words in the window. In this way, we accumulate the negative log-likelihood of outside words given center words.
+这里对所有文档、各文档中的所有词，以及窗口内的所有词求和，累积给定中心词时上下文词的负对数似然。
 
-**Gradient-based Estimation**
+**基于梯度的估计**
 
-We first make an initial guess with very little information for $U,V$, and then repeatedly move in the direction that locally improves this guess the most. This gives a gradient-based implementation.
+先在信息很少的情况下为 $U,V$ 猜测一个初值，再不断沿着局部最有利于改进这个猜测的方向移动，由此得到基于梯度的实现。
 
-For a scalar function $f$, its gradient with respect to the parameter matrix $U$ is denoted by $\nabla_U f$. The gradient gives the direction in which the function increases fastest. Therefore, if we want to minimize the loss function, we should update the parameters in the opposite direction of the gradient.
+对于标量函数 $f$，关于参数矩阵 $U$ 的梯度记为 $\nabla_U f$。梯度给出函数上升最快的方向，因此要最小化损失，就应沿梯度的反方向更新参数。
 
-Before training starts, the word vector matrices $U,V$ are usually initialized as small random numbers:
+训练开始前，通常将词向量矩阵 $U,V$ 初始化为很小的随机数：
 
 $$
 U^{(0)},V^{(0)}\sim N(0,0.001)^{\lvert V\rvert\times d}.
 $$
 
-In other words, each entry of the matrices is independently sampled from a normal distribution with mean $0$ and small variance. Then gradient descent is used to update the parameters repeatedly. For example, the update formula for matrix $U$ is
+也就是说，矩阵中的每个元素都独立采样自均值为 $0$、方差较小的正态分布。之后使用梯度下降反复更新参数，例如矩阵 $U$ 的更新公式为
 
 $$
 U^{(i+1)}=
@@ -152,7 +155,7 @@ U^{(i)}-
 \alpha\nabla_U L\left(U^{(i)},V^{(i)}\right).
 $$
 
-Here, $\alpha$ is the learning rate, which controls the step size of each parameter update. Matrix $V$ is updated in the same way:
+其中，$\alpha$ 为学习率，控制每次参数更新的步长。矩阵 $V$ 也以相同方式更新：
 
 $$
 V^{(i+1)}=
@@ -160,15 +163,15 @@ V^{(i)}-
 \alpha\nabla_V L\left(U^{(i)},V^{(i)}\right).
 $$
 
-By continuously updating $U,V$ in the direction that decreases the loss function, the predicted distribution of the model gradually approaches the true distribution of context words.
+不断沿降低损失的方向更新 $U,V$ 后，模型的预测分布就会逐渐接近真实上下文词分布。
 
-**Stochastic Gradient**
+**随机梯度**
 
-For now, we do not consider how to compute the gradient explicitly. Computing $L(U,V)$ is very expensive because it requires traversing the entire training set. Therefore, we use stochastic gradient optimization.
+这里暂不讨论如何显式计算梯度。计算 $L(U,V)$ 需要遍历整个训练集，代价很高，因此使用随机梯度优化。
 
-### 2.5 A Complete Gradient Derivation
+### 2.5 完整的梯度推导
 
-First, we write down the gradient, and then use the linearity of differentiation to move the gradient operator into the summation:
+先写出梯度，再利用微分的线性性质将梯度算子移入求和：
 
 $$
 \nabla_{v_c}\widehat L(U,V)=
@@ -184,7 +187,7 @@ w_i^{(d)}
 \right).
 $$
 
-Now we rewrite $w_{i+j}^{(d)}$ as $o$, and rewrite $w_i^{(d)}$ as $c$:
+将 $w_{i+j}^{(d)}$ 简记为 $o$，将 $w_i^{(d)}$ 简记为 $c$：
 
 $$
 \begin{aligned}
@@ -201,9 +204,9 @@ $$
 \end{aligned}
 $$
 
-We take the gradient of the two parts with respect to $v_c$ separately.
+分别对这两部分关于 $v_c$ 求梯度。
 
-The first part is
+第一部分为
 
 $$
 \nabla_{v_c}\log\exp(u_o^\top v_c)=
@@ -211,7 +214,7 @@ $$
 u_o.
 $$
 
-The second part is
+第二部分为
 
 $$
 \begin{aligned}
@@ -231,7 +234,7 @@ p_{U,V}(x\mid c)u_x.
 \end{aligned}
 $$
 
-Therefore,
+因此，
 
 $$
 \nabla_{v_c}\log p_{U,V}(o\mid c)=
@@ -240,15 +243,15 @@ u_o-
 p_{U,V}(x\mid c)u_x.
 $$
 
-Here, $u_o$ is the actually observed context word vector, while
+其中，$u_o$ 是实际观测到的上下文词向量，而
 
 $$
 \sum_{x\in V}p_{U,V}(x\mid c)u_x
 $$
 
-is the expectation of the context word vector under the model's predicted distribution. Therefore, this gradient can be understood as observation minus expectation.
+是模型预测分布下上下文词向量的期望。因此，这个梯度可以理解为“观测值减去期望值”。
 
-For the negative log-likelihood loss, the gradient has the opposite direction:
+对于负对数似然损失，梯度方向相反：
 
 $$
 \nabla_{v_c}\left[-\log p_{U,V}(o\mid c)\right]=
@@ -256,4 +259,4 @@ $$
 p_{U,V}(x\mid c)u_x-u_o.
 $$
 
-Gradient descent makes the center word vector $v_c$ closer to the true context word vector $u_o$, while pushing it away from word vectors to which the model incorrectly assigns high probabilities.
+梯度下降使中心词向量 $v_c$ 更接近真实上下文词向量 $u_o$，同时远离那些被模型错误赋予高概率的词向量。

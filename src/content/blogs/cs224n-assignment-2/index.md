@@ -1,35 +1,37 @@
 ---
-title: "CS224N | Assignment 2"
+title: "CS224N | 作业 2"
 publishDate: 2026-08-25
 category: learning
 tags: [NLP, CS224N]
-language: en
+language: zh
 description: "personal solution to CS224N assignment 2"
 heroImage:
   src: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
-  alt: "Sunset cityscape with a figure looking over the skyline"
+  alt: "文章封面"
   color: "#9a7093"
 ---
 
-You can download the [LaTeX](/output/pdf/cs224n-assignment-2.tex) and [PDF](/output/pdf/cs224n-assignment-2.pdf),and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/RlQo8o4QP) here.
+<aside class="download-callout" role="note">
+  <p>You can download the <a href="/output/pdf/cs224n-assignment-2.tex">LaTeX</a> and <a href="/output/pdf/cs224n-assignment-2.pdf">PDF</a>.</p>
+</aside>
 
 ## Problem 1
 
 ### (a)
 
-Let $y \in \mathbb{R}^{\lvert V\rvert}$ be the one-hot true distribution, let $\hat{y} \in \mathbb{R}^{\lvert V\rvert}$ be the predicted distribution, and let
+设 $y \in \mathbb{R}^{\lvert V\rvert}$ 为真实分布对应的 one-hot 向量，$\hat{y} \in \mathbb{R}^{\lvert V\rvert}$ 为预测分布，并令
 
 $$
 \hat{y}_w = P(O=w\mid C=c) = \frac{\exp(u_w^\top v_c)} {\sum_{j\in V}\exp(u_j^\top v_c)}.
 $$
 
-The matrix U contains the outside-word vectors as its columns:
+矩阵 $U$ 的每一列是一个上下文词向量：
 
 $$
 U = \begin{bmatrix}u_1 & u_2 & \cdots & u_{\lvert V\rvert}\end{bmatrix}.
 $$
 
-Since $y$ is one-hot, $y_o=1$ and $y_w=0$ for every $w\neq o$. Therefore,
+由于 $y$ 是 one-hot 向量，$y_o=1$，而所有 $w\neq o$ 都满足 $y_w=0$。因此，
 
 $$
 -\sum_{w\in V}y_w\log \hat{y}_w = -\log \hat{y}_o.
@@ -39,25 +41,25 @@ $$
 
 **(i)**
 
-First, rewrite the naive-softmax loss as
+先将朴素 softmax 的损失改写为
 
 $$
 J_{\text{naive-softmax}}(v_c,o,U) = -\log \hat{y}_o = -u_o^\top v_c+ \log\left(\sum_{w\in V}\exp(u_w^\top v_c)\right).
 $$
 
-Taking the derivative with respect to $v_c$,
+对 $v_c$ 求导，得到
 
 $$
 \frac{\partial J}{\partial v_c} = -u_o+ \frac{\sum_{w\in V}\exp(u_w^\top v_c)u_w} {\sum_{j\in V}\exp(u_j^\top v_c)} = -u_o + \sum_{w\in V}\hat{y}_w u_w.
 $$
 
-Because $y$ is one-hot,
+由于 $y$ 是 one-hot 向量，
 
 $$
 u_o = Uy,\quad \sum_{w\in V}\hat{y}_w u_w = U\hat{y}.
 $$
 
-Hence the vectorized result is
+因此，向量化形式为
 
 $$
 \frac{\partial J}{\partial v_c}=U(\hat{y}-y)
@@ -65,38 +67,38 @@ $$
 
 **(ii)**
 
-The gradient is zero exactly when
+梯度为零，当且仅当
 
 $$
 U(\hat{y}-y)=0
 $$
 
-Equivalently, $\hat{y}-y\in\operatorname{Null}(U)$. In particular, $\hat{y}=y$ is sufficient for the gradient to be zero.
+等价地，$\hat{y}-y\in\operatorname{Null}(U)$。特别地，$\hat{y}=y$ 是梯度为零的充分条件。
 
 **(iii)**
 
-Using a learning rate $\eta>0$, gradient descent gives
+取学习率 $\eta>0$，梯度下降更新为
 
 $$
 v_c \leftarrow v_c-\eta\left(U\hat{y}-Uy\right) =v_c+\eta u_o-\eta\sum_{w\in V}\hat{y}_w u_w.
 $$
 
-The $+\eta u_o$ term moves the center-word vector $v_c$ toward the true outside-word vector $u_o$, increasing their similarity. The $-\eta\sum_w\hat{y}_w u_w$ term moves $v_c$ away from the probability-weighted average of the predicted outside-word vectors, with a larger correction for words to which the model currently assigns more probability. Together, these changes increase the score of the true outside word relative to the scores of the other words.
+其中，$+\eta u_o$ 项把中心词向量 $v_c$ 拉向真实上下文词向量 $u_o$，提高两者的相似度。$-\eta\sum_w\hat{y}_w u_w$ 项则让 $v_c$ 远离按预测概率加权的上下文词向量均值；模型当前赋予概率越高的词，受到的修正越大。两项共同提高真实上下文词相对于其他词的得分。
 
 ### (c)
 
-Suppose $u_x=\alpha u_y$ for $x\neq y$. If $\alpha>0$, then
+设 $x\neq y$ 且 $u_x=\alpha u_y$。当 $\alpha>0$ 时，
 
 $$
 \frac{u_x}{\lVert u_x\rVert_2} =\frac{\alpha u_y}{\lVert \alpha u_y\rVert_2} =\frac{u_y}{\lVert u_y\rVert_2}.
 $$
 
-Thus, L2 normalization makes two vectors that point in the same direction identical, even if their original magnitudes differ. It removes useful information when vector magnitude encodes information relevant to the phrase classification—for example, when $x$ and $y$ have similar semantic directions but different strengths or polarities in the classifier. It does not remove useful information when only vector direction matters, or when same-direction vectors with different magnitudes should have the same effect on the final classification.
+因此，L2 归一化会让方向相同、模长不同的两个向量变得完全相同。如果模长包含与短语分类有关的信息，例如 $x$ 和 $y$ 的语义方向相近，但在分类器中的强度或倾向不同，就会丢失有用信息。如果任务只关心方向，或者同方向、不同模长的向量本来就应产生相同分类效果，则不会丢失有用信息。
 
 ### (d)
 
-Since $U$ is formed by placing the outside-word vectors in columns, its
-gradient has the same column structure:
+由于 $U$ 由上下文词向量按列组成，
+它的梯度也具有相同的列结构：
 
 $$
 \frac{\partial J(v_c,o,U)}{\partial U}= \begin{bmatrix} \dfrac{\partial J(v_c,o,U)}{\partial u_1} & \dfrac{\partial J(v_c,o,U)}{\partial u_2} & \cdots & \dfrac{\partial J(v_c,o,U)}{\partial u_{\lvert V\rvert}} \end{bmatrix}
@@ -104,25 +106,25 @@ $$
 
 ### (e)
 
-The loss is
+损失为
 
 $$
 J=-u_o^\top v_c+\log\left(\sum_{j\in V}\exp(u_j^\top v_c)\right).
 $$
 
-For the true outside word $w=o$,
+对于真实上下文词 $w=o$，
 
 $$
 \frac{\partial J}{\partial u_o} =-v_c+\frac{\exp(u_o^\top v_c)}{\sum_{j\in V}\exp(u_j^\top v_c)}v_c =(\hat{y}_o-1)v_c.
 $$
 
-For every $w\neq o$,
+对于所有 $w\neq o$，
 
 $$
 \frac{\partial J}{\partial u_w} =\frac{\exp(u_w^\top v_c)}{\sum_{j\in V}\exp(u_j^\top v_c)}v_c =\hat{y}_w v_c.
 $$
 
-Therefore,
+因此，
 
 $$
 \frac{\partial J}{\partial u_w} =(\hat{y}_w-y_w)v_c= \begin{cases} (\hat{y}_o-1)v_c, & w=o,\\\ \hat{y}_w v_c, & w\neq o. \end{cases}
@@ -130,29 +132,29 @@ $$
 
 ### (f)
 
-For $f(x)=\max(\alpha x,x)$, where $0<\alpha<1$,
+对于 $f(x)=\max(\alpha x,x)$，其中 $0<\alpha<1$，
 
 $$
 f'(x)= \begin{cases} 1, & x>0,\\\ \alpha, & x<0. \end{cases}
 $$
 
-The derivative at $x=0$ is not required.
+本题不要求讨论 $x=0$ 处的导数。
 
 ### (g)
 
-Starting from
+从
 
 $$
 \sigma(x)=\frac{1}{1+e^{-x}},
 $$
 
-we obtain
+可得
 
 $$
 \sigma'(x) =\frac{e^{-x}}{(1+e^{-x})^2} =\frac{1}{1+e^{-x}}\left(1-\frac{1}{1+e^{-x}}\right).
 $$
 
-Hence,
+因此，
 
 $$
 \sigma'(x)=\sigma(x)\bigl(1-\sigma(x)\bigr)
@@ -164,30 +166,30 @@ $$
 
 **(i)**
 
-Momentum averages gradients over multiple minibatches, so random variations in individual minibatch gradients tend to cancel out. Directions that are consistently useful accumulate in $m$, making parameter updates smoother and less noisy. This can reduce oscillation and allow the model to converge more stably and quickly.
+Momentum 对多个小批次的梯度进行平均，单个小批次梯度中的随机波动往往会相互抵消。持续有用的方向会在 $m$ 中累积，使参数更新更平滑、噪声更小，从而减少振荡，让模型更稳定、更快地收敛。
 
 **(ii)**
 
-Parameters whose gradients have historically been small receive relatively larger updates, since their corresponding values in $v$ are smaller. Parameters with consistently large gradients receive smaller updates. This adaptive scaling prevents large-gradient parameters from changing too aggressively while still allowing small-gradient parameters to make meaningful progress.
+历史梯度较小的参数对应的 $v$ 较小，因此会获得相对更大的更新；历史梯度持续较大的参数则获得较小的更新。这种自适应缩放既避免大梯度参数变化过猛，也让小梯度参数能够取得有效进展。
 
 ### (b)
 
 **(i)**
 
-For each hidden unit $i$,
+对于每个隐藏单元 $i$，
 
 $$
 (h_{\text{drop}})_i=\gamma d_i h_i.
 $$
 
-Since $\mathbb{E}[d_i]=1-p_{\text{drop}}$,
+由于 $\mathbb{E}[d_i]=1-p_{\text{drop}}$，
 
 $$
 \mathbb{E}[(h_{\text{drop}})_i]=
 \gamma h_i(1-p_{\text{drop}}).
 $$
 
-Requiring $\mathbb{E}[(h_{\text{drop}})_i]=h_i$ gives
+要求 $\mathbb{E}[(h_{\text{drop}})_i]=h_i$，可得
 
 $$
 \gamma=\frac{1}{1-p_{\text{drop}}}.
@@ -195,19 +197,17 @@ $$
 
 **(ii)**
 
-Dropout is applied during training as a regularization method, since randomly dropping hidden units prevents the model from relying too heavily on specific neurons and reduces overfitting. During evaluation, dropout is disabled so that the full network is used and predictions remain stable and deterministic.
-
-
+训练时使用 Dropout 进行正则化，随机丢弃隐藏单元能够防止模型过度依赖特定神经元，从而减少过拟合。评估时关闭 Dropout，使用完整网络，使预测保持稳定和确定。
 
 ## Problem 3
 
 ### (a)
 
-The required sequence of transitions is:
+所需的转移序列如下：
 
-| Stack                                         | Buffer                                                   | New dependency           | Transition            |
+| 栈 | 缓冲区 | 新增依存关系 | 转移动作 |
 | --------------------------------------------- | -------------------------------------------------------- | ------------------------ | --------------------- |
-| `[ROOT]`                                      | `[I, presented, my, findings, at, the, NLP, conference]` |                          | Initial Configuration |
+| `[ROOT]`                                      | `[I, presented, my, findings, at, the, NLP, conference]` |                          | 初始配置 |
 | `[ROOT, I]`                                   | `[presented, my, findings, at, the, NLP, conference]`    |                          | SHIFT                 |
 | `[ROOT, I, presented]`                        | `[my, findings, at, the, NLP, conference]`               |                          | SHIFT                 |
 | `[ROOT, presented]`                           | `[my, findings, at, the, NLP, conference]`               | `presented → I`          | LEFT-ARC              |
@@ -227,7 +227,7 @@ The required sequence of transitions is:
 
 ### (b)
 
-A sentence containing $n$ words requires $2n$ transitions to parse. Each word is shifted onto the stack exactly once and is removed from the stack exactly once by either a LEFT-ARC or RIGHT-ARC transition.
+包含 $n$ 个词的句子需要 $2n$ 次转移。每个词恰好经过一次 SHIFT 入栈，并通过一次 LEFT-ARC 或 RIGHT-ARC 从栈中移除。
 
 ### (c)
 
@@ -237,7 +237,7 @@ A sentence containing $n$ words requires $2n$ transitions to parse. Each word is
 
 ### (d)
 
-`minibatch_parse` creates one `PartialParse` object for each input sentence and keeps their original order. During each iteration, it selects up to `batch_size` unfinished parses, asks the model to predict one transition for each parse, and applies those transitions. A parse is removed from the unfinished list only when its buffer is empty and its stack contains only `ROOT`. Finally, dependencies are collected from the original list of partial parses, which preserves the input sentence order.
+`minibatch_parse` 为每个输入句子创建一个 `PartialParse` 对象，并保留原始顺序。每轮选取至多 `batch_size` 个未完成的分析对象，让模型分别预测一个转移动作，再执行这些动作。只有当缓冲区为空且栈中只剩 `ROOT` 时，才将该对象从未完成列表中移除。最后从原始对象列表中收集依存关系，因而保留输入句子的顺序。
 
 ![](/assets/img/posts/cs224n-assignment-2/code3.png)
 
@@ -245,7 +245,7 @@ A sentence containing $n$ words requires $2n$ transitions to parse. Each word is
 
 **(i)**
 
-Let
+令
 
 $$
 \mathbf{z} = \mathbf{xW} + \mathbf{b}_1,
@@ -253,14 +253,14 @@ $$
 \mathbf{h} = \operatorname{ReLU}(\mathbf{z}).
 $$
 
-For an individual hidden unit $h_i$,
+对于单个隐藏单元 $h_i$，
 
 $$
 h_i = \max(z_i, 0)
 = \max\left(\sum_k x_k W_{ki} + b_{1,i}, 0\right).
 $$
 
-Therefore, for an input feature $x_j$,
+因此，对于输入特征 $x_j$，
 
 $$
 \begin{cases}
@@ -269,29 +269,29 @@ W_{ji}, & z_i > 0,\\
 \end{cases}
 $$
 
-The derivative is undefined at $z_i=0$, which the question allows us to ignore.
+在 $z_i=0$ 处导数不存在，题目允许忽略这一点。
 
 **(ii)**
 
-Let the logits be $\mathbf{l}$, and let
+设 logits 为 $\mathbf{l}$，并令
 
 $$
 \hat{y}_j = \frac{e^{l_j}}{\sum_k e^{l_k}}
 $$
 
-be the softmax probability for class $j$. The cross-entropy loss is
+为类别 $j$ 的 softmax 概率。交叉熵损失为
 
 $$
 -\sum_j y_j \log \hat{y}_j.
 $$
 
-For a one-hot target vector whose correct class is $c$, the derivative with respect to logit $l_i$ is
+对于正确类别为 $c$ 的 one-hot 目标向量，损失关于 logit $l_i$ 的导数为
 
 $$
 \hat{y}_i - y_i
 $$
 
-Equivalently,
+等价地，
 
 $$
 \begin{cases}
@@ -300,7 +300,7 @@ $$
 \end{cases}
 $$
 
-This gradient increases the logit of the correct transition and decreases the relative preference for incorrect transitions during training.
+训练时，这个梯度会提高正确转移动作的 logit，并降低模型对错误转移动作的相对偏好。
 
 **(iii) UAS**
 
@@ -308,11 +308,11 @@ This gradient increases the logit of the correct transition and decreases the re
 
 ![](/assets/img/posts/cs224n-assignment-2/screenshot-2026-09-14-19-39-50.png)
 
-The best development-set UAS achieved by the model was **88.85**. The final model, restored using the best development-set checkpoint, achieved a test-set UAS of **89.23**.
+模型在开发集上取得的最佳 UAS 为 **88.85**。使用开发集上的最佳检查点恢复的最终模型，在测试集上取得了 **89.23** 的 UAS。
 
-UAS  measures the percentage of words whose predicted syntactic heads are correct, regardless of dependency-relation labels.
+UAS 衡量预测句法中心词正确的词所占比例，不考虑依存关系标签。
 
-**my code**
+**我的代码**
 
 ![__init__](/assets/img/posts/cs224n-assignment-2/code4.png)
 
@@ -320,6 +320,6 @@ UAS  measures the percentage of words whose predicted syntactic heads are correc
 
 ![](/assets/img/posts/cs224n-assignment-2/code6.png)
 
-**test**
+**测试**
 
 ![](/assets/img/posts/cs224n-assignment-2/screenshot-2026-09-14-19-21-52.png)

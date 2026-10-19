@@ -1,5 +1,5 @@
 ---
-title: 'Chelsea 2026/27 — First-Half Notes'
+title: "切尔西 2026/27 赛季上半程随记"
 publishDate: 2026-09-07
 category: daily
 tags: [Chelsea, Football]
@@ -7,63 +7,63 @@ language: zh
 description: 'A living Chelsea fan journal for the 2026/27 first half — match reactions, tactical notes and player thoughts, updated after every matchday.'
 heroImage:
   src: /assets/img/posts/chelsea-2026-27-first-half-notes/chelsea-2026-27-card-cover.webp
-  alt: 'Chelsea players celebrate with the FIFA Club World Cup trophy'
+  alt: "文章封面"
   color: '#294b82'
 ---
 
-This is my living journal for Chelsea's 2026/27 season — first half only. Whenever I find time after a matchday, I'll add a few notes under the month below. It's written from the sofa, not the press box — moods, hunches, tactical nitpicks and all. Nothing here is trying to be neutral or complete.
+这是我持续更新的切尔西 2026/27 赛季上半程观赛日记。每轮比赛后有时间就会在对应月份下面记几笔。它来自沙发上的球迷，而不是新闻席：有情绪、直觉、战术上的碎碎念，也有对球员的个人看法，不追求中立或面面俱到。
 
-> This post grows over time. Last updated: 2026-09-07.
+> 本文会持续更新。最近更新：2026-09-07。
 
-## September
+## 九月
 <!--
-Example match note — copy a block like this under any month and reshape it freely.
-Long write-ups and two-line bullet notes are both fine; matches don't need to
-use the same template.
+比赛随记模板：可以把这样的段落复制到对应月份，再自由调整。
+长篇分析和两行短记都可以，
+不必每场比赛都使用相同模板。
 
-### Chelsea vs Opponent
-date / competition
+### 切尔西对阵某队
+日期 / 赛事
 
-One or two sentences of gut reaction before the details fade...
+先用一两句话记下最直接的感受。
 
-**What happened** — the shape of the match in a few lines: key moments, the
-goal(s), how the game swung.
+**比赛经过**：用几句话记录关键时刻、进球，
+以及比赛走势如何变化。
 
-**Tactical observations** — buildup structure, press triggers, mid-block shape,
-wide overloads, whatever actually stood out.
+**战术观察**：出球结构、压迫触发点、中位防守、
+边路人数优势，或其他印象深刻的细节。
 
-**Player thoughts** — who impressed, who struggled, individual duels that
-decided things.
+**球员表现**：谁发挥出色，谁比较挣扎，
+哪些个人对抗影响了比赛。
 
-**Substitutions / coaching decisions** — timing, whether they worked, what I
-would have done differently from the couch.
+**换人与教练决策**：时机、效果，
+以及我自己会考虑怎样调整。
 
-**Liked / disliked** — quick bullets, either or both.
+**喜欢 / 不喜欢的地方**：简单列出即可。
 
-Short version for busy weeks:
+忙碌时也可以只写短版：
 
-### Chelsea vs Opponent
-date / competition
+### 切尔西对阵某队
+日期 / 赛事
 
-- reaction in one line
-- one thing I liked, one thing I didn't
+- 一句话感受
+- 一件满意的事，一件不满意的事
 -->
-### 2026.09.06 Arsenal 2–1 Chelsea
+### 2026.09.06 阿森纳 2–1 切尔西
 
 再一次输给阿森纳，罗杰斯开场不到两分钟的进球一度让我觉得，这场比赛可能真的能把这些年面对阿森纳的颓势结束，但之后比赛的发展还是很熟悉，我们能够制造威胁，也有一些不错的进攻片段，可一旦比赛进入阿森纳熟悉的节奏，整体的稳定性还是差了一截。最大的问题还是中场对球的控制力以及左中卫的选择，在凯塞多回归之前这都是需要阿隆索一场一场的调教来试的（希望凯塞多早日回归吧），健康的拉维亚确实能给我们带来无限的遐想，但是出球的能力仍然还是不及enzo，不过我们期待健康的拉维亚能够在未来占据首发的一席之地，而另外一位中场詹姆斯，詹姆斯的能力毋庸置疑，但是踢后腰的位置他显然不太舒服，对于位置的感受并不佳，不过等凯塞多回来后这个问题能够得到解决，再看前场三叉戟这场的发挥，虽然罗杰斯在开场两分钟就打进了一记相当精彩的进球，但是到比赛下半场阿森纳领先之后面对阿森纳这种级别球队的防线显然三叉戟相当吃力，我认为最大的问题还是三个人都喜欢在中路或者是肋部拿球，并且回撤的过深，导致无法把对手防线拉开，面对加布里埃尔，孔萨这种类型的中卫我认为还是应该多打身后才能造成威胁，这一点罗杰斯做的还是不错的，但是罗杰斯这一侧要承担的责任太多了导致下半场体力明显不够，关于这一点最大的责任人就是哈托，开场接连吃到犯规后不敢下脚，并且防守的站位有很大问题，哈弗茨一直可以在这一侧轻松下底接到直塞。被打了好几个身后，等帕莱斯特拉回归看看阿隆索会不会考虑让内托踢左边翼卫，甚至我觉得可以让艾斯特旺来踢右翼卫的位置，今天上场后非常活跃，并且差点绝平，表现很出色，最后总结一下吧，我觉得最大的问题还是开头说的中场控制力，我们在1-0之后并不能把球控下来，只能踢防反，对攻，和中下游球队固然可以，但是这场反映出来面对顶级球队，如果中场不能拿住球，踢对攻我们是很难赢球的，并且目前的防线也不支持踢防反，这几场这么多的失球已经能看出来了，看阿隆索接下来会怎么改变吧，相信龙哥！
 
-## October
+## 十月
 
-_Match notes will be added here after each game._
+_每场比赛后在这里补充随记。_
 
-## November
+## 十一月
 
-_Match notes will be added here after each game._
+_每场比赛后在这里补充随记。_
 
-## December
+## 十二月
 
-_Match notes will be added here after each game._
+_每场比赛后在这里补充随记。_
 
-## Half-Season Review
+## 半程总结
 
-_To be written at the end of December, once the first half is actually done._
+_等十二月底、上半程真正结束后再写。_

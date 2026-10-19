@@ -1,140 +1,113 @@
 ---
-title: 'Reinforcement Learning | Tabular Methods'
+title: "强化学习 | 表格型方法"
 publishDate: 2026-10-17
 category: learning
 tags: [Reinforcement learning]
-language: en
+language: zh
 description: 'Model-free prediction and control with Q-tables, Monte Carlo estimation, temporal-difference learning, exploring starts, and epsilon-greedy policies.'
 heroImage:
   src: /assets/img/posts/multi-armed-bandits/cover.png
-  alt: 'A traveler looking over a desert city and lake at sunset'
+  alt: "文章封面"
   color: '#bd7d77'
 ---
 
-## Model-Based and Model-Free Methods
+## 有模型与免模型方法
 
-- **Model-based methods:** The environment's transition dynamics and reward model are available. Dynamic programming is a typical example.
-- **Model-free methods:** The transition dynamics and reward model are not given. The agent interacts with the environment, collects data, and uses that experience to improve its policy and obtain more reward.
+- 有模型：已知状态转移规律和奖励模型，动态规划是一个典型例子
 
-## Q-Tables
+- 免模型：状态转移规律和奖励模型是未知的，让智能体和环境交互，采集数据改进策略，从而获得更多的的奖励
 
-A **Q-table** stores the state-action values $Q(s,a)$. A value is not merely the reward for a single step: it estimates the expected future return after taking action $a$ in state $s$ and following a policy thereafter. With a one-step temporal-difference method, we update the table after each transition rather than waiting for the episode to end.
+## Q 表格
 
-## Model-Free Prediction
+Q 表格就是一个记录状态-动作价值 $Q(s,a)$ 的表。$Q(s,a)$ 记录的不是单步奖励，而是在当前状态执行某个动作、随后遵循策略时的期望回报。使用一步时序差分方法时，每走一步就更新 $Q$ 表格，不必等到回合结束。
 
-### Monte Carlo Policy Evaluation
+## 免模型预测
 
-**Monte Carlo (MC)** methods interact with the environment to sample complete episodes. They estimate the state values of a given policy $\pi$ by averaging the observed returns.
+### 蒙特卡洛策略评估
 
-The state-value function
+蒙特卡洛（Monte Carlo，MC）方法通过与环境交互，采样完整回合，用实际回报的平均值估计给定策略 π 的状态价值
 
-$$
-V_\pi(s)=\mathbb{E}_\pi[G_t\mid S_t=s]
-$$
+状态价值 $V_\pi(s)=\mathbb{E}_\pi[G_t\mid S_t=s]$ 表示：从状态 s 出发，按照策略 π 行动时，能够获得的期望回报
 
-is the expected return obtained by starting in state $s$ and following policy $\pi$.
+因此，可以反复执行策略 π，记录每次访问状态 s 之后的实际回报，再取平均值。对于终止时刻为 T 的回合，回报为：
 
-We can therefore execute $\pi$ repeatedly, record the actual return following each visit to $s$, and average those returns. For an episode that terminates at time $T$, the return is
+$G_t=r_{t+1}+\gamma r_{t+2}+\cdots+\gamma^{T-t-1}r_T$
 
-$$
-G_t=r_{t+1}+\gamma r_{t+2}+\cdots+\gamma^{T-t-1}r_T.
-$$
+每个回合结束后，计算所访问状态对应的回报。对状态 s，维护访问次数 N(s) 和累计回报 S(s)：
 
-At the end of each episode, compute the returns for the visited states. For each state $s$, maintain a visit count $N(s)$ and an accumulated return $S(s)$:
+- $N(s)\leftarrow N(s)+1$；
+- $S(s)\leftarrow S(s)+G_t$；
+- $V(s)=S(s)/N(s)$
 
-- $N(s)\leftarrow N(s)+1$;
-- $S(s)\leftarrow S(s)+G_t$;
-- $V(s)=S(s)/N(s)$.
+在策略固定、相关状态得到充分采样等条件下，随着样本数量增加，估计值会趋近真实价值 $V_\pi(s)$
 
-When the policy is fixed and the relevant states are sampled sufficiently often, the estimates approach the true values $V_\pi(s)$ as the number of samples increases.
-
-Using the incremental mean formula $\mu_n=\mu_{n-1}+\frac{1}{n}(x_n-\mu_{n-1})$, we can update the value directly without storing the accumulated return:
+利用增量均值公式 $\mu_n=\mu_{n-1}+\frac{1}{n}(x_n-\mu_{n-1})$，可以直接更新价值，无须保存累计回报：
 
 $$
-V(s)\leftarrow V(s)+\frac{1}{N(s)}[G_t-V(s)].
+V(s)\leftarrow V(s)+\frac{1}{N(s)}[G_t-V(s)]
 $$
 
-We can also replace the step size $1/N(s)$ with a learning rate $\alpha$:
+可以将步长 $1/N(s)$ 替换为学习率 α：$V(s)\leftarrow V(s)+\alpha[G_t-V(s)]$
+
+其中，$G_t-V(s)$ 是实际回报与当前估计之间的误差。每次更新都让 V(s) 向实际回报靠近一些。步长为 $1/N(s)$ 时得到算术平均；固定 α 时则更重视近期样本
+
+### 时序差分
+
+一步时序差分TD(0)是最简单的算法，每往前走一步，就做一步自举，回报满足 $G_t=r_{t+1}+\gamma G_{t+1}$。虽然还不知道后续的实际回报 $G_{t+1}$，但可以用当前估计的 $V(s_{t+1})$ 代替它，因此每走一步就能更新：
 
 $$
-V(s)\leftarrow V(s)+\alpha[G_t-V(s)].
+V(s_t)\leftarrow V(s_t)+\alpha[r_{t+1}+\gamma V(s_{t+1})-V(s_t)]
 $$
 
-Here, $G_t-V(s)$ is the error between the observed return and the current estimate. Each update moves $V(s)$ a little closer to the observed return. The step size $1/N(s)$ produces the arithmetic mean; a constant $\alpha$ gives more weight to recent samples.
+$r_{t+1}+\gamma V(s_{t+1})$是时序差分目标，由实际获得的即时奖励和后继状态的估计价值组成。$\delta_t=r_{t+1}+\gamma V(s_{t+1})-V(s_t)$是时序差分误差，表示更新目标与当前估计之间的差距
 
-### Temporal-Difference Learning
+更新也可以简写为 $V(s_t)\leftarrow V(s_t)+\alpha\delta_t$，即让当前估计向时序差分目标靠近一些，若下一状态是终止状态，则其价值取 0
 
-One-step temporal-difference learning, **TD(0)**, is the simplest TD method. It bootstraps after every step. The return satisfies $G_t=r_{t+1}+\gamma G_{t+1}$. Although the actual future return $G_{t+1}$ is not yet known, we can replace it with the current estimate $V(s_{t+1})$. This lets us update the value after each transition:
-
-$$
-V(s_t)\leftarrow V(s_t)+\alpha[r_{t+1}+\gamma V(s_{t+1})-V(s_t)].
-$$
-
-The **TD target** is $r_{t+1}+\gamma V(s_{t+1})$: it combines the immediate reward actually received with the estimated value of the successor state. The **TD error** is the difference between this target and the current estimate:
+我们可以把一步时序差分改变步数变成 **n 步时序差分**，先观察 n 步，再用后续状态的估计价值补上剩余回报：
 
 $$
-\delta_t=r_{t+1}+\gamma V(s_{t+1})-V(s_t).
+G_t^{(n)}=r_{t+1}+\gamma r_{t+2}+\cdots+\gamma^{n-1}r_{t+n}+\gamma^nV(s_{t+n})
 $$
 
-The update can therefore be written more compactly as $V(s_t)\leftarrow V(s_t)+\alpha\delta_t$. It moves the current estimate toward the TD target. If the next state is terminal, its value is taken to be zero.
-
-We can extend the one-step method to **$n$-step temporal-difference learning**. First observe $n$ steps, then use the estimated value of the later state to account for the remaining return. When those $n$ steps end before termination, the target is
+更新为
 
 $$
-G_t^{(n)}=r_{t+1}+\gamma r_{t+2}+\cdots+\gamma^{n-1}r_{t+n}+\gamma^nV(s_{t+n}).
+V(s_t)\leftarrow V(s_t)+\alpha[G_t^{(n)}-V(s_t)]
 $$
 
-The update becomes
+$n$ 越大，使用的实际奖励越多，在回合制任务中，当回报覆盖直到终止的所有剩余步骤时，就得到蒙特卡洛更新
+
+### 蒙特卡洛与时序差分方法的比较
+
+- 时序差分可以在线更新，效率高；而蒙特卡洛得要到回合结束才更新
+- 时序差分可以从不完整序列上学习；而蒙特卡洛方法不行
+- 时序差分可以在没有终止状态的持续任务中学习；而蒙特卡洛只能在有终止的环境下学习
+- 时序差分利用马尔可夫性质，用当前状态的价值概括后续回报；蒙特卡洛方法则直接使用完整轨迹的实际回报
+
+## 免模型控制
+
+在不知道环境模型，即不知道奖励函数 $R(s,a)$ 和状态转移概率 $P(s'\mid s,a)$ 时，无法直接计算 $Q$ 函数，因此可以使用蒙特卡洛法，通过与环境交互得到的完整回合来估计动作价值函数 $Q_\pi(s,a)$。
+
+广义策略迭代主要包含两个不断交替的过程：先固定当前策略 $\pi$，通过蒙特卡洛采样估计 $Q_\pi$，再根据当前 $Q$ 函数进行贪心更新
 
 $$
-V(s_t)\leftarrow V(s_t)+\alpha[G_t^{(n)}-V(s_t)].
+\pi'(s)\in\arg\max_a Q_\pi(s,a)
 $$
 
-Larger values of $n$ use more observed rewards. In an episodic task, once the return extends all the way to termination, there is no remaining value to bootstrap from, and the update becomes a Monte Carlo update.
-
-### Comparing Monte Carlo and Temporal-Difference Methods
-
-- TD updates online after each step, whereas MC waits for the episode to finish before updating.
-- TD can learn from incomplete trajectories, whereas the MC method described here needs complete episodes.
-- TD can learn in continuing tasks without terminal states, whereas episodic MC requires episodes that terminate.
-- TD uses the Markov property and summarizes the remaining return with a successor state's estimated value. MC instead uses the actual return from the complete sampled trajectory.
-
-## Model-Free Control
-
-When the environment model is unknown, neither the reward function $R(s,a)$ nor the transition probabilities $P(s'\mid s,a)$ are available for directly computing action values. We can instead use Monte Carlo methods to estimate the action-value function $Q_\pi(s,a)$ from complete episodes collected through interaction with the environment.
-
-**Generalized policy iteration** alternates between two processes. First, fix the current policy $\pi$ and estimate $Q_\pi$ through Monte Carlo sampling. Then improve the policy greedily with respect to the current action values:
+不断重复：
 
 $$
-\pi'(s)\in\arg\max_a Q_\pi(s,a).
+\pi \rightarrow Q_\pi \rightarrow \pi' \rightarrow Q_{\pi'} \rightarrow \cdots
 $$
 
-Repeat this process:
+在满足适当的探索与评估条件下，策略和价值函数逐渐逼近最优策略 $\pi^*$ 和最优动作价值函数 $Q^*$。
 
-$$
-\pi\;\longrightarrow\;Q_\pi\;\longrightarrow\;\pi'\;\longrightarrow\;Q_{\pi'}\;\longrightarrow\;\cdots
-$$
+为了使用蒙特方法估计动作价值函数 Q，需要保证所有状态-动作对 $(s,a)$ 都能够被充分采样。并且回合要有探索性开始，也就是每个回合从随机的状态-动作对 $(s_0,a_0)$ 开始，并保证任意 $(s,a)$ 都有非零概率被选为起点，从而使所有状态-动作对最终都能被访问
 
-With suitable exploration and evaluation conditions, the policy and value estimates can approach an optimal policy $\pi^*$ and the optimal action-value function $Q^*$.
+<img src="/assets/img/posts/tabular-methods/monte-carlo-exploring-starts.png" alt="采用探索性开始的蒙特卡洛控制伪代码：从随机状态—动作对采样回合，平均回报并贪心地改进策略。" style="display: block; width: min(100%, 760px); height: auto; margin: 1.5rem auto 0.5rem;" />
 
-To estimate action values using MC, we must sample the relevant state-action pairs $(s,a)$ sufficiently often. One approach is **exploring starts**: begin each episode from a randomly selected state-action pair $(s_0,a_0)$, with every relevant pair having a nonzero probability of being selected. This supplies exploration even when subsequent actions follow a deterministic greedy policy.
+在首次访问版本中，只在状态—动作对**此前未在该回合出现过**时更新它。这是上图伪代码中首次访问条件应表达的含义。
 
-<figure>
-  <img src="/assets/img/posts/tabular-methods/monte-carlo-exploring-starts.png" alt="Original Chinese pseudocode for Monte Carlo control with exploring starts: initialize a policy and action values, sample episodes from random state-action pairs, average returns, and improve the policy greedily." style="display: block; width: min(100%, 760px); height: auto; margin: 1.5rem auto 0.5rem;" />
-  <figcaption>Monte Carlo control with exploring starts (original Chinese pseudocode).</figcaption>
-</figure>
+为了兼顾探索和利用，采用 ε-贪心策略：以 $1-\varepsilon$ 的概率选择 Q 值最大的动作，以 ε 的概率从所有动作中均匀随机选择。训练初期多探索，随后逐渐减小 ε，更多地利用已有经验，蒙特卡洛控制不断重复：使用 ε-贪心策略采样完整回合，根据实际回报更新 Q 表格，再根据 Q 表格改进策略。固定相同的 ε，在准确评估 $Q_\pi$ 的前提下，将原 ε-贪心策略更新为关于 $Q_\pi$ 的 ε-贪心策略 π′，可保证 $V_{\pi'}(s)\ge V_\pi(s)$
 
-In the first-visit version, update a state-action pair only if it **has not appeared earlier in the episode**. This is the intended first-visit condition in the pseudocode above.
-
-To balance exploration and exploitation without requiring exploring starts, we can use an **$\varepsilon$-greedy policy**. With probability $1-\varepsilon$, choose an action with the largest Q-value; with probability $\varepsilon$, choose uniformly at random from all available actions. Explore more early in training, then gradually reduce $\varepsilon$ to rely more on existing experience.
-
-Monte Carlo control repeatedly samples a complete episode using the $\varepsilon$-greedy policy, updates the Q-table from the observed returns, and improves the policy using the updated table. For the same fixed $\varepsilon$, if $Q_\pi$ is evaluated accurately, replacing an $\varepsilon$-greedy policy with a policy $\pi'$ that is $\varepsilon$-greedy with respect to $Q_\pi$ guarantees
-
-$$
-V_{\pi'}(s)\ge V_\pi(s).
-$$
-
-<figure>
-  <img src="/assets/img/posts/tabular-methods/monte-carlo-epsilon-greedy.png" alt="Original Chinese pseudocode for epsilon-greedy Monte Carlo control: initialize action values and counts, sample episodes, update action values with incremental means, reduce epsilon, and update the epsilon-greedy policy." style="display: block; width: min(100%, 760px); height: auto; margin: 1.5rem auto 0.5rem;" />
-  <figcaption>Monte Carlo control with epsilon-greedy exploration (original Chinese pseudocode).</figcaption>
-</figure>
+<img src="/assets/img/posts/tabular-methods/monte-carlo-epsilon-greedy.png" alt="采用 ε-贪心探索的蒙特卡洛控制伪代码：采样回合，使用增量均值更新动作价值，并改进策略。" style="display: block; width: min(100%, 760px); height: auto; margin: 1.5rem auto 0.5rem;" />

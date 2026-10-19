@@ -1,367 +1,281 @@
 ---
-title: "CS224N | Language Models and Recurrent Neural Networks"
+title: "CS224N | 语言模型与循环神经网络"
 publishDate: 2026-08-20
 category: learning
 tags: [NLP, CS224N]
-language: en
+language: zh
 description: "CS224n lec4,A note on n-gram and neural language models, recurrent neural networks, bidirectional RNNs, GRUs, and LSTMs."
 heroImage:
   src: /assets/img/posts/neural-network-architectures/transformer-card-cover.png
-  alt: "Sunset cityscape with a figure looking over the skyline"
+  alt: "文章封面"
   color: "#9a7093"
 ---
 
->人间 瞬间 天地之间 下次我 又是谁  
-> You can download the [LaTeX](/output/pdf/language-models-and-recurrent-neural-networks.tex) and [PDF](/output/pdf/language-models-and-recurrent-neural-networks.pdf), and you can also read the [Chinese version](https://notes.sjtu.edu.cn/s/G0gesfJHt) here.
-## Language Models
+<aside class="download-callout" role="note">
+  <p>You can download the <a href="/output/pdf/language-models-and-recurrent-neural-networks.tex">LaTeX</a> and <a href="/output/pdf/language-models-and-recurrent-neural-networks.pdf">PDF</a>.</p>
+</aside>
 
-A language model computes the probability that a sequence of words appears in a particular order. The probability of a sequence of $m$ words, $\{w_1,\ldots,w_m\}$, is denoted by $P(w_1,\ldots,w_m)$. Because the number of words preceding $w_i$ depends on its position in the input document, practical models usually do not condition $P(w_1,\ldots,w_m)$ on the entire history. Instead, they approximate it by conditioning only on the previous $n-1$ words:
+> 人间 瞬间 天地之间 下次我 又是谁
 
-$$
-P(w_1,\ldots,w_m)
-=\prod_{i=1}^{m}P(w_i\mid w_1,\ldots,w_{i-1})
-\approx\prod_{i=1}^{m}P(w_i\mid w_{i-n+1},\ldots,w_{i-1}).
-$$
-
-### n-gram Language Models
-
-We can estimate these probabilities by comparing the count of each n-gram with the count of its prefix. For example, the following equations show the relationship between bigram and trigram models:
+## 语言模型
+语言模型用于计算若干单词以某一特定顺序出现的概率，由 $m$ 个单词组成的序列 $\{w_1,...,w_m\}$ 的概率记为 $P(w_1,\dots,w_m)$，由于单词 $w_i$ 之 前出现的单词数量取决于它在输入文档中的位置，因此在实际计算中， $P(w_1, . . . , w_m)$ 通常不会条件于全部历史单词，而是近似地只条件于之前的 $n-1$ 个单词：
 
 $$
-\begin{aligned}
-p(w_2\mid w_1)
-&=\frac{\operatorname{count}(w_1,w_2)}{\operatorname{count}(w_1)},\\
-p(w_3\mid w_1,w_2)
-&=\frac{\operatorname{count}(w_1,w_2,w_3)}{\operatorname{count}(w_1,w_2)}.
-\end{aligned}
+P(w_1,\ldots,w_m)=\prod_{i=1}^{m}P(w_i\mid w_1,\ldots,w_{i-1})\approx\prod_{i=1}^{m}P(w_i\mid w_{i-n+1},\ldots,w_{i-1})
 $$
 
-This approach allows us to predict the next word from the preceding $n-1$ words, but how long should the context window be? In some cases, the preceding $n$ consecutive words are not enough to capture the true context. This leads to two major problems with n-gram models: **sparsity** and **storage**.
-
-- **Sparsity:** Consider the trigram example above. If $w_1,w_2,w_3$ have never appeared together in the corpus, the estimated probability of $w_3$ is zero. One solution is to add a small value $\delta$ to the count of every word in the vocabulary, a technique known as **smoothing**. If $w_1$ and $w_2$ have never appeared together, the conditional probability of $w_3$ cannot even be computed. In that case, we can condition only on $w_2$, a technique known as **backoff**. Sparsity becomes increasingly severe as $n$ grows, so in practice $n\le 5$ is common.
-- **Storage:** We must store the count of every n-gram that appears in the corpus. The required storage therefore grows as either $n$ or the corpus size increases.
-
-### Window-based Neural Language Models
-
-In *A Neural Probabilistic Language Model*, Bengio et al. proposed using a neural network to address the “curse of dimensionality” in language modeling. The model learns distributed word representations while using the vectors of the previous $n$ words to predict a probability distribution over the next word.
-
-![A window-based neural language model](/assets/img/posts/language-models-and-rnns/window-neural-language-model.png)
-
-The model above can be written as
-
-$$
-\hat{y}
-=\operatorname{softmax}\left(
-W^{(2)}\tanh\left(W^{(1)}x+b^{(1)}\right)
-+W^{(3)}x+b^{(3)}
-\right).
-$$
-
-Here, $W^{(1)}$ acts on the word vectors, $W^{(2)}$ acts on the hidden layer, and $W^{(3)}$ acts directly on the word vectors.
-
-![A simplified neural language model](/assets/img/posts/language-models-and-rnns/simplified-neural-language-model.png)
-
-In the simplified model above, the vectors of multiple input words are concatenated:
-
-$$
-e=[e^{(1)};e^{(2)};e^{(3)};e^{(4)}].
-$$
-
-The concatenated vector then passes through a hidden layer, $h=f(We+b_1)$, and finally produces the output distribution $\hat{y}=\operatorname{softmax}(Uh+b_2)$.
-
-## Recurrent Neural Networks (RNNs)
-
-Unlike traditional language models, which use only a fixed-length history window, a recurrent neural network can condition its predictions on information carried by all previous words. The following diagram shows the structure of an RNN.
-
-![The structure of a recurrent neural network](/assets/img/posts/language-models-and-rnns/rnn-structure.png)
-
-Each vertical rectangle represents the hidden layer at time step $t$. A hidden layer contains several neurons, each of which first applies a linear matrix operation and then a nonlinear function. At each time step, the hidden layer receives two inputs: the previous hidden state $h_{t-1}$ and the current input $x_t$. The former is multiplied by the weight matrix $W^{(hh)}$, while the latter is multiplied by $W^{(hx)}$. Together, they produce the hidden representation $h_t$. The hidden state is then multiplied by $W^{(S)}$ and passed through a softmax over the vocabulary to produce the predicted distribution $\hat{y}_t$ for the next word:
+### n-gram 语言模型
+ 为了计算上面的概率，可以把每个n-gram的出现次数与对应单词的频率作比较，这样就得到了n-gram语言模型，比如下面这个例子就是二元模型与三元模型之间的关系
 
 $$
 \begin{aligned}
-h_t
-&=\sigma\left(W^{(hh)}h_{t-1}+W^{(hx)}x_t\right),\\
-\hat{y}_t
-&=\operatorname{softmax}\left(W^{(S)}h_t\right).
+p(w_2\mid w_1)&=\frac{\operatorname{count}(w_1,w_2)}{\operatorname{count}(w_1)}\\
+p(w_3\mid w_1,w_2)&=\frac{\operatorname{count}(w_1,w_2,w_3)}{\operatorname{count}(w_1,w_2)}
 \end{aligned}
 $$
 
-The same $W^{(hh)}$ and $W^{(hx)}$ are reused at every time step. The model therefore has fewer parameters to learn; more importantly, the number of parameters is independent of the input sequence length, avoiding the curse of dimensionality.
+我们发现了可以用前 $n-1$ 个单词来预测第 $n$ 个单词，但是上下文窗口到底应该多长，在有些情况连续的前 $n$ 个单词不足以捕获真正的上下文。因此这就引出了n-gram模型两个主要的问题，**稀疏性**和**存储**
 
-### RNN Loss and Perplexity
+- n-gram模型的稀疏性问题：回顾上面提到的三元模型的例子，如果 $w_1,w_2,w_3$ 从未在语料库中共同出现，则 $w_3$ 的概率会被估计为0，一种解决方法是给词表中每个词的计数加一个很小的 $\delta$，这称为平滑。我们继续回顾这个等式，如 果 $w_1$ 和 $w_2$ 从未同时出现，那么 $w_3$ 的条件概率甚至无法计算。对此可以退而只条件于 $w_2$，这称为**回退**。随着 $n$ 增大，稀疏性会越来越严重，因此通常取 $n \le 5$
+-  n-gram语言模型中的存储问题：我们需要保存语料库中出现过的所有n-gram的计数。因此当 $n$ 增大，或者语料库规模增大时，模型所需的存储空间也会随之增加。
 
-RNNs commonly use the cross-entropy loss introduced in the previous notes. At time step $t$, summing over the entire vocabulary gives
+### 基于窗口的神经语言模型
+Bengio 等人在 *A Neural Probabilistic Language Model* 中提出使用神经网络处理语言模型中的“维数灾难”问题。模型同时学习单词的分布式表示，并利用前 $n$ 个单词的词向量预测下一个单词的概率分布。
 
-$$
-\mathcal{J}^{(t)}(\theta)
-=-\sum_{j=1}^{\lvert V\rvert}y_{t,j}\log\hat{y}_{t,j}.
-$$
+![基于窗口的神经语言模型](/assets/img/posts/language-models-and-rnns/window-neural-language-model.png)
 
-For a corpus of size $T$, the overall cross-entropy is
-
-$$
-J
-=\frac{1}{T}\sum_{t=1}^{T}\mathcal{J}^{(t)}(\theta)
-=-\frac{1}{T}\sum_{t=1}^{T}\sum_{j=1}^{\lvert V\rvert}
-y_{t,j}\log\hat{y}_{t,j}.
-$$
-
-The following equation defines **perplexity**. When the logarithm in the cross-entropy is base $2$, perplexity is the exponential form of that cross-entropy:
+上图模型可写为
 
 $$
-\operatorname{Perplexity}=2^J.
+\hat{y}=\operatorname{softmax}\left(W^{(2)}\tanh(W^{(1)}x+b^{(1)})+W^{(3)}x+b^{(3)}\right)
 $$
 
-Lower perplexity means that the model is more confident in its predictions of the next word and, in general, agrees more closely with the observed sequence.
+其中，$W^{(1)}$ 作用于词向量，$W^{(2)}$ 作用于隐藏层，$W^{(3)}$ 直接作用于词向量。
 
-### Limitations of RNNs
+![简化的神经语言模型](/assets/img/posts/language-models-and-rnns/simplified-neural-language-model.png)
 
-RNNs are not a universal solution. They have several limitations:
-
-- Computation is slow because it proceeds sequentially and is difficult to parallelize.
-- In practice, it is difficult to use information from the distant past effectively, partly because of vanishing and exploding gradients.
-
-### Vanishing and Exploding Gradients
-
-An RNN repeatedly propagates the same weight matrix from one time step to the next. One of its goals is to carry contextual information across long temporal distances. However, information from much earlier time steps may disappear during backpropagation; this is known as the **vanishing-gradient problem**. The mathematical reason is described below.
-
-To compute the total error gradient with respect to the parameter $W$, we sum the error gradients from all time steps:
+上图简化后，将多个输入单词的词向量拼接为
 
 $$
-\frac{\partial E}{\partial W}
-=\sum_{t=1}^{T}\frac{\partial E_t}{\partial W}.
+e=[e^{(1)};e^{(2)};e^{(3)};e^{(4)}]
 $$
 
-Applying the chain rule to the gradient at a single time step gives
+再经过隐藏层 $h=f(We+b_1)$，最后得到输出分布 $\hat{y}=\operatorname{softmax}(Uh+b_2)$
 
-$$
-\frac{\partial E_t}{\partial W}
-=\sum_{k=1}^{t}
-\frac{\partial E_t}{\partial y_t}
-\frac{\partial y_t}{\partial h_t}
-\frac{\partial h_t}{\partial h_k}
-\frac{\partial h_k}{\partial W}.
-$$
+## 循环神经网络（RNN）
+和传统语言模型只使用有限长度的历史窗口不同，RNN能够让模型条件于此前所有单词所携带的信息
+下图展示了RNN的结构。
 
-Here, $\frac{\partial h_t}{\partial h_k}$ is the gradient of the hidden state at time $t$ with respect to the hidden state at time $k$. By the chain rule,
+![循环神经网络结构](/assets/img/posts/language-models-and-rnns/rnn-structure.png)
 
-$$
-\frac{\partial h_t}{\partial h_k}
-=\prod_{j=k+1}^{t}\frac{\partial h_j}{\partial h_{j-1}}
-=\prod_{j=k+1}^{t}W^\top
-\operatorname{diag}\left[f'(h_{j-1})\right].
-$$
-
-The total gradient is therefore
-
-$$
-\frac{\partial E}{\partial W}
-=\sum_{t=1}^{T}\sum_{k=1}^{t}
-\frac{\partial E_t}{\partial y_t}
-\frac{\partial y_t}{\partial h_t}
-\left(
-\prod_{j=k+1}^{t}\frac{\partial h_j}{\partial h_{j-1}}
-\right)
-\frac{\partial h_k}{\partial W}.
-$$
-
-Suppose that
-
-$$
-\left\lVert W^\top\right\rVert\le\beta_W,
-\qquad
-\left\lVert\operatorname{diag}\left[f'(h_{j-1})\right]\right\rVert
-\le\beta_h.
-$$
-
-Then
-
-$$
-\left\lVert\frac{\partial h_j}{\partial h_{j-1}}\right\rVert
-\le\beta_W\beta_h,
-\qquad
-\left\lVert\frac{\partial h_t}{\partial h_k}\right\rVert
-\le(\beta_W\beta_h)^{t-k}.
-$$
-
-Therefore:
-
-- If $\beta_W\beta_h<1$, the gradient decays exponentially over time, producing a **vanishing gradient**.
-- If $\beta_W\beta_h>1$, the gradient may grow exponentially, producing an **exploding gradient**.
-
-### Remedies for Exploding and Vanishing Gradients
-
-**Exploding gradients**
-
-When the gradient norm exceeds a threshold, we scale the gradient to a fixed range:
-
-$$
-\hat{g}\leftarrow\frac{\partial E}{\partial W},
-\qquad
-\left\lVert\hat{g}\right\rVert\ge\operatorname{threshold}
-\Rightarrow
-\hat{g}\leftarrow
-\frac{\operatorname{threshold}}{\left\lVert\hat{g}\right\rVert}\hat{g}.
-$$
-
-This method is called **gradient clipping**. It preserves the direction of the gradient while limiting its magnitude, preventing excessively large parameter updates.
-
-**Vanishing gradients**
-
-Common approaches include:
-
-- Initialize $W^{(hh)}$ as the identity matrix rather than randomly.
-- Use ReLU instead of sigmoid. The derivative of ReLU is either $0$ or $1$; where it is $1$, the gradient does not continuously decay as it propagates backward through time.
-
-### Deep Bidirectional RNNs
-
-So far, we have focused on RNNs that predict the next word from previous words. By allowing another RNN to read the corpus in reverse, we can also use information from future words. A standard RNN uses only past information, whereas a bidirectional RNN maintains two hidden states:
-
-- $\overrightarrow{h_t}$ propagates from left to right and encodes past information.
-- $\overleftarrow{h_t}$ propagates from right to left and encodes future information.
+每个竖直的矩形框表示时间步 $t$ 上的隐藏层，每个隐藏层包含若干神经元，每个神经元先对输入做线性矩阵运算，再通过非线性函数。在每个时间步，隐藏层有两个输入：上一时间步的隐藏状态 $h_{t-1}$ ，以及当前时间步的输入 $x_t$。前者乘以权重矩阵 $W^{(hh)}$，后者乘以权重矩阵 $W^{(hx)}$，共同产生隐藏特征 $h_t$ ，随后 $h_t$ 再乘以权重矩阵 $W^{(S)}$，并通过词表上的 softmax 得到下一个单词的预测分布 $\hat{y}_t$：
 
 $$
 \begin{aligned}
-\overrightarrow{h_t}
-&=f\left(
-\overrightarrow{W}x_t
-+\overrightarrow{V}\overrightarrow{h}_{t-1}
-+\overrightarrow{b}
-\right),\\
-\overleftarrow{h_t}
-&=f\left(
-\overleftarrow{W}x_t
-+\overleftarrow{V}\overleftarrow{h}_{t+1}
-+\overleftarrow{b}
-\right).
+h_t&=\sigma\left(W^{(hh)}h_{t-1}+W^{(hx)}x_t\right)\\
+\hat{y}_t&=\operatorname{softmax}\left(W^{(S)}h_t\right)
 \end{aligned}
 $$
 
-![A bidirectional RNN](/assets/img/posts/language-models-and-rnns/bidirectional-rnn.png)
+每个时间步中都会重复使用同一组 $W^{(hh)}$ 和 $W^{(hx)}$ 。因此模型需要学习的参数数量更少，更重要的是，参数数量与输入序列的长度无关，避免了维数灾难
 
-The hidden states from the two directions are concatenated to make a prediction:
-
-$$
-\hat{y}_t
-=g\left(U[\overrightarrow{h_t};\overleftarrow{h_t}]+c\right).
-$$
-
-A bidirectional RNN can use context on both sides of the current position, but it must maintain two sets of hidden states and parameters.
-
-**Deep bidirectional RNNs**
-
-RNNs can be stacked into multiple layers. The output of a lower layer becomes the input to the next layer at the same time step. For layer $i$,
+### RNN 的损失与困惑度
+RNN 中常用的损失函数是前面讲义已经介绍过的交叉熵。时间步 $t$ 上，对整个词表求和可以得到
 
 $$
-\begin{aligned}
-\overrightarrow{h_t}^{(i)}
-&=f\left(
-\overrightarrow{W}^{(i)}h_t^{(i-1)}
-+\overrightarrow{V}^{(i)}\overrightarrow{h}_{t-1}^{(i)}
-+\overrightarrow{b}^{(i)}
-\right),\\
-\overleftarrow{h_t}^{(i)}
-&=f\left(
-\overleftarrow{W}^{(i)}h_t^{(i-1)}
-+\overleftarrow{V}^{(i)}\overleftarrow{h}_{t+1}^{(i)}
-+\overleftarrow{b}^{(i)}
-\right).
-\end{aligned}
+\mathcal{J}^{(t)}(\theta)=-\sum_{j=1}^{\lvert V\rvert} y_{t,j}\log \hat{y}_{t,j}
 $$
 
-The two directional hidden states from the highest layer are used for prediction:
+对于大小为 $T$ 的语料，整体交叉熵为
 
 $$
-\hat{y}_t
-=g\left(U[\overrightarrow{h_t}^{(L)};\overleftarrow{h_t}^{(L)}]+c\right).
+J=\frac{1}{T}\sum_{t=1}^{T}\mathcal{J}^{(t)}(\theta)=-\frac{1}{T}\sum_{t=1}^{T}\sum_{j=1}^{\lvert V\rvert}y_{t,j}\log\hat{y}_{t,j}
 $$
 
-![A deep bidirectional RNN](/assets/img/posts/language-models-and-rnns/deep-bidirectional-rnn.png)
+下式给出了**困惑度**。若交叉熵使用以 2 为底的对数，它等于 $2^J$；若使用自然对数，则等于 $e^J$：
 
-## Gated Recurrent Units (GRUs)
+$$
+\mathrm{Perplexity}=2^J
+$$
 
-Beyond these extensions, researchers have found that more complex activation units can improve RNN performance. So far, we have transformed $h_{t-1}$ into $h_t$ using an affine transformation followed by an element-wise nonlinearity. A GRU changes this structure by introducing **gated activation functions**.
+与真实结果相比，困惑度越低，意味着模型对下一个词的预测越有把握
 
-Although an RNN can theoretically capture long-term dependencies, it is difficult to train one to do so reliably in practice. The GRU is designed to preserve memory more easily over long periods, making long-range dependencies easier to capture. It generates the next hidden state $h_t$ from $h_{t-1}$ and $x_t$ in four steps:
+### RNN 的局限性
+RNN当前也不是全能的，它存在以下缺点
 
-1. **Update gate:** Determines how much of the previous hidden state $h_{t-1}$ is retained directly in the current state.
+- 计算较慢，因为计算过程是顺序进行的，难以并行化；
+- 实际中很难有效使用很久以前的信息，原因包括梯度消失和梯度爆炸
 
-   $$
-   z_t=\sigma\left(W^{(z)}x_t+U^{(z)}h_{t-1}\right).
-   $$
+### 梯度消失与梯度爆炸
+RNN会把权重矩阵从一个时间步反复传播到下一个时间步。RNN 的目标之一，就是让上下文信息能够跨越很远的时间距离传递，来自一段时间之前的信息在反向传播的过程中可能消失了，这就叫梯度消失，下面给出梯度消失的数学原因
+在时间步 $t$ ，为了计算 RNN 关于参数 $W$ 的总误差梯度，需要把每个时间步的误差梯度累加
 
-   When $z_t\approx1$, the unit mainly preserves the old memory. When $z_t\approx0$, it mainly uses the new memory.
+$$
+\frac{\partial E}{\partial W}=\sum_{t=1}^{T}\frac{\partial E_t}{\partial W}
+$$
 
-2. **Reset gate:** Determines how much past information is used when generating the new memory.
+对于单个时间步的梯度计算应用链式法则，可写成
 
-   $$
-   r_t=\sigma\left(W^{(r)}x_t+U^{(r)}h_{t-1}\right).
-   $$
+$$
+\frac{\partial E_t}{\partial W}=\sum_{k=1}^{t}\frac{\partial E_t}{\partial y_t}\frac{\partial y_t}{\partial h_t}\frac{\partial h_t}{\partial h_k}\frac{\partial h_k}{\partial W}
+$$
 
-   The smaller $r_t$ is, the more the unit tends to ignore the previous hidden state when generating new memory.
+其中 $\frac{\partial h_t}{\partial h_k}$ 表示第 $t$ 个隐藏状态对第 $k$ 个隐藏状态的梯度。根据链式法则，
 
-3. **New memory generation:** Combines the current input $x_t$ with past information filtered by the reset gate to produce a candidate hidden state.
+$$
+\frac{\partial h_t}{\partial h_k}=\prod_{j=k+1}^{t}\frac{\partial h_j}{\partial h_{j-1}}=\prod_{j=k+1}^{t}W^T\operatorname{diag}\left[f'(h_{j-1})\right]
+$$
 
-   $$
-   \widetilde{h}_t
-   =\tanh\left(r_t\circ Uh_{t-1}+Wx_t\right).
-   $$
+因此总梯度为
 
-4. **Hidden state:** Uses the update gate to form a weighted combination of the old memory $h_{t-1}$ and the new memory $\widetilde{h}_t$.
+$$
+\frac{\partial E}{\partial W}=\sum_{t=1}^{T}\sum_{k=1}^{t}\frac{\partial E_t}{\partial y_t}\frac{\partial y_t}{\partial h_t}\left(\prod_{j=k+1}^{t}\frac{\partial h_j}{\partial h_{j-1}}\right)\frac{\partial h_k}{\partial W}
+$$
 
-   $$
-   h_t
-   =(1-z_t)\circ\widetilde{h}_t
-   +z_t\circ h_{t-1}.
-   $$
+设 $\|W^T\|\leq\beta_W$，$\|\operatorname{diag}[f'(h_{j-1})]\|\leq\beta_h$，则
 
-![The gated structure of a GRU](/assets/img/posts/language-models-and-rnns/gru.png)
+$$
+\left\|\frac{\partial h_j}{\partial h_{j-1}}\right\|\leq\beta_W\beta_h,\qquad
+\left\|\frac{\partial h_t}{\partial h_k}\right\|\leq(\beta_W\beta_h)^{t-k}
+$$
 
-## Long Short-Term Memory Networks (LSTMs)
+因此：
 
-An LSTM controls information flow with an **input gate**, a **forget gate**, and an **output gate**. It also maintains a memory cell $c_t$ that stores long-term information. The LSTM can be understood in the following stages:
+- $\beta_W\beta_h<1$：梯度随时间指数衰减，产生**梯度消失**；
+- $\beta_W\beta_h>1$：梯度可能指数增长，产生**梯度爆炸**。
 
-1. **New memory generation:** Generates candidate memory from the current input $x_t$ and the previous hidden state $h_{t-1}$.
+### 梯度爆炸与梯度消失的解决方法
+**梯度爆炸**
 
-   $$
-   \widetilde{c}_t
-   =\tanh\left(W^{(c)}x_t+U^{(c)}h_{t-1}\right).
-   $$
+当梯度范数超过阈值时，将梯度缩放到固定范围：
 
-2. **Input gate:** Determines how much of the candidate memory $\widetilde{c}_t$ is written to the current memory.
+$$
+\hat g\leftarrow\frac{\partial E}{\partial W},\qquad
+\|\hat g\|\geq\mathrm{threshold}\Rightarrow\hat g\leftarrow\frac{\mathrm{threshold}}{\|\hat g\|}\hat g
+$$
 
-   $$
-   i_t=\sigma\left(W^{(i)}x_t+U^{(i)}h_{t-1}\right).
-   $$
+我们把这个方法称为梯度裁剪，梯度裁剪保留梯度方向，只限制梯度大小，避免参数更新过大
 
-3. **Forget gate:** Determines how much information from the previous memory $c_{t-1}$ is retained.
+**梯度消失**
 
-   $$
-   f_t=\sigma\left(W^{(f)}x_t+U^{(f)}h_{t-1}\right).
-   $$
+常见方法：
 
-4. **Final memory generation:** Combines the retained old memory with the newly written memory to produce the current memory $c_t$.
+- 将 $W^{(hh)}$ 初始化为单位矩阵，而不是随机初始化；
+- 使用 ReLU 替代 sigmoid。ReLU 的导数为 $0$ 或 $1$，在导数为 $1$ 时，梯度不会随时间反向传播而不断衰减
 
-   $$
-   c_t
-   =f_t\circ c_{t-1}
-   +i_t\circ\widetilde{c}_t.
-   $$
+### 深层双向 RNN
+现在我们主要讨论了根据过去的单词预测下一个词的RNN。通过让另一个 RNN 反向读取语料，也可以利用未来单词的信息进行预测，普通 RNN 只利用过去的信息，双向 RNN 同时维护两个隐藏状态：
 
-5. **Output gate and hidden state:** The output gate determines how much of the memory $c_t$ is exposed through the hidden state $h_t$.
+- $\overrightarrow{h_t}$：从左向右传播，编码过去信息；
+- $\overleftarrow{h_t}$：从右向左传播，编码未来信息。
 
-   $$
-   o_t=\sigma\left(W^{(o)}x_t+U^{(o)}h_{t-1}\right),
-   \qquad
-   h_t=o_t\circ\tanh(c_t).
-   $$
+$$
+\overrightarrow{h_t}=f\left(\overrightarrow{W}x_t+\overrightarrow{V}\overrightarrow{h}_{t-1}+\overrightarrow{b}\right),\qquad
+\overleftarrow{h_t}=f\left(\overleftarrow{W}x_t+\overleftarrow{V}\overleftarrow{h}_{t+1}+\overleftarrow{b}\right)
+$$
 
-In summary:
+![双向循环神经网络](/assets/img/posts/language-models-and-rnns/bidirectional-rnn.png)
 
-- $i_t$ controls **how much new information is written**.
-- $f_t$ controls **how much old information is retained**.
-- $o_t$ controls **how much of the current memory is exposed**.
-- $c_t$ is the long-term memory.
-- $h_t$ is the hidden state exposed at the current time step.
+最终将两个方向的隐藏状态拼接后进行预测：
 
-![The gated structure of an LSTM](/assets/img/posts/language-models-and-rnns/lstm.png)
+$$
+\hat y_t=g\left(U[\overrightarrow{h_t};\overleftarrow{h_t}]+c\right)
+$$
+
+双向 RNN 能同时利用当前位置前后的上下文信息，但需要维护两套隐藏状态和参数。
+
+**深层双向 RNN**
+
+RNN 可以堆叠多层，较低层的输出作为上一层在同一时间步的输入。第 $i$ 层有
+
+$$
+\overrightarrow{h_t}^{(i)}=f\left(\overrightarrow{W}^{(i)}h_t^{(i-1)}+\overrightarrow{V}^{(i)}\overrightarrow{h}_{t-1}^{(i)}+\overrightarrow{b}^{(i)}\right),\qquad
+\overleftarrow{h_t}^{(i)}=f\left(\overleftarrow{W}^{(i)}h_t^{(i-1)}+\overleftarrow{V}^{(i)}\overleftarrow{h}_{t+1}^{(i)}+\overleftarrow{b}^{(i)}\right)
+$$
+
+最后使用最高层两个方向的隐藏状态进行预测：
+
+$$
+\hat y_t=g\left(U[\overrightarrow{h_t}^{(L)};\overleftarrow{h_t}^{(L)}]+c\right)
+$$
+
+![深层双向循环神经网络](/assets/img/posts/language-models-and-rnns/deep-bidirectional-rnn.png)
+
+## 门控循环单元（GRU）
+除了上述扩展之外，人们发现使用更复杂的激活单元可以让RNN获得更好的表现。此前，我们一直通过仿射变换加逐点非线性函数，把隐藏状态 $h_{t-1}$ 转换成 $h_t$。这里则通过引入**门控激活函数**来改变RNN的结构
+虽然理论上RNN可以捕获长期依赖，但是实践上很难训练到稳定实现这一点，GRU的设计让记忆更容易长期保持，因此更容易捕获长距离依赖。GRU根据 $h_{t-1}$ 和 $x_t$ 生成下一隐藏状态 $h_t$ 的过程为
+
+1. **更新门**：决定过去的隐藏状态 $h_{t-1}$ 有多少直接保留到当前状态。
+
+$$
+z_t=\sigma(W^{(z)}x_t+U^{(z)}h_{t-1})
+$$
+
+当 $z_t\approx1$ 时，主要保留旧记忆；当 $z_t\approx0$ 时，主要使用新记忆。
+
+2. **重置门**：决定生成新记忆时需要使用多少过去的信息。
+
+$$
+r_t=\sigma(W^{(r)}x_t+U^{(r)}h_{t-1})
+$$
+
+$r_t$ 越小，生成新记忆时越倾向于忽略过去的隐藏状态。
+
+3. **新记忆生成**：将当前输入 $x_t$ 与经过重置门筛选后的过去信息结合，得到候选隐藏状态。
+
+$$
+\tilde h_t=\tanh(r_t\circ Uh_{t-1}+Wx_t)
+$$
+
+4. **隐藏状态**：根据更新门，在旧记忆 $h_{t-1}$ 和新记忆 $\tilde h_t$ 之间进行加权组合。
+
+$$
+h_t=(1-z_t)\circ\tilde h_t+z_t\circ h_{t-1}
+$$
+
+![GRU 的门控结构](/assets/img/posts/language-models-and-rnns/gru.png)
+
+## 长短期记忆网络（LSTM）
+LSTM通过**输入门、遗忘门和输出门**控制信息流，并额外维护记忆单元 $c_t$，用于保存长期信息。
+可以将 LSTM 理解为以下几个阶段：
+
+1. **新记忆生成**：根据当前输入 $x_t$ 和上一时刻隐藏状态 $h_{t-1}$ 生成候选记忆：
+
+$$
+\tilde c_t=\tanh\left(W^{(c)}x_t+U^{(c)}h_{t-1}\right)
+$$
+
+2. **输入门**：决定候选记忆 $\tilde c_t$ 中有多少信息写入当前记忆：
+
+$$
+i_t=\sigma\left(W^{(i)}x_t+U^{(i)}h_{t-1}\right)
+$$
+
+3. **遗忘门**：决定上一时刻记忆 $c_{t-1}$ 中有多少信息被保留：
+
+$$
+f_t=\sigma\left(W^{(f)}x_t+U^{(f)}h_{t-1}\right)
+$$
+
+4. **最终记忆生成**：结合保留的旧记忆和写入的新记忆，得到当前记忆 $c_t$：
+
+$$
+c_t=f_t\circ c_{t-1}+i_t\circ\tilde c_t
+$$
+
+5. **输出门与隐藏状态**：输出门决定记忆 $c_t$ 中有多少信息暴露到隐藏状态 $h_t$：
+
+$$
+o_t=\sigma\left(W^{(o)}x_t+U^{(o)}h_{t-1}\right),\qquad
+h_t=o_t\circ\tanh(c_t)
+$$
+
+其中：
+
+- $i_t$：控制**写入多少新信息**；
+- $f_t$：控制**保留多少旧信息**；
+- $o_t$：控制**输出多少当前记忆**；
+- $c_t$：长期记忆；
+- $h_t$：当前时刻对外输出的隐藏状态。
+
+![LSTM 的门控结构](/assets/img/posts/language-models-and-rnns/lstm.png)

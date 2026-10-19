@@ -1,38 +1,41 @@
 ---
-title: "Two Proofs of the Matrix-Tree Theorem"
+title: "矩阵树定理的两种证明"
 publishDate: 2026-06-25
 category: learning
 tags: [graph-theory]
-language: en
+language: zh
 description: "Two proofs of the Matrix-Tree Theorem—by induction and Cauchy-Binet—showing how determinants count graph spanning trees."
 heroImage:
   src: /assets/img/posts/matrix-tree/matrix-tree-card-cover-v2.png
-  alt: "A diver descending through sunlit blue water"
+  alt: "文章封面"
   color: "#3287bd"
 ---
 
-> You can download the [TeX (LaTeX source)](/output/pdf/two-proofs-of-the-matrix-tree-theorem.tex) and [PDF (PDF file)](/output/pdf/two-proofs-of-the-matrix-tree-theorem.pdf).
-This chapter introduces the Matrix-Tree Theorem and presents two proofs, using induction and the Cauchy-Binet formula, to show how determinants can be used to count spanning trees in a graph.
+<aside class="download-callout" role="note">
+  <p>You can download the <a href="/output/pdf/two-proofs-of-the-matrix-tree-theorem.tex">LaTeX</a> and <a href="/output/pdf/two-proofs-of-the-matrix-tree-theorem.pdf">PDF</a>.</p>
+</aside>
 
-We denote by $A[i]$ the matrix obtained from $A$ by deleting the $i$-th row and the $i$-th column.
+本文介绍矩阵树定理，并分别使用归纳法和 Cauchy–Binet 公式给出两种证明，说明如何通过行列式计算图的生成树数量。
 
-## Kirchhoff's Matrix-Tree Theorem
+用 $A[i]$ 表示从矩阵 $A$ 中删除第 $i$ 行与第 $i$ 列得到的矩阵。
 
-**Theorem (Kirchhoff's Matrix-Tree Theorem).**
+## Kirchhoff 矩阵树定理
 
-The number of spanning trees of a graph $G$ is given by
+**定理（Kirchhoff 矩阵树定理）。**
+
+图 $G$ 的生成树数量为
 
 $$
 \tau(G)=\det(L_G[i]),
 $$
 
-where $i$ can be any vertex.
+其中，$i$ 可以是任意顶点。
 
-Here $L_G$ denotes the Laplacian matrix of $G$.
+这里，$L_G$ 是图 $G$ 的拉普拉斯矩阵。
 
 ## Fact 1
 
-Let $A \in \mathbb{R}^{n \times n}$, and let $E_{ii}$ be the matrix whose $(i,i)$ entry is $1$ and all other entries are $0$. Then
+设 $A \in \mathbb{R}^{n \times n}$，$E_{ii}$ 表示仅在 $(i,i)$ 位置为 $1$、其余位置均为 $0$ 的矩阵，则
 
 $$
 \det(A + E_{ii})
@@ -40,7 +43,7 @@ $$
 \det(A) + \det(A[i]).
 $$
 
-Consider the permutation expansion definition of the determinant:
+考虑行列式的排列展开定义：
 
 $$
 \det(A=(a_{ij}))
@@ -53,17 +56,17 @@ a_{2\pi(2)}
 a_{n\pi(n)}.
 $$
 
-This fact is not difficult to see. We replace the $(i,i)$ entry by $a_{ii}+1$, so we obtain the original determinant plus one extra term.
+这个结论不难看出。将 $(i,i)$ 位置的元素替换为 $a_{ii}+1$ 后，得到原行列式加上一个额外项。
 
-This extra term corresponds exactly to the sum over all permutations on the set $[n]\setminus\{i\}$, namely the determinant obtained by deleting the $i$-th row and the $i$-th column. Hence this term is precisely $\det(A[i])$.
+这个额外项恰好对应集合 $[n]\setminus\{i\}$ 上所有排列的求和，也就是删除第 $i$ 行与第 $i$ 列后得到的行列式，因此它就是 $\det(A[i])$。
 
 ## First Proof
 
-Now we begin the first proof of Kirchhoff's Matrix-Tree Theorem.
+下面开始证明 Kirchhoff 矩阵树定理。
 
-Our first proof proceeds by induction on both the number of vertices and the number of edges of the graph $G$.
+第一种证明同时对图 $G$ 的顶点数和边数进行归纳。
 
-If $G$ is an empty graph with two vertices, then
+如果 $G$ 是一个只有两个顶点、没有边的图，则
 
 $$
 L_G=
@@ -73,41 +76,41 @@ L_G=
 \end{bmatrix}.
 $$
 
-Hence $L_G[i]=[0]$, and
+因此，$L_G[i]=[0]$，并且
 
 $$
 \det(L_G[i])=0,
 $$
 
-which agrees with the theorem.
+与定理一致。
 
-Throughout the proof:
+证明中使用以下记号：
 
-- $\tau(G)$ denotes the number of spanning trees of $G$;
-- $G-e$ denotes the graph obtained by deleting the edge $e$;
-- $G/e$ denotes the graph obtained by contracting the edge $e$, that is, merging its two endpoints into a single vertex.
+- $\tau(G)$ 表示图 $G$ 的生成树数量；
+- $G-e$ 表示从图中删除边 $e$；
+- $G/e$ 表示收缩边 $e$，即将它的两个端点合并为一个顶点。
 
-If $i$ is an isolated vertex, then $G$ has no spanning trees, and the $i$-th row and the $i$-th column of $L_G$ are entirely zero. Therefore
+如果 $i$ 是孤立点，图 $G$ 不存在生成树，$L_G$ 的第 $i$ 行与第 $i$ 列都为零。因此
 
 $$
 \det(L_G[i])=\det(L_{G-i})=0.
 $$
 
-Otherwise, we may assume there exists an edge $e=(i,j)$ adjacent to $i$. For any spanning tree $T$, either $e \in T$ or $e \notin T$, so
+否则，可以假设存在一条与顶点 $i$ 相邻的边 $e=(i,j)$。对于任意生成树 $T$，要么 $e \in T$，要么 $e \notin T$，所以
 
 $$
 \tau(G)=\tau(G/e)+\tau(G-e).
 $$
 
-The first term reduces the number of vertices by $1$, while the second term reduces the number of edges by $1$, so this gives us an induction framework.
+第一项将顶点数减少 $1$，第二项将边数减少 $1$，由此建立归纳框架。
 
-First, we establish the relation between $L_G$ and $L_{G-e}$. Observe that
+先建立 $L_G$ 与 $L_{G-e}$ 的关系。注意到
 
 $$
 L_G[i]=L_{G-e}[i]+E_{jj}.
 $$
 
-That is, after deleting the edge $e$, the only difference between the resulting Laplacian matrix and $L_G[i]$ lies in the degree of vertex $j$. By Fact 1, we obtain
+也就是说，删除边 $e$ 后，得到的矩阵与 $L_G[i]$ 的差异只来自点 $j$ 的度数。利用结论 1，得到
 
 $$
 \begin{aligned}
@@ -118,15 +121,15 @@ $$
 \end{aligned}
 $$
 
-Here $L_G[i,j]$ denotes the matrix obtained by deleting both the $i$-th and $j$-th rows and columns. The last equality holds because once the $i,j$ rows and columns are removed, there is no remaining difference between $L_G$ and $L_{G-e}$.
+其中，$L_G[i,j]$ 表示同时删除第 $i$、$j$ 行与列后得到的矩阵。最后一个等号成立，是因为移除 $i,j$ 所在的行和列后，$L_G$ 与 $L_{G-e}$ 已没有差异。
 
-Next, we establish the relation between $L_G$ and $L_{G/e}$. Suppose we contract vertex $i$ into vertex $j$. Then
+再建立 $L_G$ 与 $L_{G/e}$ 的关系。设将点 $i$ 收缩到点 $j$，则
 
 $$
 L_{G/e}[j]=L_G[i,j].
 $$
 
-Hence
+因此，
 
 $$
 \begin{aligned}
@@ -137,11 +140,11 @@ $$
 \end{aligned}
 $$
 
-The second equality follows from the induction hypothesis, completing the first proof.
+第二个等号来自归纳假设，第一种证明完成。
 
-## Fact 2: Cauchy-Binet Formula
+## Fact 2: Cauchy–Binet 公式
 
-Let
+设
 
 $$
 A \in \mathbb{R}^{n \times m},
@@ -149,12 +152,12 @@ A \in \mathbb{R}^{n \times m},
 B \in \mathbb{R}^{m \times n},
 $$
 
-where $m \ge n$. Define:
+其中 $m \ge n$。定义：
 
-- $A_S$: the submatrix of $A$ consisting of the columns indexed by $S\subseteq[m]$;
-- $B_S$: the submatrix of $B$ consisting of the rows indexed by $S\subseteq[m]$.
+- $A_S$：从 $A$ 中取出由 $S\subseteq[m]$ 指定的列组成的子矩阵；
+- $B_S$：从 $B$ 中取出由 $S\subseteq[m]$ 指定的行组成的子矩阵。
 
-Let $\binom{[m]}{n}$ denote the collection of all subsets of $[m]$ of size $n$. Then
+用 $\binom{[m]}{n}$ 表示 $[m]$ 中所有大小为 $n$ 的子集组成的集合，则
 
 $$
 \det(AB)
@@ -165,39 +168,39 @@ $$
 
 ## Second Proof
 
-Since
+由于
 
 $$
 L_G = \sum_{(i,j) \in E}(e_i - e_j)(e_i-e_j)^T,
 $$
 
-we may write
+可以写成
 
 $$
 L_G=BB^T,
 $$
 
-where $B \in \mathbb{R}^{n \times m}$ is an incidence matrix of $G$. Each edge $(i,j)$ corresponds to a column vector
+其中，$B \in \mathbb{R}^{n \times m}$ 为图 $G$ 的一个关联矩阵。每条边 $(i,j)$ 对应一列向量
 
 $$
 e_i-e_j.
 $$
 
-Since $L_G=BB^T$, this once again proves that $L_G$ is positive semidefinite.
+由于 $L_G=BB^T$，也再次说明 $L_G$ 是半正定矩阵。
 
-If $B[i]$ denotes the matrix obtained by deleting the $i$-th row of $B$, then
+用 $B[i]$ 表示从 $B$ 中删除第 $i$ 行得到的矩阵，则
 
 $$
 L_G[i]=B[i]B[i]^T.
 $$
 
-We further let $B_S[i]$ denote the matrix obtained from $B[i]$ by keeping only the columns indexed by $S\subseteq E$.
+进一步用 $B_S[i]$ 表示从 $B[i]$ 中只保留由 $S\subseteq E$ 指定的列得到的矩阵。
 
-We also need the following lemma.
+我们还需要下面的引理。
 
-**Lemma 2.**
+**引理 2。**
 
-For $S \subseteq E$ with $\lvert S\rvert = n-1$,
+对于满足 $\lvert S\rvert = n-1$ 的 $S \subseteq E$，
 
 $$
 \left|\det(B_S[i])\right|
@@ -208,7 +211,7 @@ $$
 \end{cases}
 $$
 
-With this lemma, the second proof of the Matrix-Tree Theorem becomes extremely short:
+有了这个引理，矩阵树定理的第二种证明非常简短：
 
 $$
 \begin{aligned}
@@ -220,36 +223,36 @@ $$
 \end{aligned}
 $$
 
-Here:
+其中：
 
-- the second equality follows from the Cauchy-Binet formula;
-- the third equality follows from Lemma 2.
+- 第二个等号来自 Cauchy–Binet 公式；
+- 第三个等号来自引理 2。
 
 ## Proof of Lemma 2
 
-Assume without loss of generality that the edges in $B_S[i]$ are oriented arbitrarily. That is, we may replace the column corresponding to an edge $(i,j)$ from $e_i-e_j$ to $e_j-e_i$.
+不失一般性，给 $B_S[i]$ 中的边任意指定方向。也就是说，可以将边 $(i,j)$ 对应的列从 $e_i-e_j$ 改为 $e_j-e_i$。
 
-This only changes the sign of the determinant, so it does not change the absolute value.
+这样只会改变行列式的符号，不会改变其绝对值。
 
-If $S\subseteq E$, $\lvert S\rvert=n-1$, and $S$ is not a spanning tree, then $S$ necessarily contains a cycle. We may orient the edges along this cycle.
+若 $S\subseteq E$、$\lvert S\rvert=n-1$，且 $S$ 不是生成树，则 $S$ 必然包含一个环。可以将环上各边的方向沿环统一。
 
-If we sum the columns corresponding to this cycle, we obtain the zero vector. Hence the columns of $B_S[i]$ are linearly dependent, and therefore
+将这个环对应的各列相加，得到零向量。因此，$B_S[i]$ 的列线性相关，从而
 
 $$
 \det(B_S[i])=0.
 $$
 
-Now assume that $S$ is a spanning tree. We prove
+现在设 $S$ 是一棵生成树。下面通过归纳证明
 
 $$
 \left|\det(B_S[i])\right|=1
 $$
 
-by induction on $n$.
+其中归纳变量为 $n$。
 
-### Base Case
+### 基础情况
 
-If $n=2$, then
+若 $n=2$，则
 
 $$
 B_S=
@@ -259,32 +262,32 @@ B_S=
 \end{bmatrix}.
 $$
 
-After deleting one row, we get
+删除一行后，得到
 
 $$
 B_S[i]=[\pm 1],
 $$
 
-and therefore
+因此，
 
 $$
 \left|\det(B_S[i])\right|=1.
 $$
 
-### Inductive Case
+### 归纳步骤
 
-Assume the lemma holds for trees with $n-1$ vertices.
+假设引理对有 $n-1$ 个顶点的树成立。
 
-Let $j\ne i$ be a leaf vertex of the tree, and let $(k,j)$ be the unique edge adjacent to $j$. Such a leaf vertex exists because every tree with at least two vertices has at least two leaves.
+取树中一个叶子节点 $j\ne i$，并令 $(k,j)$ 为与 $j$ 相邻的唯一一条边。这样的叶子节点一定存在，因为每棵至少有两个顶点的树都至少有两个叶子。
 
-Permute rows and columns so that:
+对行与列进行置换，使得：
 
-- the edge $(k,j)$ becomes the last column;
-- the vertex $j$ becomes the last row.
+- 边 $(k,j)$ 成为最后一列；
+- 点 $j$ 成为最后一行。
 
-These permutations may change the sign of the determinant, but they do not affect its absolute value.
+这些置换可能改变行列式的符号，但不影响其绝对值。
 
-Since $j$ is a leaf, the last row has only one nonzero entry. Expanding the determinant along the last row gives
+由于 $j$ 是叶子，最后一行只有一个非零元素。沿最后一行展开行列式，得到
 
 $$
 \left|\det(B_S[i])\right|
@@ -294,7 +297,7 @@ $$
 \right|.
 $$
 
-By the induction hypothesis,
+由归纳假设，
 
 $$
 \left|
@@ -303,10 +306,10 @@ $$
 =1.
 $$
 
-Therefore,
+因此，
 
 $$
 \left|\det(B_S[i])\right|=1.
 $$
 
-This completes the proof of Lemma 2, and hence the second proof of Kirchhoff's Matrix-Tree Theorem.
+引理 2 得证，Kirchhoff 矩阵树定理的第二种证明也随之完成。

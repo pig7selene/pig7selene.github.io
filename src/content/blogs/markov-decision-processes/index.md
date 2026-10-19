@@ -1,25 +1,25 @@
 ---
-title: 'Reinforcement Learning | Markov Decision Processes'
+title: "强化学习 | 马尔可夫决策过程"
 publishDate: 2026-10-13
 category: learning
 tags: [Reinforcement learning]
-language: en
+language: zh
 description: 'Notes on Markov processes, Bellman expectation and optimality equations, optimal policies, policy iteration, and value iteration.'
 heroImage:
   src: /assets/img/posts/multi-armed-bandits/cover.png
-  alt: 'A traveler looking over a desert city and lake at sunset'
+  alt: "文章封面"
   color: '#bd7d77'
 ---
 
 <aside class="download-callout" role="note">
-  <p>You can download the <a href="/output/pdf/markov-decision-processes.tex">LaTeX</a> and <a href="/output/pdf/markov-decision-processes.pdf">PDF</a>, and you can also read the <a href="https://notes.sjtu.edu.cn/s/EAv0SXi2C">Chinese version</a> here.</p>
+  <p>You can download the <a href="/output/pdf/markov-decision-processes.tex">LaTeX</a> and <a href="/output/pdf/markov-decision-processes.pdf">PDF</a>.</p>
 </aside>
 
-## Markov Processes
+## 马尔可夫过程
 
-**The Markov property** states that the future state depends only on the current state, not on the past history.
+**马尔可夫性质**：未来状态只和当前状态有关，和过去的无关
 
-We can use a state-transition matrix $P$ to describe the transition probabilities $p(s_{t+1}=s'\mid s_t=s)$:
+我们可以用状态转移矩阵 $P$ 来描述状态转移 $p(s_{t+1}=s' \mid s_t=s)$：
 
 $$
 P=
@@ -28,42 +28,38 @@ p(s_1\mid s_1) & p(s_2\mid s_1) & \cdots & p(s_N\mid s_1) \\
 p(s_1\mid s_2) & p(s_2\mid s_2) & \cdots & p(s_N\mid s_2) \\
 \vdots & \vdots & \ddots & \vdots \\
 p(s_1\mid s_N) & p(s_2\mid s_N) & \cdots & p(s_N\mid s_N)
-\end{pmatrix}.
+\end{pmatrix}
 $$
 
-## Markov Reward Processes
+## 马尔可夫奖励过程
 
-A Markov reward process adds a reward function to a Markov chain. The reward function gives the expected one-step reward. For an episode with a finite number of steps, the **return** is the discounted sum of rewards. If the rewards after time $t$ are $r_{t+1},r_{t+2},r_{t+3},\ldots$, then the return is
+在马尔可夫链的基础上增加奖励函数，奖励函数给出即时奖励的期望。对于有限回合，回报定义为奖励的折扣叠加。假设时刻 $t$ 后的奖励序列为 $r_{t+1},r_{t+2},r_{t+3},\cdots$，那么回报为
 
 $$
-G_t=r_{t+1}+\gamma r_{t+2}+\gamma^2r_{t+3}+\cdots+\gamma^{T-t-1}r_T.
+r_{t+1} + \gamma r_{t+2} + \gamma ^ 2r_{t+3}+\cdots + \gamma ^ {T-t-1}r_T
 $$
 
-Here, $T$ is the final time step and $\gamma$ is the discount factor. When $0<\gamma<1$, rewards further in the future are discounted more heavily, expressing a preference for rewards received sooner. We define the **state-value function** as the expected return:
+$T$ 是最后时刻，$\gamma$ 是折扣因子，显然越往后折扣越多，说明我们更想要现在的奖励，我们定义状态价值函数为回报的期望，即
 
 $$
 \begin{aligned}
 V^t(s)
 &=\mathbb{E}[G_t\mid s_t=s] \\
-&=\mathbb{E}\left[r_{t+1}+\gamma r_{t+2}+\gamma^2r_{t+3}+\cdots+\gamma^{T-t-1}r_T\mid s_t=s\right].
+&=\mathbb{E}\left[r_{t+1}+\gamma r_{t+2}+\gamma^2 r_{t+3}+\cdots+\gamma^{T-t-1}r_T\mid s_t=s\right]
 \end{aligned}
 $$
 
-The superscript $t$ records the dependence on time in a finite-horizon episode.
+### Bellman 方程
 
-### The Bellman Equation
-
-**The Bellman equation** decomposes the value of a state into two parts: the **expected reward for the next step**, plus the **discounted expected value of the next state**.
-
-For a time-homogeneous process with an infinite discounted horizon, we write the stationary value function as $V(s)$:
+**贝尔曼方程**把状态价值拆成两部分：**当前一步的期望奖励**，加上**下一状态价值的折扣期望**。
 
 $$
-V(s)=R(s)+\gamma\sum_{s'}p(s'\mid s)V(s').
+V(s)=R(s)+\gamma\sum_{s'}p(s'\mid s)V(s')
 $$
 
-Here, $R(s)$ is the expected one-step reward from state $s$, and $p(s'\mid s)$ is the probability of moving from $s$ to $s'$. The term $\gamma\sum_{s'}p(s'\mid s)V(s')$ represents the expected discounted return after the first step. For a finite horizon, the corresponding recursion uses $V^t$ on the left and $V^{t+1}$ on the right, with $V^T(s)=0$.
+其中 $p(s'\mid s)$ 是从 $s$ 转移到 $s'$ 的概率，$\gamma\sum_{s'}p(s'\mid s)V(s')$ 可以看作未来的折扣总和
 
-We can write the Bellman equation in matrix form:
+我们可以把贝尔曼方程写成矩阵的形式
 
 $$
 \begin{pmatrix}
@@ -79,7 +75,8 @@ R(s_2) \\
 \vdots \\
 R(s_N)
 \end{pmatrix}
-+\gamma
++
+\gamma
 \begin{pmatrix}
 p(s_1\mid s_1) & p(s_2\mid s_1) & \cdots & p(s_N\mid s_1) \\
 p(s_1\mid s_2) & p(s_2\mid s_2) & \cdots & p(s_N\mid s_2) \\
@@ -91,97 +88,91 @@ V(s_1) \\
 V(s_2) \\
 \vdots \\
 V(s_N)
-\end{pmatrix}.
+\end{pmatrix}
 $$
 
-Combining the Bellman equations for all states gives $V=R+\gamma PV$. Rearranging yields the **analytical solution**:
+把所有状态的 Bellman 方程合起来，可写成矩阵形式 $V=R+\gamma PV$，移项后得到**解析解**
 
 $$
-V=(I-\gamma P)^{-1}R.
+V=(I-\gamma P)^{-1}R
 $$
 
-For a finite state space and $0\le\gamma<1$, the matrix $I-\gamma P$ is invertible.
+### 状态价值的计算
 
-### Computing State Values
+- 蒙特卡洛：从状态 $s$ 出发采样多条完整轨迹，计算各轨迹的回报并取平均
+- 动态规划：已知奖励和转移概率时，反复迭代 Bellman 方程更新价值，直到收敛，用后继状态的当前价值估计更新前一状态，这称为自举（bootstrapping）。
 
-- **Monte Carlo:** Starting from state $s$, sample multiple complete trajectories, compute the return of each trajectory, and average those returns.
-- **Dynamic programming:** When the rewards and transition probabilities are known, repeatedly apply the Bellman equation to update the values until they converge. Updating a state's value using the current estimates of its successor states is called **bootstrapping**.
+## 马尔可夫决策过程
 
-## Markov Decision Processes
+### MDP 与 MRP
 
-### MDPs and MRPs
+MRP是直接在 $S$ 中选择下一个的状态，而 MDP 先经过动作集，从动作 $a$ 再转移，所以 MDP 的下一步动作是由智能体来决定的
 
-In an MRP, the next state is sampled directly from the transition distribution over the state space $S$. In an MDP, an action comes first: the agent chooses an action $a$, and the next state is then sampled according to the transition distribution conditioned on both the state and the action. A policy $\pi(a\mid s)$ describes how the agent chooses actions in state $s$.
+<img src="/assets/img/posts/markov-decision-processes/mrp-mdp-transitions.png" alt="MRP 直接从状态转移到后继状态；MDP 先根据策略选择动作，再转移到后继状态。" style="display: block; width: min(100%, 680px); height: auto; margin: 1.5rem auto;" />
 
-<img src="/assets/img/posts/markov-decision-processes/mrp-mdp-transitions.png" alt="An MRP transitions directly from a state to a successor state; an MDP first chooses an action according to a policy, then transitions to a successor state." style="display: block; width: min(100%, 680px); height: auto; margin: 1.5rem auto;" />
+### Bellman 期望方程
 
-### The Bellman Expectation Equations
-
-For a fixed policy $\pi$, $V_\pi(s)$ is the expected return when we start in state $s$ and follow $\pi$. The action-value function $Q_\pi(s,a)$ is the expected return when we first take action $a$ in state $s$ and then follow $\pi$. They satisfy
+固定策略 $\pi$ 后，$V_\pi(s)$ 是从状态 $s$ 出发遵循 $\pi$ 的期望回报；$Q_\pi(s,a)$ 是在 $s$ 先执行 $a$、之后遵循 $\pi$ 的期望回报。两者满足
 
 $$
 \begin{aligned}
-V_\pi(s)&=\sum_a\pi(a\mid s)Q_\pi(s,a), \\
+V_\pi(s)&=\sum_a\pi(a\mid s)Q_\pi(s,a),\\
 Q_\pi(s,a)&=R(s,a)+\gamma\sum_{s'}p(s'\mid s,a)V_\pi(s').
 \end{aligned}
 $$
 
-Here, $R(s,a)$ is the expected one-step reward for taking action $a$ in state $s$.
-
-Substituting the first equation into the second gives a Bellman expectation equation involving only $Q_\pi$:
+将第一个式子代入第二个式子，可得到只含 $Q_\pi$ 的 Bellman 期望方程
 
 $$
 Q_\pi(s,a)=R(s,a)+\gamma\sum_{s'}p(s'\mid s,a)
 \sum_{a'}\pi(a'\mid s')Q_\pi(s',a').
 $$
 
-Similarly, we obtain a Bellman expectation equation involving only $V_\pi$:
+同理可得只含 $V_\pi$ 的 Bellman 期望方程
 
 $$
 V_\pi(s)=\sum_a\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}p(s'\mid s,a)V_\pi(s')\right].
 $$
 
-## Optimal Policies
+## 最优策略
 
-### The Optimal Value Function
+### 最优价值函数
 
-The **optimal value function** is defined as $V^*(s)=\max_\pi V_\pi(s)$. An optimal policy $\pi^*$ attains this value for every state. Once we have the optimal action-value function $Q^*$, we can obtain an optimal policy by maximizing $Q^*$ in each state. Choose an action $a^*(s)\in\arg\max_{a\in A}Q^*(s,a)$, selecting one maximizer if there is a tie. The resulting deterministic policy is
+最佳价值函数定义为 $V^*(s)=\max_{\pi}V_{\pi}(s)$。达到最佳价值的策略称为最佳策略。当取得最佳动作价值函数后，我们可以在每个状态选择一个使 $Q^*(s,a)$ 最大的动作 $a^*(s)$，得到确定性的最佳策略：
 
 $$
 \pi^*(a\mid s)=
 \begin{cases}
-1, & a=a^*(s), \\
-0, & \text{otherwise}.
+1, & a=a^*(s) \\
+0, & \text{otherwise}
 \end{cases}
 $$
 
-We now introduce two common methods for finding an optimal policy: **policy iteration** and **value iteration**. The following updates use the same finite-state, discounted setting as above.
+这里介绍两种常用的搜索最佳策略的方法，策略迭代和价值迭代
 
-### Policy Iteration
+### 策略迭代
 
-Policy iteration consists of two important steps: **policy evaluation** and **policy improvement**.
+策略迭代包含两个重要的步骤，策略评估和策略提升
 
-Policy evaluation computes the state-value function of a policy. We then use those values to improve the policy, which is the policy improvement step. Policy iteration alternates between these steps until it converges to an optimal policy. Let us look at the two steps more closely.
+策略评估用来计算一个策略的状态价值函数，然后据此改进这个策略，也就是策略提升，因此策略迭代的过程就是不断进行策略评估和策略提升，不断迭代直到收敛到最佳，接下来细讲一下策略评估和策略提升是怎么做的
 
-**Policy evaluation:** Fix a policy $\pi$ and repeatedly update state values using the Bellman expectation equation:
+策略评估：固定策略 π，反复用 Bellman 期望方程更新状态价值：
 
 $$
 V_{k+1}(s)=\sum_a\pi(a\mid s)
 \left[R(s,a)+\gamma\sum_{s'}p(s'\mid s,a)V_k(s')\right].
 $$
 
-**Policy improvement:** Using the values obtained from evaluation, choose an action with the highest expected return in each state:
+策略提升：根据评估得到的价值，在每个状态选择预期回报最高的动作：
 
 $$
-\pi'(s)\in\arg\max_a
+\pi'(s)=\arg\max_a
 \left[R(s,a)+\gamma\sum_{s'}p(s'\mid s,a)V_\pi(s')\right].
 $$
 
-Here, $\pi'(s)$ denotes the action chosen by the improved deterministic policy. When actions tie, retaining the current action if it is a maximizer avoids unnecessary policy changes.
+### Bellman 最优方程
 
-### The Bellman Optimality Equations
-
-The optimal state value and optimal action value satisfy
+最优状态价值与最优动作价值满足：
 
 $$
 V^*(s)=\max_a Q^*(s,a),
@@ -191,7 +182,7 @@ $$
 Q^*(s,a)=R(s,a)+\gamma\sum_{s'}p(s'\mid s,a)V^*(s').
 $$
 
-Combining the two equations gives two common forms:
+将两式结合，得到两种常见形式：
 
 $$
 V^*(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}p(s'\mid s,a)V^*(s')\right],
@@ -201,30 +192,30 @@ $$
 Q^*(s,a)=R(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\max_{a'}Q^*(s',a').
 $$
 
-After computing the optimal values, choosing an action that maximizes $Q^*$ in each state gives an optimal policy:
+求出最优价值后，在每个状态选择使 Q* 最大的动作，就得到最优策略：
 
 $$
 \pi^*(s)\in\arg\max_a Q^*(s,a).
 $$
 
-### Value Iteration
+### 价值迭代
 
-Value iteration updates each state's value once per iteration and directly selects the action with the largest value during that update:
+价值迭代则在每轮只更新一次各状态的价值，并在更新时直接选择价值最大的动作
 
 $$
 V_{k+1}(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}p(s'\mid s,a)V_k(s')\right].
 $$
 
-Starting from an arbitrary initial value function $V_0$, repeatedly apply this update to every state until the change between successive iterations is sufficiently small. At that point, $V$ is close to the optimal state-value function $V^*$. We then choose a policy greedily with respect to the resulting value estimates. With the exact optimal values, this gives
+从任意初始价值 V₀ 开始，对所有状态反复应用这个更新式，直到前后两轮的价值变化足够小。此时 V 接近最优状态价值 V*，再据此选出策略：
 
 $$
 \pi^*(s)\in\arg\max_a
 \left[R(s,a)+\gamma\sum_{s'}p(s'\mid s,a)V^*(s')\right].
 $$
 
-### Comparing Policy Iteration and Value Iteration
+### 策略迭代与价值迭代的比较
 
-- **Policy iteration:** Fix the current policy, repeatedly evaluate its value, and then improve it using the evaluation results. Alternate between evaluation and improvement until the policy no longer changes.
-- **Value iteration:** Update each state's value once per iteration, choosing the action with the largest value under the current estimates. Repeat these updates until the values converge.
+- **策略迭代（Policy Iteration）**：固定当前策略，反复评估其价值，再根据评估结果提升策略；交替进行，直到策略不再改变。
+- **价值迭代（Value Iteration）**：每轮只更新一次各状态的价值，并直接选择当前估计下价值最大的动作；反复更新，直到价值收敛。
 
-Policy iteration evaluates each policy more thoroughly before improving it, which can make its progress more stable. Value iteration is more like a greedy update at each step. Which method to choose depends on the setting.
+策略迭代更稳健，评估充分，价值迭代有点像贪心，具体怎么选得看情况
