@@ -111,3 +111,45 @@ $$
 为了兼顾探索和利用，采用 ε-贪心策略：以 $1-\varepsilon$ 的概率选择 Q 值最大的动作，以 ε 的概率从所有动作中均匀随机选择。训练初期多探索，随后逐渐减小 ε，更多地利用已有经验，蒙特卡洛控制不断重复：使用 ε-贪心策略采样完整回合，根据实际回报更新 Q 表格，再根据 Q 表格改进策略。固定相同的 ε，在准确评估 $Q_\pi$ 的前提下，将原 ε-贪心策略更新为关于 $Q_\pi$ 的 ε-贪心策略 π′，可保证 $V_{\pi'}(s)\ge V_\pi(s)$
 
 <img src="/assets/img/posts/tabular-methods/monte-carlo-epsilon-greedy.png" alt="采用 ε-贪心探索的蒙特卡洛控制伪代码：采样回合，使用增量均值更新动作价值，并改进策略。" style="display: block; width: min(100%, 760px); height: auto; margin: 1.5rem auto 0.5rem;" />
+
+### Sarsa算法
+
+Sarsa 把原本时序差分的 $V$ 换成了 $Q$ 
+$$
+Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left[r_{t+1} + \gamma Q(s_{t+1}, a_{t+1}) - Q(s_t, a_t)\right]
+$$
+Sarsa的更新公式如下
+$$
+Q(S,A) \leftarrow Q(S,A) + \alpha \left(R + \gamma Q(S',A') - Q(S,A)\right)
+$$
+同理，我们也可以得到 $n$ 步Sarsa的回报函数和更新过程
+$$
+Q_t^\lambda = (1-\lambda)\sum_{n=1}^{\infty}\lambda^{n-1}Q_t^n \\
+Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left(Q_t^\lambda - Q(s_t, a_t)\right)
+$$
+
+### Q-learning 算法
+
+Q学习算法有两种策略，行为策略和目标策略，目标策略 $\pi$ 直接在Q表格上做贪心
+$$
+\pi(s_{t+1}) = \arg\max_{a'} Q(s_{t+1}, a')
+$$
+行为策略 $\mu$ 我们采用 $\epsilon$-贪心策略，我们可以构造 Q学习 目标，Q学习的下一个动作都是通过 arg max 操作选出来的
+$$
+\begin{aligned}
+r_{t+1} + \gamma Q(s_{t+1}, A')
+&= r_{t+1} + \gamma Q\left(s_{t+1}, \arg\max_{a'} Q(s_{t+1}, a')\right) \\
+&= r_{t+1} + \gamma \max_{a'} Q(s_{t+1}, a')
+\end{aligned}
+$$
+接着我们就可以写出更新过程了
+$$
+Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left[r_{t+1} + \gamma \max_a Q(s_{t+1}, a) - Q(s_t, a_t)\right]
+$$
+
+
+### Sarsa和Q学习的区别
+
+这两个算法一个是同策略算法，一个是异策略算法， 所以最大区别就是Sarsa只用一个策略学习和交互，而Q学习有两套策略，目标策略用来制定一个相对保守的计划，但是目标策略并不会与环境交互，行为策略用来和环境交互，把数据再喂给目标策略
+
+Sarsa 和 Q-learning 更新过程的区别在于更新 Q 值的目标，Sarsa 使用实际选择的下一步动作，需要 $(S,A,R,S',A')$，因此会考虑探索风险，策略相对保守；Q-learning 直接使用下一状态的最大 Q 值，只需要 $(S,A,R,S')$，不考虑探索动作对更新目标的影响，因此相对激进
